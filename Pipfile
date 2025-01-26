@@ -5,6 +5,13 @@ name = "pypi"
 
 [packages]
 django = "*"
+djangorestframework = "*"
+environ = "*"
+mysqlclient = "==2.2.4"
+django-debug-toolbar = "*"
+django-environ = "*"
+whitenoise = "*"
+django-cors-headers = "*"
 
 [dev-packages]
 

@@ -11,21 +11,30 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+import environ
+
+# Inicjalizacja pliku .env
+env = environ.Env()
+environ.Env.read_env()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+# LOGIN_URL = "/accounts/login/" # Ustawienie przekierowania do strony logowania
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-$g+*cr*-7kobo$#mlrdkjuvbyjedyjvt2!kit5ro!f-(v(!m1z'
+SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    '127.0.0.1', # IP localhosta
+    '88.99.97.188' # IP Serwera
+]
 
 
 # Application definition
@@ -36,17 +45,33 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'whitenoise.runserver_nostatic', # Narzędzie do wczytywania statycznych plików
     'django.contrib.staticfiles',
+    'debug_toolbar', # Narzędzie debugowania
+    'corsheaders', # Narzędzie do obsługi API za pomocą CORS
+    # MyApps
+    'main', # Główna aplikacja
 ]
 
 MIDDLEWARE = [
+    'debug_toolbar.middleware.DebugToolbarMiddleware', # Narzędzie do debugowania, działa jedynie na localhostcie
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware', # Narzędzie do wczytywania statycznych plików
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware', # Narzędzie do obsługi API za pomocą CORS
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    "django.contrib.auth.middleware.LoginRequiredMiddleware", # Powoduje potrzebe logowania aby korzystać ze strony
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.middleware.locale.LocaleMiddleware', # Odczytuje język przeglądarki i dostosowuje stronę do tego języka
+]
+
+INTERNAL_IPS = [
+    # ...
+    '127.0.0.1', # Definiujemy IP localhosta
+    # ...
 ]
 
 ROOT_URLCONF = 'forumSamorzadu.urls'
@@ -75,8 +100,14 @@ WSGI_APPLICATION = 'forumSamorzadu.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',   # Silnik bazy danych django
+        'NAME': env('DATABASE_NAME'),           # Nazwa bazy danych brana z pliku .env
+        'USER': env('DATABASE_USER'),           # Nazwa użytkownika brana z pliku .env
+        'PASSWORD': env('DATABASE_PASSWORD'),   # Hasło brane z pliku .env
+        'HOST': 'localhost',                    # Adres serwera
+        'PORT': '3306',                         # Port bazy danych
+        'CHARSET': 'utf8_general_ci',           # Kodowanie tekstu
+
     }
 }
 
@@ -103,9 +134,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'pl-pl'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'CET'
 
 USE_I18N = True
 
@@ -115,9 +146,22 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
+# Definiowanie ścieżek plików statyczny oraz systemu ich obsługa w etapie produkcji
 STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+STATICFILES_DIRS = [
+    BASE_DIR / 'static'
+]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# CORS Headers
+
+CORS_ALLOW_ALL_ORIGINS = True # SECURITY WARNING: Don't run in production!
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:5173',  # React server
+]

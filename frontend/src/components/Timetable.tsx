@@ -1,5 +1,11 @@
-function Timetable() {
-	return <h1>This is a Timetable (harmonogram) page</h1>;
-}
+import TimetableCalendar from "./calendar/TimetableCalendar";
+import FAB from "./Buttons/FAB";
 
-export default Timetable;
+export default function Timetable() {
+	return (
+		<>
+			<TimetableCalendar />
+			<FAB />
+		</>
+	);
+}

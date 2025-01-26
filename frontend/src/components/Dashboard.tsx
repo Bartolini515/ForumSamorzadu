@@ -3,7 +3,6 @@ import CssBaseline from "@mui/material/CssBaseline";
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 import Grid2 from "@mui/material/Grid2";
-import "../css/Dashboard.css";
 
 export default function Dashboard() {
 	return (

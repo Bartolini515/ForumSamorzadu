@@ -46,7 +46,7 @@ export default function Menu() {
 			</ListItemButton>
 			<ListItemButton
 				onClick={handleClick}
-				selected={path === "/timetable" || path === "/planer"}
+				selected={path === "/timetable" || path === "/tasks"}
 			>
 				<ListItemIcon>
 					<ScheduleIcon />
@@ -74,13 +74,13 @@ export default function Menu() {
 					<ListItemButton
 						sx={{ pl: 3 }}
 						component={Link}
-						to="/planer"
-						selected={path === "/planer"}
+						to="/tasks"
+						selected={path === "/tasks"}
 					>
 						<EditNoteIcon>
 							<StarBorder />
 						</EditNoteIcon>
-						<ListItemText primary="Planer" />
+						<ListItemText primary="Zadania" />
 					</ListItemButton>
 				</List>
 			</Collapse>

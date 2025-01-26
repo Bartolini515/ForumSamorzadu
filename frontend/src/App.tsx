@@ -6,10 +6,10 @@ import Login from "./components/Login";
 import Register from "./components/Register";
 import Schedule from "./components/Schedule";
 import Timetable from "./components/Timetable";
-import Planer from "./components/Planer";
+import Tasks from "./components/Tasks";
 import Navbar from "./components/navbar/Navbar";
 
-function App() {
+export default function App() {
 	return (
 		<>
 			<Navbar
@@ -21,12 +21,10 @@ function App() {
 						<Route path="/register" element={<Register />} />
 						<Route path="/schedule" element={<Schedule />} />
 						<Route path="/timetable" element={<Timetable />} />
-						<Route path="/planer" element={<Planer />} />
+						<Route path="/tasks" element={<Tasks />} />
 					</Routes>
 				}
 			/>
 		</>
 	);
 }
-
-export default App;

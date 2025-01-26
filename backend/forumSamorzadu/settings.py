@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'debug_toolbar', # Narzędzie debugowania
     'corsheaders', # Narzędzie do obsługi API za pomocą CORS
+    'rest_framework', # Narzędzie do obsługi API za pomocą REST
     # MyApps
     'main', # Główna aplikacja
 ]

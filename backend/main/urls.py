@@ -1,6 +1,7 @@
 from django.urls import path
-from . import views
+from rest_framework.routers import DefaultRouter
+from .views import *
 
-urlpatterns = [
-    path('', views.index, name='index'), # Przekierowanie na stronę główną w przypadku wejścia na stronę
-]
+router = DefaultRouter()
+router.register('timetable', TimetableViewset, basename='timetable')
+urlpatterns = router.urls

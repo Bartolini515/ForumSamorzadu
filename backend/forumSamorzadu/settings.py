@@ -63,7 +63,6 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    "django.contrib.auth.middleware.LoginRequiredMiddleware", # Powoduje potrzebe logowania aby korzystać ze strony
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.locale.LocaleMiddleware', # Odczytuje język przeglądarki i dostosowuje stronę do tego języka
@@ -166,3 +165,6 @@ CORS_ALLOW_ALL_ORIGINS = True # SECURITY WARNING: Don't run in production!
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:5173',  # React server
 ]
+
+# User model
+AUTH_USER_MODEL = "main.Profile"

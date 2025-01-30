@@ -10,3 +10,5 @@ createRoot(document.getElementById("root")!).render(
 		</BrowserRouter>
 	</StrictMode>
 );
+
+// TODO : Delete StrictMode

@@ -3,16 +3,31 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import plLocale from "@fullcalendar/core/locales/pl";
 
-export default function Calendar() {
+interface Props {
+	events: {
+		id: string;
+		title: string;
+		start: string;
+		end: string;
+		description: string;
+		className: string;
+	}[];
+	setClickedEventId: any;
+}
+
+export default function Calendar(props: Props) {
 	return (
 		<>
 			<FullCalendar
 				plugins={[dayGridPlugin, interactionPlugin]}
 				initialView="dayGridMonth"
-				events={[{ title: "Event #1", start: "2025-01-27" }]}
-				views={{
-					timeGridSchoolHours: {},
+				events={props.events}
+				eventClick={(clicked_event) => {
+					props.setClickedEventId(clicked_event.event.id);
 				}}
+				// views={{
+				// 	timeGridSchoolHours: {},
+				// }}
 				headerToolbar={{
 					left: "dayGridWeek,dayGridMonth",
 					center: "title",

@@ -12,6 +12,7 @@ import MenuIcon from "@mui/icons-material/Menu";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import Menu from "./Menu";
+import AccountMenu from "./AccountMenu";
 import "../../assets/react.svg";
 
 const drawerWidth = 240;
@@ -94,7 +95,12 @@ export default function Navbar({ content }: NavbarProps) {
 		<Box sx={{ display: "flex" }}>
 			<CssBaseline />
 			<AppBar position="fixed" open={open}>
-				<Toolbar>
+				<Toolbar
+					sx={{
+						flex: { right: 0, left: 0 },
+						justifyContent: "space-between",
+					}}
+				>
 					<IconButton
 						color="inherit"
 						aria-label="open drawer"
@@ -104,11 +110,12 @@ export default function Navbar({ content }: NavbarProps) {
 							{
 								mr: 2,
 							},
-							open && { display: "none" },
+							open && { visibility: "hidden" },
 						]}
 					>
 						<MenuIcon />
 					</IconButton>
+					<AccountMenu />
 				</Toolbar>
 			</AppBar>
 			<Drawer
@@ -126,7 +133,7 @@ export default function Navbar({ content }: NavbarProps) {
 			>
 				<DrawerHeader>
 					<img
-						src="../../assets/react.svg"
+						src="../../assets/react.svg" // TODO: logo SU
 						alt="React Logo"
 						width="32"
 						height="32"

@@ -42,7 +42,6 @@ export default function EventDetails(props: Props) {
 			.then((response) => {
 				setEvents(response.data);
 				handleOpen();
-				props.setAlertOpen(true);
 			})
 			.catch((error: any) => {
 				console.log(error);

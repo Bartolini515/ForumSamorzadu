@@ -35,10 +35,17 @@ class Profile(AbstractUser):
     def __str__(self):
         return self.first_name + ' ' + self.last_name if self.first_name and self.last_name is not None else self.username if self.username is not None else self.email
 
-    
+
+class Event_typesManager(models.Manager):
+    def create_event_type(self, event_type):
+        event_type = self.model(event_type=event_type)
+        event_type.save(using=self._db)
+        return event_type
+
 class Event_types(models.Model):
     event_type = models.CharField(max_length=20, unique=True, null=False, blank=False)
     
+    objects = Event_typesManager()
     def __str__(self):
         return self.event_type
         

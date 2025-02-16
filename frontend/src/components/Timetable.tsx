@@ -5,8 +5,8 @@ import AxiosInstance from "./AxiosInstance";
 import MultipleSelectChip from "./forms/MultiSelectChip";
 import { Box } from "@mui/material";
 import MultiSelectCheckbox from "./forms/MultiSelectCheckbox";
-import EventDetails from "./EventDetails";
-import FilledAlerts from "./alerts/filledAlert";
+import EventDetails from "./modals/EventDetailsModal";
+import FilledAlerts from "./alerts/FilledAlert";
 
 export default function Timetable() {
 	const [events, setEvents] = useState([]);

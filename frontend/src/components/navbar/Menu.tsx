@@ -1,4 +1,3 @@
-import * as React from "react";
 import { Link, useLocation } from "react-router"; // Ensure this is from react-router-dom
 import List from "@mui/material/List";
 import ListItemButton from "@mui/material/ListItemButton";
@@ -13,12 +12,19 @@ import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import ScheduleIcon from "@mui/icons-material/Schedule";
 import SchoolIcon from "@mui/icons-material/School";
 import EditNoteIcon from "@mui/icons-material/EditNote";
+import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
+import { useState } from "react";
 
 export default function Menu() {
-	const [open, setOpen] = React.useState(false);
+	const [openEvents, setOpenEvents] = useState(false);
+	const [openModerator, setOpenModerator] = useState(false);
 
-	const handleClick = () => {
-		setOpen(!open);
+	const handleClickEvents = () => {
+		setOpenEvents(!openEvents);
+	};
+
+	const handleClickModerator = () => {
+		setOpenModerator(!openModerator);
 	};
 
 	const location = useLocation();
@@ -45,16 +51,16 @@ export default function Menu() {
 				<ListItemText primary="Pulpit" />
 			</ListItemButton>
 			<ListItemButton
-				onClick={handleClick}
+				onClick={handleClickEvents}
 				selected={path === "/timetable" || path === "/tasks"}
 			>
 				<ListItemIcon>
 					<ScheduleIcon />
 				</ListItemIcon>
 				<ListItemText primary="Wydarzenia" />
-				{open ? <ExpandLess /> : <ExpandMore />}
+				{openEvents ? <ExpandLess /> : <ExpandMore />}
 			</ListItemButton>
-			<Collapse in={open} timeout="auto" unmountOnExit>
+			<Collapse in={openEvents} timeout="auto" unmountOnExit>
 				<List component="div" disablePadding>
 					<ListItemButton
 						sx={{ pl: 3 }}
@@ -69,7 +75,7 @@ export default function Menu() {
 					</ListItemButton>
 				</List>
 			</Collapse>
-			<Collapse in={open} timeout="auto" unmountOnExit>
+			<Collapse in={openEvents} timeout="auto" unmountOnExit>
 				<List component="div" disablePadding>
 					<ListItemButton
 						sx={{ pl: 3 }}
@@ -95,6 +101,35 @@ export default function Menu() {
 				</ListItemIcon>
 				<ListItemText primary="Plan lekcji" />
 			</ListItemButton>
+
+			<ListItemButton
+				onClick={handleClickModerator}
+				selected={
+					path === "/moderator_panel_users" ||
+					path === "/moderator_panel_event_types"
+				}
+			>
+				<ListItemIcon>
+					<AdminPanelSettingsIcon />
+				</ListItemIcon>
+				<ListItemText primary="Panel moderatora" />
+				{openModerator ? <ExpandLess /> : <ExpandMore />}
+			</ListItemButton>
+			<Collapse in={openModerator} timeout="auto" unmountOnExit>
+				<List component="div" disablePadding>
+					<ListItemButton
+						sx={{ pl: 3 }}
+						component={Link}
+						to="/moderator_panel_tables"
+						selected={path === "/moderator_panel_tables"}
+					>
+						<CalendarMonthIcon>
+							<StarBorder />
+						</CalendarMonthIcon>
+						<ListItemText primary="Zarządzanie danymi" />
+					</ListItemButton>
+				</List>
+			</Collapse>
 		</List>
 	);
 }

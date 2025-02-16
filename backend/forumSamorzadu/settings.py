@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'debug_toolbar', # Narzędzie debugowania
     'corsheaders', # Narzędzie do obsługi API za pomocą CORS
     'rest_framework', # Narzędzie do obsługi API za pomocą REST
+    'knox', # Narzędzie oferujące dodatkową ochronę API
     # MyApps
     'main', # Główna aplikacja
 ]
@@ -160,11 +161,19 @@ STATICFILES_DIRS = [
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # CORS Headers
-
 CORS_ALLOW_ALL_ORIGINS = True # SECURITY WARNING: Don't run in production!
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:5173',  # React server
 ]
 
-# User model
+# User model and auth
 AUTH_USER_MODEL = "main.Profile"
+
+AUTHENTICATION_BACKEND = [
+    'main.auth_backend.EmailAuthBackend'
+]
+
+# REST Framework
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': ('knox.auth.TokenAuthentication',)
+}

@@ -3,10 +3,10 @@ import Box from "@mui/material/Box";
 import Modal from "@mui/material/Modal";
 import Fade from "@mui/material/Fade";
 import { useState, useEffect } from "react";
-import AxiosInstance from "./AxiosInstance";
+import AxiosInstance from "../AxiosInstance";
 import { Button, Typography } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import TasksList from "./lists/TasksList";
+import TasksList from "../lists/TasksList";
 
 const style = {
 	position: "absolute",
@@ -74,7 +74,7 @@ export default function EventDetails(props: Props) {
 								display: "flex",
 								justifyContent: "center",
 								alignItems: "center",
-								marginBottom: 2, // add some margin bottom for better spacing
+								marginBottom: 2,
 							}}
 						>
 							<Typography

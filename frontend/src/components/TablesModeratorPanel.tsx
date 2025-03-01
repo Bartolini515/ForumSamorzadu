@@ -2,7 +2,7 @@ import { Box, Divider, Button } from "@mui/material";
 import ModeratorPanelTable from "./Tables/ModeratorPanelTable";
 import SingleSelectAutoWidth from "./forms/SingleSelectAutoWidth";
 import { useState, useMemo } from "react";
-import CreateUserModal from "./modals/CreateUserEventModal";
+import CreateUserModal from "./modals/CreateUserOrEventModal";
 
 export default function ModeratorPanel() {
 	const [selectedOption, setSelectedOption] = useState<any>("Użytkownicy");

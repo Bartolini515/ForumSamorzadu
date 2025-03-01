@@ -1,18 +1,20 @@
 import { useEffect, useState } from "react";
 import TimetableCalendar from "./calendar/TimetableCalendar";
-import FAB from "./Buttons/FAB";
+import FAB from "./forms/FAB";
 import AxiosInstance from "./AxiosInstance";
 import MultipleSelectChip from "./forms/MultiSelectChip";
 import { Box } from "@mui/material";
 import MultiSelectCheckbox from "./forms/MultiSelectCheckbox";
 import EventDetails from "./modals/EventDetailsModal";
 import FilledAlerts from "./alerts/FilledAlert";
+import CreateEventModal from "./modals/CreateEventModal";
 
 export default function Timetable() {
 	const [events, setEvents] = useState([]);
 	const [options, setOptions] = useState<any>([]);
 	const [selectedOptions, setSelectedOptions] = useState<any>([]);
 	const [clickedEventId, setClickedEventId] = useState<string>("");
+	const [createEventModal, setCreateEventModal] = useState<boolean>(false);
 
 	const [alertOpen, setAlertOpen] = useState<boolean>(false);
 	const [alertMessage, setAlertMessage] = useState<string>("");
@@ -55,6 +57,11 @@ export default function Timetable() {
 	useEffect(() => {
 		GetData();
 	}, []);
+
+	const handleClickFAB = () => {
+		setCreateEventModal(true);
+	};
+
 	return (
 		<>
 			{loading ? (
@@ -105,7 +112,17 @@ export default function Timetable() {
 								setAlertOpen={setAlertOpen}
 							/>
 						)}
-						<FAB />
+						<FAB handleClick={handleClickFAB} />
+						{createEventModal && (
+							<CreateEventModal
+								open={createEventModal}
+								onClose={() => {
+									setCreateEventModal(false);
+									GetData();
+									console.log(createEventModal);
+								}}
+							/>
+						)}
 						{alertOpen && (
 							<FilledAlerts
 								message={alertMessage}

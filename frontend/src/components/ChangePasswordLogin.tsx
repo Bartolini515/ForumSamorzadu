@@ -1,43 +1,43 @@
 import "../App.css";
 import { useState } from "react";
 import { Box, Typography } from "@mui/material";
-import MyTextField from "./forms/MyTextField";
 import MyPassField from "./forms/MyPassField";
 import MyButton from "./forms/MyButton";
-// import { Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import AxiosInstance from "./AxiosInstance";
 import { useNavigate } from "react-router-dom";
-// import MyMessage from "./Message";
 
 interface FormData {
-	email?: string;
 	password?: string;
+	confirmPassword?: string;
 }
 
-export default function Login() {
+export default function ChangePasswordLogin() {
 	const navigate = useNavigate();
 	const { handleSubmit, control, setError } = useForm<FormData>({
 		defaultValues: {
-			email: "",
 			password: "",
+			confirmPassword: "",
 		},
 	});
 	const [showMessage, setShowMessage] = useState(false);
 
 	const submission = (data: FormData) => {
-		AxiosInstance.post(`login/`, {
-			email: data.email,
+		if (data.password !== data.confirmPassword) {
+			setError("confirmPassword", {
+				type: "manual",
+				message: "Hasła się nie zgadzają",
+			});
+			return;
+		}
+		const token = localStorage.getItem("Token");
+
+		AxiosInstance.post(`login/change_password/${token}/`, {
 			password: data.password,
 		})
-
-			.then((response) => {
-				localStorage.setItem("Token", response.data.token);
-				if (response.data.user.last_login === null) {
-					navigate(`/change_password`);
-				} else {
-					navigate(`/dashboard`);
-				}
+			.then((response: any) => {
+				navigate(`/dashboard`);
+				console.log(response);
 			})
 			.catch((error: any) => {
 				console.log(error);
@@ -82,7 +82,7 @@ export default function Login() {
 						variant="h5"
 						sx={{ textAlign: "center", marginBottom: 2, fontWeight: "bold" }}
 					>
-						Logowanie
+						Zmień hasło
 					</Typography>
 
 					{showMessage && (
@@ -93,27 +93,29 @@ export default function Login() {
 								textAlign: "center",
 							}}
 						>
-							Logowanie nie powiodło się, proszę spróbować ponownie.
+							Zmiana hasła nie powiodła się, proszę spróbować ponownie.
 						</Typography>
 					)}
 
 					<Box sx={{ marginBottom: 2 }}>
-						<MyTextField label={"Email"} name={"email"} control={control} />
+						<MyPassField
+							label={"Nowe hasło"}
+							name={"password"}
+							control={control}
+						/>
 					</Box>
 
 					<Box sx={{ marginBottom: 2 }}>
-						<MyPassField label={"Hasło"} name={"password"} control={control} />
+						<MyPassField
+							label={"Potwierdź hasło"}
+							name={"confirmPassword"}
+							control={control}
+						/>
 					</Box>
 
 					<Box sx={{ marginTop: 2 }}>
-						<MyButton label={"Zaloguj"} type={"submit"} />
+						<MyButton label={"Zmień hasło"} type={"submit"} />
 					</Box>
-
-					{/* <Box sx={{ textAlign: "center", marginTop: 2 }}>
-                        <Link href="/request/password_reset" underline="hover">
-                            Forgot password?
-                        </Link>
-                    </Box> */}
 				</Box>
 			</form>
 		</Box>

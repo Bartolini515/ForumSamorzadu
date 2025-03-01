@@ -10,17 +10,15 @@ const AxiosInstance = axios.create({
 	},
 });
 
-AxiosInstance.interceptors.request.use(
-	(config) => {
-		const token = localStorage.getItem("Token");
-		if (token) {
-			config.headers.Authorization = `Token ${token}`;
-		} else {
-			config.headers.Authorization = "";
-		}
-		return config;
+AxiosInstance.interceptors.request.use((config) => {
+	const token = localStorage.getItem("Token");
+	if (token) {
+		config.headers.Authorization = `Token ${token}`;
+	} else {
+		config.headers.Authorization = "";
 	}
-);
+	return config;
+});
 
 AxiosInstance.interceptors.response.use(
 	(response) => {
@@ -29,7 +27,9 @@ AxiosInstance.interceptors.response.use(
 	(error) => {
 		if (error.response && error.response.status === 401) {
 			localStorage.removeItem("Token");
-			window.location.href = "/";
+			if (window.location.pathname !== "/") {
+				window.location.href = "/";
+			}
 		}
 		return Promise.reject(error);
 	}

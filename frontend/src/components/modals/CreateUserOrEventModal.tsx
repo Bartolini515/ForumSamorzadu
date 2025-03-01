@@ -37,8 +37,8 @@ interface FormData {
 	event_type?: string;
 }
 
-export default function CreateUser(props: Props) {
-	const { handleSubmit, control, setError } = useForm<FormData>({
+export default function CreateUserOrEvent(props: Props) {
+	const { handleSubmit, control, setError, clearErrors } = useForm<FormData>({
 		defaultValues: {
 			email: "",
 			password: "",
@@ -65,7 +65,11 @@ export default function CreateUser(props: Props) {
 					handleClose();
 				})
 				.catch((error: any) => {
-					if (error.response && error.response.data) {
+					if (
+						error.response &&
+						error.response.data &&
+						error.response.status === 400
+					) {
 						const serverErrors = error.response.data;
 						Object.keys(serverErrors).forEach((field) => {
 							setError(field as keyof FormData, {
@@ -226,7 +230,7 @@ export default function CreateUser(props: Props) {
 									</Box>
 								</>
 							)}
-							<MyButton label="Stwórz" type="submit" />
+							<MyButton label="Stwórz" type="submit" onClick={clearErrors} />
 						</form>
 					</Box>
 				</Fade>

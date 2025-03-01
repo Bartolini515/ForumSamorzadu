@@ -6,6 +6,9 @@ interface Props {
 	label: string;
 	name: string;
 	control: any;
+	variant?: "standard" | "filled" | "outlined";
+	multiline?: boolean;
+	maxRows?: number;
 }
 
 export default function MyTextField(props: Props) {
@@ -19,7 +22,9 @@ export default function MyTextField(props: Props) {
 					onChange={onChange}
 					value={value || ""}
 					label={props.label}
-					variant="outlined"
+					variant={props.variant || "outlined"}
+					multiline={props.multiline || false}
+					maxRows={props.maxRows || 1}
 					className={"myForm"}
 					error={!!error}
 					helperText={error ? error.message : ""}

@@ -1,3 +1,4 @@
+from datetime import datetime
 from rest_framework import serializers
 from .models import *
 from django.contrib.auth import get_user_model
@@ -8,6 +9,22 @@ User = get_user_model()
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField()
+    
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        ret.pop('password', None)
+        ret['last_login'] = instance.last_login
+        return ret
+    
+class Login_password_changeSerializer(serializers.Serializer):
+    password = serializers.CharField()
+    
+    def validate_password(self, value):
+        try:
+            validate_password(value)
+        except ValidationError as e:
+            raise serializers.ValidationError(e.messages)
+        return value
     
     def to_representation(self, instance):
         ret = super().to_representation(instance)
@@ -59,6 +76,15 @@ class Timetable_eventsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Timetable_events
         fields = ('id', 'title', 'start', 'end', 'className')
+        
+        
+class Timetable_eventsCreateSerializer(serializers.ModelSerializer):
+    # start_date = 
+    # end_date = 
+    
+    class Meta:
+        model = Timetable_events
+        fields = ('id', 'event_name', 'start_date', 'end_date', 'event_type', 'description', 'created_by')
 
 class Timetable_eventsDetailsSerializer(serializers.ModelSerializer):
     title = serializers.CharField(source='event_name')
@@ -106,7 +132,7 @@ class Profiles_moderatorPanelSerializer(serializers.ModelSerializer):
         model = Profile
         fields = ("id", "first_name", "last_name", "email", "last_login", "password")
         
-class Event_types_moderatorPanelSerializer(serializers.ModelSerializer):
+class Event_typesSerializer(serializers.ModelSerializer):
     event_type = serializers.CharField()
     
     def validate_event_type(self, value):

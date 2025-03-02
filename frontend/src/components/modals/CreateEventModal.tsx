@@ -11,6 +11,7 @@ import MyButton from "../forms/MyButton";
 import MyDatePicker from "../forms/MyDatePicker";
 import MySelect from "../forms/MySelect";
 import { useEffect, useState } from "react";
+import { useAlert } from "../../contexts/AlertContext";
 
 const style = {
 	position: "absolute",
@@ -55,6 +56,8 @@ export default function CreateUser(props: Props) {
 
 	const token = localStorage.getItem("Token");
 
+	const { setAlert } = useAlert();
+
 	const submission = (data: FormData) => {
 		if (data.end_date) {
 			const date = new Date(data.end_date);
@@ -63,7 +66,6 @@ export default function CreateUser(props: Props) {
 		}
 		data.start_date = new Date(data.start_date.toISOString().split("T")[0]);
 
-		console.log(data);
 		AxiosInstance.post(`timetable/create/${token}/`, {
 			event_name: data.event_name,
 			start_date: data.start_date,
@@ -71,13 +73,11 @@ export default function CreateUser(props: Props) {
 			event_type: data.event_type,
 			description: data.description,
 		})
-			.then(() => {
+			.then((response) => {
 				props.onClose();
-				console.log("done");
-				console.log(props.onClose);
+				setAlert(response.data.message, "success");
 			})
 			.catch((error: any) => {
-				console.log(error);
 				if (
 					error.response &&
 					error.response.data &&
@@ -90,6 +90,9 @@ export default function CreateUser(props: Props) {
 							message: serverErrors[field][0],
 						});
 					});
+				} else {
+					console.log(error);
+					setAlert(error.message, "error");
 				}
 			});
 	};
@@ -97,12 +100,12 @@ export default function CreateUser(props: Props) {
 	const getEventTypes = () => {
 		AxiosInstance.get("timetable/event_types/")
 			.then((response) => {
-				console.log(response.data);
 				setOptions(response.data);
 				setLoading(false);
 			})
 			.catch((error: any) => {
 				console.log(error);
+				setAlert(error.message, "error");
 			});
 	};
 
@@ -115,7 +118,7 @@ export default function CreateUser(props: Props) {
 	};
 
 	return (
-		<div>
+		<>
 			<Modal
 				aria-labelledby="transition-modal-title"
 				aria-describedby="transition-modal-description"
@@ -271,6 +274,6 @@ export default function CreateUser(props: Props) {
 					)}
 				</Fade>
 			</Modal>
-		</div>
+		</>
 	);
 }

@@ -26,6 +26,7 @@ export default function Calendar(props: Props) {
 		...event,
 		end: correctDate(event.end),
 	}));
+
 	return (
 		<>
 			<FullCalendar

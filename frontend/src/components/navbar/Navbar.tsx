@@ -72,11 +72,11 @@ const DrawerHeader = styled("div")(({ theme }) => ({
 	alignItems: "center",
 	padding: theme.spacing(0, 1),
 	...theme.mixins.toolbar,
-	justifyContent: "space-between", // Changed back to flex-end
+	justifyContent: "space-between",
 }));
 
 interface NavbarProps {
-	content: React.ReactNode; // Define the type for content
+	content: React.ReactNode;
 }
 
 export default function Navbar({ content }: NavbarProps) {

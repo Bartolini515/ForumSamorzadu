@@ -92,11 +92,12 @@ class Timetable_eventsDetailsSerializer(serializers.ModelSerializer):
     end = serializers.DateField(source='end_date')
     className = serializers.StringRelatedField(source='event_type')
     creator = serializers.StringRelatedField(source='created_by')
+    creator_id = serializers.IntegerField(source='created_by_id')
     tasks = TasksSerializer(many=True)
     
     class Meta:
         model = Timetable_events
-        fields = ("id", "title", "start", "end", "className", "description", "creator", "tasks")
+        fields = ("id", "title", "start", "end", "className", "description", "creator", "creator_id", "tasks")
 
 
 class Profiles_moderatorPanelSerializer(serializers.ModelSerializer):

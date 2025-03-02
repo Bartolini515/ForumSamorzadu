@@ -7,6 +7,9 @@ import AxiosInstance from "../AxiosInstance";
 import { Button, Typography } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import TasksList from "../lists/TasksList";
+import MyButton from "../forms/MyButton";
+import { useAuth } from "../../contexts/AuthContext";
+import { useAlert } from "../../contexts/AlertContext";
 
 const style = {
 	position: "absolute",
@@ -24,18 +27,28 @@ const style = {
 interface Props {
 	id: string;
 	setClickedEventId: any;
-	setAlertOpen: any;
+	onClose: () => void;
 }
 
 export default function EventDetails(props: Props) {
 	const [open, setOpen] = useState(false);
+	const { isAdmin } = useAuth();
 	const handleOpen = () => setOpen(true);
 	const handleClose = () => {
 		setOpen(false);
 		props.setClickedEventId("");
+		props.onClose();
+	};
+	const handleDeleteClick = () => {
+		DeleteData();
+	};
+	const handleModifyClick = () => {
+		console.log("Modify");
 	};
 
 	const [events, setEvents] = useState<any>([]);
+
+	const { setAlert } = useAlert();
 
 	const GetData = () => {
 		AxiosInstance.get(`timetable/${props.id}`)
@@ -45,7 +58,19 @@ export default function EventDetails(props: Props) {
 			})
 			.catch((error: any) => {
 				console.log(error);
-				props.setAlertOpen(true);
+				setAlert(error.message, "error");
+			});
+	};
+
+	const DeleteData = () => {
+		AxiosInstance.delete(`timetable/delete/${props.id}/`)
+			.then((response) => {
+				handleClose();
+				setAlert(response.data.message, "success");
+			})
+			.catch((error: any) => {
+				console.log(error);
+				setAlert(error.message, "error");
 			});
 	};
 
@@ -53,7 +78,7 @@ export default function EventDetails(props: Props) {
 		GetData();
 	}, [props.id]);
 	return (
-		<div>
+		<>
 			<Modal
 				aria-labelledby="transition-modal-title"
 				aria-describedby="transition-modal-description"
@@ -189,7 +214,17 @@ export default function EventDetails(props: Props) {
 									}}
 								>
 									<Box sx={{ fontWeight: "bold" }}>Opis: </Box>
-									<Box sx={{ marginLeft: "10px" }}>{events.description}</Box>
+									<Box
+										sx={{
+											marginLeft: "10px",
+											maxHeight: "200px",
+											maxWidth: "100%",
+											overflowY: "auto",
+											overflowWrap: "break-word",
+										}}
+									>
+										{events.description}
+									</Box>
 								</Box>
 							</>
 						) : (
@@ -212,9 +247,26 @@ export default function EventDetails(props: Props) {
 								</Box>
 							</Box>
 						</Box>
+
+						{(events.is_creator || isAdmin) && (
+							<Box sx={{ display: "flex", justifyContent: "space-between" }}>
+								<MyButton
+									label="Usuń"
+									type="button"
+									color="error"
+									onClick={handleDeleteClick}
+								/>
+								<MyButton
+									label="Modyfikuj(WIP)"
+									type="button"
+									color="primary"
+									onClick={handleModifyClick}
+								/>
+							</Box>
+						)}
 					</Box>
 				</Fade>
 			</Modal>
-		</div>
+		</>
 	);
 }

@@ -8,6 +8,12 @@ from django.utils import timezone
 from knox.models import AuthToken
 User = get_user_model()
 
+def message_response(data, message="Operacja się powiodła"):
+    return Response({
+        "result": data,
+        "message": message
+    })
+
 class LoginViewset(viewsets.ViewSet):
     permission_classes = [permissions.AllowAny]
     serializer_class = LoginSerializer
@@ -28,10 +34,12 @@ class LoginViewset(viewsets.ViewSet):
                 _, token=AuthToken.objects.create(user)
                 return Response({
                     'user': self.serializer_class(user).data,
-                    'token': token
+                    'token': token,
+                    'isAdmin': user.is_staff,
+                    'message': "Zalogowano pomyślnie"
                     })
             else:
-                return Response({"error": "Nieprawidłowe dane"}, status=401)
+                return Response({"message": "Nieprawidłowe dane"}, status=401)
         else:
             return Response(serializer.errors, status=400)
         
@@ -45,7 +53,7 @@ class LoginViewset(viewsets.ViewSet):
                 auth_token = AuthToken.objects.get(token_key=token[:15])
                 user = auth_token.user
             except AuthToken.DoesNotExist:
-                return Response({"error": "Invalid token"}, status=400)
+                return Response({"message": "Invalid token"}, status=400)
             
             user.set_password(password)
             user.last_login = timezone.now()
@@ -55,7 +63,7 @@ class LoginViewset(viewsets.ViewSet):
             return Response(serializer.errors, status=400)
 
 class TimetableViewset(viewsets.ViewSet):
-    permission_classes = [permissions.IsAuthenticated] # TODO Tylko na czas testowania
+    permission_classes = [permissions.IsAuthenticated]
     queryset = Timetable_events.objects.all()
     serializer_class = Timetable_eventsSerializer
     
@@ -66,7 +74,38 @@ class TimetableViewset(viewsets.ViewSet):
     
     def retrieve(self, request, pk=None):
         serializer = Timetable_eventsDetailsSerializer(self.queryset.get(pk=pk))
-        return Response(serializer.data)
+        try:
+            token = request.headers['Authorization'][6:21]
+            auth_token = AuthToken.objects.get(token_key=token[:15])
+            user = auth_token.user
+        except AuthToken.DoesNotExist:
+            return Response({"message": "Invalid token"}, status=400)
+        data = serializer.data
+        
+        if data['creator_id'] == user.id:
+            data['is_creator'] = True
+        else:
+            data['is_creator'] = False
+            
+        return Response(data)
+    
+    @action(detail=False, methods=["delete"], url_path="delete/(?P<pk>[^/.]+)")
+    def deleteEvent(self, request, pk=None):
+        try:
+            token = request.headers['Authorization'][6:21]
+            auth_token = AuthToken.objects.get(token_key=token[:15])
+            user = auth_token.user
+        except AuthToken.DoesNotExist:
+            return Response({"message": "Invalid token"}, status=400)
+        
+        serializer = Timetable_eventsDetailsSerializer(self.queryset.get(pk=pk))
+        event = Timetable_events.objects.get(pk=pk)
+        
+        if serializer.data['creator_id'] == user.id or user.is_staff:
+            event.delete()
+            return Response({"message": "Wydarzenie usunięte"})
+        else:
+            return Response({"message": "Użytkownik nie zgodny"}, status=403)
     
     @action(detail=False, methods=["post"], url_path="create/(?P<token>[^/.]+)")
     def createEvent(self, request, token=None):
@@ -79,11 +118,11 @@ class TimetableViewset(viewsets.ViewSet):
                 data['end_date'] = request.data['end_date'][:10]
             data['created_by'] = user.id
         except AuthToken.DoesNotExist:
-            return Response({"error": "Invalid token"}, status=400)
+            return Response({"message": "Invalid token"}, status=400)
         
         serializer = Timetable_eventsCreateSerializer(data=data)
         if serializer.is_valid():
-            return Response(Timetable_eventsDetailsSerializer(serializer.save()).data)
+            return message_response(Timetable_eventsDetailsSerializer(serializer.save()).data, "Wydarzenie utworzone")
         else:
             return Response(serializer.errors, status=400)
         
@@ -94,7 +133,7 @@ class TimetableViewset(viewsets.ViewSet):
         return Response(serializer.data)
     
 class ModeratorPanelViewset(viewsets.ViewSet):
-    permission_classes = [permissions.IsAdminUser] # TODO Tylko na czas testowania
+    permission_classes = [permissions.IsAdminUser]
     queryset = Profile.objects.all()
     serializer_class = Profiles_moderatorPanelSerializer
     
@@ -115,7 +154,7 @@ class ModeratorPanelViewset(viewsets.ViewSet):
         serializer = Event_typesSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data)
+            return message_response(serializer.data, "Dodano typ wydarzenia")
         else:
             return Response(serializer.errors, status=400)
         
@@ -124,7 +163,7 @@ class ModeratorPanelViewset(viewsets.ViewSet):
         serializer = Profiles_moderatorPanelSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data)
+            return message_response(serializer.data, "Dodano użytkownika")
         else:
             return Response(serializer.errors, status=400)
 

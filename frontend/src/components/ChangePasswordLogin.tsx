@@ -6,6 +6,7 @@ import MyButton from "./forms/MyButton";
 import { useForm } from "react-hook-form";
 import AxiosInstance from "./AxiosInstance";
 import { useNavigate } from "react-router-dom";
+import { useAlert } from "../contexts/AlertContext";
 
 interface FormData {
 	password?: string;
@@ -21,6 +22,7 @@ export default function ChangePasswordLogin() {
 		},
 	});
 	const [showMessage, setShowMessage] = useState(false);
+	const { setAlert } = useAlert();
 
 	const submission = (data: FormData) => {
 		if (data.password !== data.confirmPassword) {
@@ -37,10 +39,9 @@ export default function ChangePasswordLogin() {
 		})
 			.then((response: any) => {
 				navigate(`/dashboard`);
-				console.log(response);
+				setAlert(response.data.message, "success");
 			})
 			.catch((error: any) => {
-				console.log(error);
 				setShowMessage(true);
 				if (
 					error.response &&
@@ -54,6 +55,9 @@ export default function ChangePasswordLogin() {
 							message: serverErrors[field][0],
 						});
 					});
+				} else {
+					console.log(error);
+					setAlert(error.message, "error");
 				}
 			});
 	};

@@ -12,6 +12,7 @@ import AxiosInstance from "../AxiosInstance";
 import { useEffect, useState } from "react";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import { red } from "@mui/material/colors";
+import { useAlert } from "../../contexts/AlertContext";
 
 interface Props {
 	headers: string[];
@@ -23,6 +24,7 @@ interface Props {
 export default function ModeratorPanelTable(props: Props) {
 	const [data, setData] = useState<{ id: number; [key: string]: any }[]>([]);
 	const [loading, setLoading] = useState(true);
+	const { setAlert } = useAlert();
 
 	const GetData = () => {
 		AxiosInstance.get(`moderator_panel/${props.option}/`)
@@ -35,6 +37,7 @@ export default function ModeratorPanelTable(props: Props) {
 			})
 			.catch((error: any) => {
 				console.log(error);
+				setAlert(error.message, "error");
 			});
 	};
 
@@ -44,11 +47,13 @@ export default function ModeratorPanelTable(props: Props) {
 
 	const DeleteData = (id: number) => {
 		AxiosInstance.delete(`moderator_panel/${props.option}/delete/${id}/`)
-			.then(() => {
+			.then((response) => {
 				props.setRefresh(true);
+				setAlert(response.data.message, "success");
 			})
 			.catch((error: any) => {
 				console.log(error);
+				setAlert(error.message, "error");
 			});
 	};
 

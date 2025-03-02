@@ -8,6 +8,8 @@ import MyButton from "./forms/MyButton";
 import { useForm } from "react-hook-form";
 import AxiosInstance from "./AxiosInstance";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
+import { useAlert } from "../contexts/AlertContext";
 // import MyMessage from "./Message";
 
 interface FormData {
@@ -24,6 +26,8 @@ export default function Login() {
 		},
 	});
 	const [showMessage, setShowMessage] = useState(false);
+	const { setIsAdmin } = useAuth();
+	const { setAlert } = useAlert();
 
 	const submission = (data: FormData) => {
 		AxiosInstance.post(`login/`, {
@@ -33,14 +37,18 @@ export default function Login() {
 
 			.then((response) => {
 				localStorage.setItem("Token", response.data.token);
+				if (response.data.isAdmin) {
+					setIsAdmin(response.data.isAdmin);
+				}
+
 				if (response.data.user.last_login === null) {
 					navigate(`/change_password`);
 				} else {
 					navigate(`/dashboard`);
+					setAlert(response.data.message, "success");
 				}
 			})
 			.catch((error: any) => {
-				console.log(error);
 				setShowMessage(true);
 				if (
 					error.response &&
@@ -54,6 +62,9 @@ export default function Login() {
 							message: serverErrors[field][0],
 						});
 					});
+				} else {
+					console.log(error);
+					setAlert(error.message, "error");
 				}
 			});
 	};

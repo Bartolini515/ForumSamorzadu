@@ -125,7 +125,15 @@ export default function TaskDescriptionModal(props: Props) {
 						<Typography
 							id="TaskDescription-modal-description"
 							component="p"
-							sx={{ mb: 3, color: "#34495e", lineHeight: 1.6 }}
+							sx={{
+								mb: 3,
+								color: "#34495e",
+								lineHeight: 1.6,
+								maxHeight: "200px",
+								maxWidth: "100%",
+								overflowY: "auto",
+								overflowWrap: "break-word",
+							}}
 						>
 							{props.task_description ? props.task_description : "Brak"}
 						</Typography>

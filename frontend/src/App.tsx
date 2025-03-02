@@ -23,39 +23,37 @@ export default function App() {
 		location.pathname === "/change_password";
 
 	return (
-		<>
-			<LocalizationProvider
-				dateAdapter={AdapterDateFns}
-				adapterLocale={de}
-				localeText={
-					plPL.components.MuiLocalizationProvider.defaultProps.localeText
-				}
-			>
-				{noNavbar ? (
-					<Routes>
-						<Route path="/" element={<Login />} />
-						<Route path="/register" element={<Register />} />
-						<Route path="/change_password" element={<ChangePasswordLogin />} />
-					</Routes>
-				) : (
-					<Navbar
-						content={
-							<Routes>
-								<Route element={<ProtectedRoutes />}>
-									<Route path="/dashboard" element={<Dashboard />} />
-									<Route path="/schedule" element={<Schedule />} />
-									<Route path="/timetable" element={<Timetable />} />
-									<Route path="/tasks" element={<Tasks />} />
-									<Route
-										path="/moderator_panel_tables"
-										element={<TablesModeratorPanel />}
-									/>
-								</Route>
-							</Routes>
-						}
-					/>
-				)}
-			</LocalizationProvider>
-		</>
+		<LocalizationProvider
+			dateAdapter={AdapterDateFns}
+			adapterLocale={de}
+			localeText={
+				plPL.components.MuiLocalizationProvider.defaultProps.localeText
+			}
+		>
+			{noNavbar ? (
+				<Routes>
+					<Route path="/" element={<Login />} />
+					<Route path="/register" element={<Register />} />
+					<Route path="/change_password" element={<ChangePasswordLogin />} />
+				</Routes>
+			) : (
+				<Navbar
+					content={
+						<Routes>
+							<Route element={<ProtectedRoutes />}>
+								<Route path="/dashboard" element={<Dashboard />} />
+								<Route path="/schedule" element={<Schedule />} />
+								<Route path="/timetable" element={<Timetable />} />
+								<Route path="/tasks" element={<Tasks />} />
+								<Route
+									path="/moderator_panel_tables"
+									element={<TablesModeratorPanel />}
+								/>
+							</Route>
+						</Routes>
+					}
+				/>
+			)}
+		</LocalizationProvider>
 	);
 }

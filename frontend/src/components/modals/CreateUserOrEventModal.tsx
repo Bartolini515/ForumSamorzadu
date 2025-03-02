@@ -8,6 +8,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import MyTextField from "../forms/MyTextField";
 import { useForm } from "react-hook-form";
 import MyButton from "../forms/MyButton";
+import { useAlert } from "../../contexts/AlertContext";
 
 const style = {
 	position: "absolute",
@@ -53,6 +54,8 @@ export default function CreateUserOrEvent(props: Props) {
 		props.setRefresh(true);
 	};
 
+	const { setAlert } = useAlert();
+
 	const submission = (data: FormData) => {
 		if (props.option === "user") {
 			AxiosInstance.post(`moderator_panel/user/create/`, {
@@ -61,8 +64,9 @@ export default function CreateUserOrEvent(props: Props) {
 				last_name: data.last_name,
 				password: data.password,
 			})
-				.then(() => {
+				.then((response) => {
 					handleClose();
+					setAlert(response.data.message, "success");
 				})
 				.catch((error: any) => {
 					if (
@@ -77,14 +81,18 @@ export default function CreateUserOrEvent(props: Props) {
 								message: serverErrors[field][0],
 							});
 						});
+					} else {
+						console.log(error);
+						setAlert(error.message, "error");
 					}
 				});
 		} else if (props.option === "event_types") {
 			AxiosInstance.post(`moderator_panel/event_types/create/`, {
 				event_type: data.event_type,
 			})
-				.then(() => {
+				.then((response) => {
 					handleClose();
+					setAlert(response.data.message, "success");
 				})
 				.catch((error: any) => {
 					if (error.response && error.response.data) {
@@ -95,13 +103,16 @@ export default function CreateUserOrEvent(props: Props) {
 								message: serverErrors[field][0],
 							});
 						});
+					} else {
+						console.log(error);
+						setAlert(error.message, "error");
 					}
 				});
 		}
 	};
 
 	return (
-		<div>
+		<>
 			<Modal
 				aria-labelledby="transition-modal-title"
 				aria-describedby="transition-modal-description"
@@ -159,11 +170,11 @@ export default function CreateUserOrEvent(props: Props) {
 								}}
 							>
 								<Box sx={{ fontWeight: "bold" }}>
-									{props.option === "user" ? "Email:" : "Nazwa typu wydarzeń:"}
+									{props.option === "user" ? "Email" : "Nazwa typu wydarzeń:"}
 								</Box>
 								<Box sx={{ marginLeft: "10px" }}>
 									<MyTextField
-										label={props.option === "user" ? "Email:" : "Typ wydarzeń"}
+										label={props.option === "user" ? "Email" : "Typ wydarzeń"}
 										name={props.option === "user" ? "email" : "event_type"}
 										control={control}
 									/>
@@ -235,6 +246,6 @@ export default function CreateUserOrEvent(props: Props) {
 					</Box>
 				</Fade>
 			</Modal>
-		</div>
+		</>
 	);
 }

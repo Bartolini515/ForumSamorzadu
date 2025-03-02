@@ -14,10 +14,12 @@ import SchoolIcon from "@mui/icons-material/School";
 import EditNoteIcon from "@mui/icons-material/EditNote";
 import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
 import { useState } from "react";
+import { useAuth } from "../../contexts/AuthContext";
 
 export default function Menu() {
 	const [openEvents, setOpenEvents] = useState(false);
 	const [openModerator, setOpenModerator] = useState(false);
+	const { isAdmin } = useAuth();
 
 	const handleClickEvents = () => {
 		setOpenEvents(!openEvents);
@@ -108,6 +110,7 @@ export default function Menu() {
 					path === "/moderator_panel_users" ||
 					path === "/moderator_panel_event_types"
 				}
+				sx={{ display: isAdmin ? "flex" : "none" }}
 			>
 				<ListItemIcon>
 					<AdminPanelSettingsIcon />
@@ -118,7 +121,7 @@ export default function Menu() {
 			<Collapse in={openModerator} timeout="auto" unmountOnExit>
 				<List component="div" disablePadding>
 					<ListItemButton
-						sx={{ pl: 3 }}
+						sx={{ pl: 3, display: isAdmin ? "flex" : "none" }}
 						component={Link}
 						to="/moderator_panel_tables"
 						selected={path === "/moderator_panel_tables"}

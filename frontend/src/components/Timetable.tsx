@@ -6,8 +6,8 @@ import MultipleSelectChip from "./forms/MultiSelectChip";
 import { Box } from "@mui/material";
 import MultiSelectCheckbox from "./forms/MultiSelectCheckbox";
 import EventDetails from "./modals/EventDetailsModal";
-import FilledAlerts from "./alerts/FilledAlert";
 import CreateEventModal from "./modals/CreateEventModal";
+import { useAlert } from "../contexts/AlertContext";
 
 export default function Timetable() {
 	const [events, setEvents] = useState([]);
@@ -16,20 +16,7 @@ export default function Timetable() {
 	const [clickedEventId, setClickedEventId] = useState<string>("");
 	const [createEventModal, setCreateEventModal] = useState<boolean>(false);
 
-	const [alertOpen, setAlertOpen] = useState<boolean>(false);
-	const [alertMessage, setAlertMessage] = useState<string>("");
-	const [alertSeverity, setAlertSeverity] = useState<
-		"error" | "warning" | "info" | "success"
-	>("error");
-	const [alertTimeout, setAlertTimeout] = useState<number>(0);
-
-	const handleAlert = (error: any) => {
-		console.log(error);
-		setAlertOpen(true);
-		setAlertMessage("Coś poszło nie tak");
-		setAlertSeverity("error");
-		setAlertTimeout(8000);
-	};
+	const { setAlert } = useAlert();
 
 	const filteredEvents: any = events.filter((event: any) =>
 		selectedOptions.includes(event.className)
@@ -51,7 +38,8 @@ export default function Timetable() {
 				setLoading(false);
 			})
 			.catch((error: any) => {
-				handleAlert(error);
+				console.log(error);
+				setAlert(error.message, "error");
 			});
 	};
 	useEffect(() => {
@@ -109,7 +97,9 @@ export default function Timetable() {
 							<EventDetails
 								id={clickedEventId}
 								setClickedEventId={setClickedEventId}
-								setAlertOpen={setAlertOpen}
+								onClose={() => {
+									GetData();
+								}}
 							/>
 						)}
 						<FAB handleClick={handleClickFAB} />
@@ -119,16 +109,7 @@ export default function Timetable() {
 								onClose={() => {
 									setCreateEventModal(false);
 									GetData();
-									console.log(createEventModal);
 								}}
-							/>
-						)}
-						{alertOpen && (
-							<FilledAlerts
-								message={alertMessage}
-								severity={alertSeverity}
-								timeout={alertTimeout}
-								setAlertOpen={setAlertOpen}
 							/>
 						)}
 					</Box>

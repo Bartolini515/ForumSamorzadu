@@ -6,7 +6,7 @@ from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 User = get_user_model()
 
-class LoginSerializer(serializers.Serializer):
+class LoginSerializer(serializers.ModelSerializer):
     email = serializers.EmailField()
     password = serializers.CharField()
     
@@ -16,7 +16,11 @@ class LoginSerializer(serializers.Serializer):
         ret['last_login'] = instance.last_login
         return ret
     
-class Login_password_changeSerializer(serializers.Serializer):
+    class Meta:
+        model = Profile
+        fields = ('id', 'first_name', 'last_name', 'email', 'password')
+    
+class Password_changeSerializer(serializers.Serializer):
     password = serializers.CharField()
     
     def validate_password(self, value):
@@ -31,34 +35,11 @@ class Login_password_changeSerializer(serializers.Serializer):
         ret.pop('password', None)
         return ret
     
-# class ProfileSerializer(serializers.Serializer):
-#     first_name = serializers.CharField()
-#     last_name = serializers.CharField()
-#     email = serializers.EmailField()
-#     password = serializers.CharField()
+class ProfileSerializer(serializers.ModelSerializer):
     
-#     def validate_password(self, value):
-#         try:
-#             validate_password(value)
-#         except ValidationError as e:
-#             raise serializers.ValidationError(e.messages)
-#         return value
-    
-#     def create(self, validated_data):
-#         return User.objects.create_user(**validated_data)
-    
-#     def update(self, instance, validated_data):
-#         instance.first_name = validated_data.get('first_name', instance.first_name)
-#         instance.last_name = validated_data.get('last_name', instance.last_name)
-#         instance.email = validated_data.get('email', instance.email)
-#         instance.set_password(validated_data.get('password', instance.password))
-#         instance.save()
-#         return instance
-    
-#     def to_representation(self, instance):
-#         ret = super().to_representation(instance)
-#         ret.pop('password', None)
-#         return ret
+    class Meta:
+        model = Timetable_events
+        fields = ('id', 'first_name', 'last_name', 'email')
 
 class TasksSerializer(serializers.ModelSerializer):
     task_description = serializers.CharField(source='description')

@@ -17,10 +17,13 @@ Including another URLconf
 from django.contrib import admin
 import debug_toolbar
 from django.urls import path, include
+from knox import views as knox_views
 
 urlpatterns = [
     path('__debug__/', include(debug_toolbar.urls)),
     path('admin/', admin.site.urls),
     path('', include('main.urls')),
-    path('api/auth/', include('knox.urls'))
+    # path('api/auth/', include('knox.urls'))
+    
+    path('logout/', knox_views.LogoutView.as_view(), name='knox_logout'), 
 ]

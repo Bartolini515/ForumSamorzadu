@@ -7,8 +7,11 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
 import Tooltip from "@mui/material/Tooltip";
-import Settings from "@mui/icons-material/Settings";
+// import Settings from "@mui/icons-material/Settings";
 import Logout from "@mui/icons-material/Logout";
+import AxiosInstance from "../AxiosInstance";
+import { useNavigate } from "react-router-dom";
+import { useAlert } from "../../contexts/AlertContext";
 
 export default function AccountMenu() {
 	const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -18,6 +21,16 @@ export default function AccountMenu() {
 	};
 	const handleClose = () => {
 		setAnchorEl(null);
+	};
+	const navigate = useNavigate();
+	const { setAlert } = useAlert();
+
+	const logoutUser = () => {
+		AxiosInstance.post(`logout/`, {}).then(() => {
+			localStorage.removeItem("Token");
+			navigate("/");
+			setAlert("Wylogowano pomyślnie", "success");
+		});
 	};
 
 	return (
@@ -73,17 +86,27 @@ export default function AccountMenu() {
 				transformOrigin={{ horizontal: "right", vertical: "top" }}
 				anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
 			>
-				<MenuItem onClick={handleClose}>
+				<MenuItem
+					onClick={() => {
+						handleClose;
+						navigate("/account");
+					}}
+				>
 					<Avatar /> Moje konto
 				</MenuItem>
 				<Divider />
-				<MenuItem onClick={handleClose}>
+				{/* <MenuItem onClick={handleClose}>
 					<ListItemIcon>
 						<Settings fontSize="small" />
 					</ListItemIcon>
 					Ustawienia
-				</MenuItem>
-				<MenuItem onClick={handleClose}>
+				</MenuItem> */}
+				<MenuItem
+					onClick={() => {
+						handleClose();
+						logoutUser();
+					}}
+				>
 					<ListItemIcon>
 						<Logout fontSize="small" />
 					</ListItemIcon>

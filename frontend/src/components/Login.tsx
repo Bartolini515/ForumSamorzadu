@@ -26,7 +26,7 @@ export default function Login() {
 		},
 	});
 	const [showMessage, setShowMessage] = useState(false);
-	const { setIsAdmin } = useAuth();
+	const { setIsAdmin, setUser } = useAuth();
 	const { setAlert } = useAlert();
 
 	const submission = (data: FormData) => {
@@ -37,6 +37,7 @@ export default function Login() {
 
 			.then((response) => {
 				localStorage.setItem("Token", response.data.token);
+				setUser(response.data.user);
 				if (response.data.isAdmin) {
 					setIsAdmin(response.data.isAdmin);
 				}
@@ -64,7 +65,7 @@ export default function Login() {
 					});
 				} else {
 					console.log(error);
-					setAlert(error.message, "error");
+					setAlert("Nieprawidłowe dane logowania", "error");
 				}
 			});
 	};

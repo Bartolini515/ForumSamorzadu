@@ -9,11 +9,12 @@ import Tasks from "./components/Tasks";
 import Navbar from "./components/navbar/Navbar";
 import TablesModeratorPanel from "./components/TablesModeratorPanel";
 import ProtectedRoutes from "./components/ProtectedRoutes";
-import ChangePasswordLogin from "./components/ChangePasswordLogin";
+import ChangePassword from "./components/ChangePassword";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFnsV3";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { de } from "date-fns/locale";
 import { plPL } from "@mui/x-date-pickers/locales";
+import Account from "./components/Account";
 
 export default function App() {
 	const location = useLocation();
@@ -34,7 +35,7 @@ export default function App() {
 				<Routes>
 					<Route path="/" element={<Login />} />
 					<Route path="/register" element={<Register />} />
-					<Route path="/change_password" element={<ChangePasswordLogin />} />
+					<Route path="/change_password" element={<ChangePassword />} />
 				</Routes>
 			) : (
 				<Navbar
@@ -49,6 +50,7 @@ export default function App() {
 									path="/moderator_panel_tables"
 									element={<TablesModeratorPanel />}
 								/>
+								<Route path="/account" element={<Account />} />
 							</Route>
 						</Routes>
 					}

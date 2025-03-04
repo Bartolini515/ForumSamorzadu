@@ -42,25 +42,6 @@ class LoginViewset(viewsets.ViewSet):
                 return Response({"message": "Nieprawidłowe dane"}, status=401)
         else:
             return Response(serializer.errors, status=400)
-        
-    @action(detail=False, methods=["post"], url_path="change_password/(?P<token>[^/.]+)")
-    def change_password(self, request, token=None):
-        serializer = Login_password_changeSerializer(data=request.data)
-        if serializer.is_valid():
-            password = serializer.validated_data['password']
-            
-            try:
-                auth_token = AuthToken.objects.get(token_key=token[:15])
-                user = auth_token.user
-            except AuthToken.DoesNotExist:
-                return Response({"message": "Invalid token"}, status=400)
-            
-            user.set_password(password)
-            user.last_login = timezone.now()
-            user.save()
-            return Response({"message": "Hasło zmienione"})
-        else:
-            return Response(serializer.errors, status=400)
 
 class TimetableViewset(viewsets.ViewSet):
     permission_classes = [permissions.IsAuthenticated]
@@ -180,3 +161,39 @@ class ModeratorPanelViewset(viewsets.ViewSet):
         return Response({"message": "Typ wydarzenia usunięty"})
     
     
+class AccountViewset(viewsets.ViewSet):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = ProfileSerializer
+    queryset = Profile.objects.all()
+    
+    @action(detail=False, methods=["post"], url_path="change_password/(?P<token>[^/.]+)")
+    def change_password(self, request, token=None):
+        serializer = Password_changeSerializer(data=request.data)
+        if serializer.is_valid():
+            password = serializer.validated_data['password']
+            
+            try:
+                auth_token = AuthToken.objects.get(token_key=token[:15])
+                user = auth_token.user
+            except AuthToken.DoesNotExist:
+                return Response({"message": "Invalid token"}, status=400)
+            
+            user.set_password(password)
+            user.last_login = timezone.now()
+            user.save()
+            return Response({"message": "Hasło zmienione"})
+        else:
+            return Response(serializer.errors, status=400)
+    
+    def retrieve(self, request, pk=None):
+        serializer = ProfileSerializer(self.queryset.get(pk=pk))
+        
+        try:
+            token = request.headers['Authorization'][6:21]
+            auth_token = AuthToken.objects.get(token_key=token[:15])
+            user = auth_token.user
+        except AuthToken.DoesNotExist:
+            return Response({"message": "Invalid token"}, status=400)
+        data = serializer.data
+            
+        return Response(data)

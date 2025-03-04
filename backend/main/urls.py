@@ -6,4 +6,5 @@ router = DefaultRouter()
 router.register('timetable', TimetableViewset, basename='timetable')
 router.register('login', LoginViewset, basename='login')
 router.register('moderator_panel', ModeratorPanelViewset, basename='moderator_panel')
+router.register('account', AccountViewset, basename='account')
 urlpatterns = router.urls

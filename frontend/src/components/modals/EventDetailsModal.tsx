@@ -10,6 +10,7 @@ import TasksList from "../lists/TasksList";
 import MyButton from "../forms/MyButton";
 import { useAuth } from "../../contexts/AuthContext";
 import { useAlert } from "../../contexts/AlertContext";
+import ModifyEventModal from "./ModifyEventModal";
 
 const style = {
 	position: "absolute",
@@ -30,9 +31,45 @@ interface Props {
 	onClose: () => void;
 }
 
+interface EventData {
+	id: string;
+	title: string;
+	start: string;
+	end: string | null;
+	className: string;
+	description: string;
+	creator: string;
+	creator_id: string;
+	tasks: {
+		id: string;
+		task_name: string;
+		task_description: string;
+		assigned: string;
+		completion_status: boolean;
+		due_date: string;
+	}[];
+	is_creator: boolean;
+}
+
 export default function EventDetails(props: Props) {
 	const [open, setOpen] = useState(false);
+	const [openModify, setOpenModify] = useState(false);
+	const [event, setEvent] = useState<EventData>({
+		id: "",
+		title: "",
+		start: "",
+		end: null,
+		className: "",
+		description: "",
+		creator: "",
+		creator_id: "",
+		tasks: [],
+		is_creator: false,
+	});
+
 	const { isAdmin } = useAuth();
+	const { setAlert } = useAlert();
+
 	const handleOpen = () => setOpen(true);
 	const handleClose = () => {
 		setOpen(false);
@@ -43,17 +80,13 @@ export default function EventDetails(props: Props) {
 		DeleteData();
 	};
 	const handleModifyClick = () => {
-		console.log("Modify");
+		setOpenModify(true);
 	};
-
-	const [events, setEvents] = useState<any>([]);
-
-	const { setAlert } = useAlert();
 
 	const GetData = () => {
 		AxiosInstance.get(`timetable/${props.id}`)
 			.then((response) => {
-				setEvents(response.data);
+				setEvent(response.data);
 				handleOpen();
 			})
 			.catch((error: any) => {
@@ -133,7 +166,7 @@ export default function EventDetails(props: Props) {
 							}}
 						>
 							<Box sx={{ fontWeight: "bold" }}>Nazwa: </Box>
-							<Box sx={{ marginLeft: "10px" }}>{events.title}</Box>
+							<Box sx={{ marginLeft: "10px" }}>{event.title}</Box>
 						</Box>
 
 						<Box
@@ -146,9 +179,9 @@ export default function EventDetails(props: Props) {
 							}}
 						>
 							<Box sx={{ fontWeight: "bold" }}>Typ: </Box>
-							<Box sx={{ marginLeft: "10px" }}>{events.className}</Box>
+							<Box sx={{ marginLeft: "10px" }}>{event.className}</Box>
 						</Box>
-						{events.end ? (
+						{event.end ? (
 							<>
 								<Box
 									sx={{
@@ -160,7 +193,7 @@ export default function EventDetails(props: Props) {
 									}}
 								>
 									<Box sx={{ fontWeight: "bold" }}>Data rozpoczęcia: </Box>
-									<Box sx={{ marginLeft: "10px" }}>{events.start}</Box>
+									<Box sx={{ marginLeft: "10px" }}>{event.start}</Box>
 								</Box>
 
 								<Box
@@ -173,7 +206,7 @@ export default function EventDetails(props: Props) {
 									}}
 								>
 									<Box sx={{ fontWeight: "bold" }}>Data zakończenia: </Box>
-									<Box sx={{ marginLeft: "10px" }}>{events.end}</Box>
+									<Box sx={{ marginLeft: "10px" }}>{event.end}</Box>
 								</Box>
 							</>
 						) : (
@@ -187,7 +220,7 @@ export default function EventDetails(props: Props) {
 								}}
 							>
 								<Box sx={{ fontWeight: "bold" }}>Data: </Box>
-								<Box sx={{ marginLeft: "10px" }}>{events.start}</Box>
+								<Box sx={{ marginLeft: "10px" }}>{event.start}</Box>
 							</Box>
 						)}
 						<Box
@@ -200,9 +233,9 @@ export default function EventDetails(props: Props) {
 							}}
 						>
 							<Box sx={{ fontWeight: "bold" }}>Utworzył(a): </Box>
-							<Box sx={{ marginLeft: "10px" }}>{events.creator}</Box>
+							<Box sx={{ marginLeft: "10px" }}>{event.creator}</Box>
 						</Box>
-						{events.description ? (
+						{event.description ? (
 							<>
 								<Box
 									sx={{
@@ -223,7 +256,7 @@ export default function EventDetails(props: Props) {
 											overflowWrap: "break-word",
 										}}
 									>
-										{events.description}
+										{event.description}
 									</Box>
 								</Box>
 							</>
@@ -243,12 +276,12 @@ export default function EventDetails(props: Props) {
 							<Box sx={{ fontWeight: "bold" }}>
 								Zadania:
 								<Box sx={{ marginLeft: "10px", fontWeight: "normal" }}>
-									<TasksList tasks={events.tasks} />
+									<TasksList tasks={event.tasks} />
 								</Box>
 							</Box>
 						</Box>
 
-						{(events.is_creator || isAdmin) && (
+						{(event.is_creator || isAdmin) && (
 							<Box sx={{ display: "flex", justifyContent: "space-between" }}>
 								<MyButton
 									label="Usuń"
@@ -257,12 +290,24 @@ export default function EventDetails(props: Props) {
 									onClick={handleDeleteClick}
 								/>
 								<MyButton
-									label="Modyfikuj(WIP)"
+									label="Modyfikuj"
 									type="button"
 									color="primary"
 									onClick={handleModifyClick}
 								/>
 							</Box>
+						)}
+
+						{openModify && (
+							<ModifyEventModal
+								id={props.id}
+								event={event}
+								open={openModify}
+								onClose={() => {
+									handleClose();
+									setOpenModify(false);
+								}}
+							/>
 						)}
 					</Box>
 				</Fade>

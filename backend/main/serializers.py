@@ -38,7 +38,7 @@ class Password_changeSerializer(serializers.Serializer):
 class ProfileSerializer(serializers.ModelSerializer):
     
     class Meta:
-        model = Timetable_events
+        model = Profile
         fields = ('id', 'first_name', 'last_name', 'email')
 
 class TasksSerializer(serializers.ModelSerializer):
@@ -60,8 +60,15 @@ class Timetable_eventsSerializer(serializers.ModelSerializer):
         
         
 class Timetable_eventsCreateSerializer(serializers.ModelSerializer):
-    # start_date = 
-    # end_date = 
+
+    
+    def update(self, instance, validated_data):
+        instance.event_name = validated_data.get('event_name', instance.event_name)
+        instance.start_date = validated_data.get('start_date', instance.start_date)
+        instance.end_date = validated_data.get('end_date', instance.end_date)
+        instance.description = validated_data.get('description', instance.description)
+        instance.save()
+        return instance
     
     class Meta:
         model = Timetable_events
@@ -97,13 +104,15 @@ class Profiles_moderatorPanelSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         return User.objects.create_user(**validated_data)
     
-    # def update(self, instance, validated_data):
-    #     instance.first_name = validated_data.get('first_name', instance.first_name)
-    #     instance.last_name = validated_data.get('last_name', instance.last_name)
-    #     instance.email = validated_data.get('email', instance.email)
-    #     instance.set_password(validated_data.get('password', instance.password))
-    #     instance.save()
-    #     return instance
+    def update(self, instance, validated_data):
+        instance.first_name = validated_data.get('first_name', instance.first_name)
+        instance.last_name = validated_data.get('last_name', instance.last_name)
+        instance.email = validated_data.get('email', instance.email)
+        password = validated_data.get('password', None)
+        if password:
+            instance.set_password(password)
+        instance.save()
+        return instance
     
     def to_representation(self, instance):
         ret = super().to_representation(instance)
@@ -124,6 +133,11 @@ class Event_typesSerializer(serializers.ModelSerializer):
     
     def create(self, validated_data):
         return Event_types.objects.create_event_type(**validated_data)
+    
+    def update(self, instance, validated_data):
+        instance.event_type = validated_data.get('event_type', instance.event_type)
+        instance.save()
+        return instance
     
     class Meta:
             model = Event_types

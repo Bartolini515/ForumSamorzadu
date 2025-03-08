@@ -94,9 +94,9 @@ class TimetableViewset(viewsets.ViewSet):
             auth_token = AuthToken.objects.get(token_key=token[:15])
             user = auth_token.user
             data = request.data
-            data['start_date'] = request.data['start_date'][:10]
-            if 'end_date' in request.data and request.data['end_date'] not in [None, "", "null"]:
-                data['end_date'] = request.data['end_date'][:10]
+            # data['start_date'] = request.data['start_date'][:10]
+            # if 'end_date' in request.data and request.data['end_date'] not in [None, "", "null"]:
+            #     data['end_date'] = request.data['end_date'][:10]
             data['created_by'] = user.id
         except AuthToken.DoesNotExist:
             return Response({"message": "Invalid token"}, status=400)
@@ -113,6 +113,26 @@ class TimetableViewset(viewsets.ViewSet):
         serializer = Event_typesSerializer(queryset, many=True)
         return Response(serializer.data)
     
+    @action(detail=False, methods=["put"], url_path="(?P<pk>[^/.]+)/update")
+    def updateEvent(self, request, pk=None):
+        try:
+            token = request.headers['Authorization'][6:21]
+            auth_token = AuthToken.objects.get(token_key=token[:15])
+            user = auth_token.user
+        except AuthToken.DoesNotExist:
+            return Response({"message": "Invalid token"}, status=400)
+        
+        event = Timetable_events.objects.get(pk=pk)
+        if event.created_by != user and not user.is_staff:
+            return Response({"message": "Użytkownik nie zgodny"}, status=403)
+        
+        serializer = Timetable_eventsCreateSerializer(event, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return message_response(Timetable_eventsDetailsSerializer(event).data, "Wydarzenie zaktualizowane")
+        else:
+            return Response(serializer.errors, status=400)
+    
 class ModeratorPanelViewset(viewsets.ViewSet):
     permission_classes = [permissions.IsAdminUser]
     queryset = Profile.objects.all()
@@ -124,11 +144,43 @@ class ModeratorPanelViewset(viewsets.ViewSet):
         serializer = Profiles_moderatorPanelSerializer(queryset, many=True)
         return Response(serializer.data)
     
+    @action(detail=False, methods=["get"], url_path="user/(?P<pk>[^/.]+)")
+    def requestProfile(self, request, pk=None):
+        queryset = Profile.objects.get(pk=pk)
+        serializer = Profiles_moderatorPanelSerializer(queryset)
+        return Response(serializer.data)
+    
+    @action(detail=False, methods=["put"], url_path="user/(?P<pk>[^/.]+)/update")
+    def updateProfile(self, request, pk=None):
+        queryset = Profile.objects.get(pk=pk)
+        serializer = Profiles_moderatorPanelSerializer(queryset, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return message_response(serializer.data, "Profil zaktualizowany")
+        else:
+            return Response(serializer.errors, status=400)
+    
     @action(detail=False, methods=["get"], url_path="event_types")
     def listEvent_types(self, request):
         queryset = Event_types.objects.all()
         serializer = Event_typesSerializer(queryset, many=True)
         return Response(serializer.data)
+    
+    @action(detail=False, methods=["get"], url_path="event_types/(?P<pk>[^/.]+)")
+    def requestEvent_type(self, request, pk=None):
+        queryset = Event_types.objects.get(pk=pk)
+        serializer = Event_typesSerializer(queryset)
+        return Response(serializer.data)
+    
+    @action(detail=False, methods=["put"], url_path="event_types/(?P<pk>[^/.]+)/update")
+    def updateEvent_types(self, request, pk=None):
+        queryset = Event_types.objects.get(pk=pk)
+        serializer = Event_typesSerializer(queryset, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return message_response(serializer.data, "Typ wydarzenia zaktualizowany")
+        else:
+            return Response(serializer.errors, status=400)
     
     @action(detail=False, methods=["post"], url_path="event_types/create")
     def createEvent_type(self, request):
@@ -185,15 +237,15 @@ class AccountViewset(viewsets.ViewSet):
         else:
             return Response(serializer.errors, status=400)
     
-    def retrieve(self, request, pk=None):
-        serializer = ProfileSerializer(self.queryset.get(pk=pk))
-        
+    @action(detail=False, methods=["get"], url_path="getuser")
+    def getUser(self, request):
         try:
             token = request.headers['Authorization'][6:21]
             auth_token = AuthToken.objects.get(token_key=token[:15])
             user = auth_token.user
         except AuthToken.DoesNotExist:
             return Response({"message": "Invalid token"}, status=400)
+        serializer = ProfileSerializer(self.queryset.get(pk=user.id))
         data = serializer.data
             
-        return Response(data)
+        return Response({'user': data, 'isAdmin': user.is_staff})

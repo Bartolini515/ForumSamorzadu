@@ -9,6 +9,7 @@ import MyTextField from "../forms/MyTextField";
 import { useForm } from "react-hook-form";
 import MyButton from "../forms/MyButton";
 import { useAlert } from "../../contexts/AlertContext";
+import MyPassField from "../forms/MyPassField";
 
 const style = {
 	position: "absolute",
@@ -194,7 +195,7 @@ export default function CreateUserOrEvent(props: Props) {
 									>
 										<Box sx={{ fontWeight: "bold" }}>Hasło: </Box>
 										<Box sx={{ marginLeft: "10px" }}>
-											<MyTextField
+											<MyPassField
 												label="Hasło"
 												name="password"
 												control={control}

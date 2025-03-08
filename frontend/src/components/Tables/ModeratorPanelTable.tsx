@@ -11,8 +11,10 @@ import {
 import AxiosInstance from "../AxiosInstance";
 import { useEffect, useState } from "react";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
-import { red } from "@mui/material/colors";
+import EditIcon from "@mui/icons-material/Edit";
+import { blue, red } from "@mui/material/colors";
 import { useAlert } from "../../contexts/AlertContext";
+import ModifyUserOrEvent from "../modals/ModifyUserOrEventModal";
 
 interface Props {
 	headers: string[];
@@ -23,6 +25,9 @@ interface Props {
 
 export default function ModeratorPanelTable(props: Props) {
 	const [data, setData] = useState<{ id: number; [key: string]: any }[]>([]);
+	const [clickedId, setClickedId] = useState<string>("");
+	const [open, setOpen] = useState<boolean>(false);
+
 	const [loading, setLoading] = useState(true);
 	const { setAlert } = useAlert();
 
@@ -57,8 +62,13 @@ export default function ModeratorPanelTable(props: Props) {
 			});
 	};
 
-	const handleClick = (id: any) => {
+	const handleClickDelete = (id: number) => {
 		DeleteData(id);
+	};
+
+	const handleClickModify = (id: any) => {
+		setClickedId(id);
+		setOpen(true);
 	};
 
 	return (
@@ -83,6 +93,7 @@ export default function ModeratorPanelTable(props: Props) {
 								{props.headers.map((header, index) => (
 									<TableCell key={index}>{header}</TableCell>
 								))}
+								<TableCell>Zmodyfikuj</TableCell>
 								<TableCell>Usuń</TableCell>
 							</TableRow>
 						</TableHead>
@@ -93,7 +104,12 @@ export default function ModeratorPanelTable(props: Props) {
 										<TableCell key={cellIndex}>{row[key]}</TableCell>
 									))}
 									<TableCell>
-										<IconButton onClick={() => handleClick(row.id)}>
+										<IconButton onClick={() => handleClickModify(row.id)}>
+											<EditIcon sx={{ color: blue["600"] }}></EditIcon>
+										</IconButton>
+									</TableCell>
+									<TableCell>
+										<IconButton onClick={() => handleClickDelete(row.id)}>
 											<DeleteForeverIcon sx={{ color: red["600"] }} />
 										</IconButton>
 									</TableCell>
@@ -102,6 +118,16 @@ export default function ModeratorPanelTable(props: Props) {
 						</TableBody>
 					</Table>
 				</TableContainer>
+			)}
+			{open && (
+				<ModifyUserOrEvent
+					option={props.option}
+					open={open}
+					setOpen={setOpen}
+					setRefresh={props.setRefresh}
+					id={clickedId}
+					setClickedId={setClickedId}
+				/>
 			)}
 		</>
 	);

@@ -21,7 +21,6 @@ export default function MySelect(props: Props) {
 
 	const handleChange = (event: SelectChangeEvent) => {
 		setOption(event.target.value as string);
-		console.log(event.target.value);
 	};
 
 	return (

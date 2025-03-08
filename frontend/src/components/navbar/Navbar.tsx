@@ -13,7 +13,6 @@ import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import Menu from "./Menu";
 import AccountMenu from "./AccountMenu";
-import "../../assets/react.svg";
 
 const drawerWidth = 240;
 
@@ -132,12 +131,7 @@ export default function Navbar({ content }: NavbarProps) {
 				open={open}
 			>
 				<DrawerHeader>
-					<img
-						src="../../assets/react.svg" // TODO: logo SU
-						alt="React Logo"
-						width="32"
-						height="32"
-					/>
+					<img src="/Logo_SU.svg" alt="Logo" width="32" height="32" />
 					<Typography noWrap component="div">
 						Panel Narzędzi
 					</Typography>

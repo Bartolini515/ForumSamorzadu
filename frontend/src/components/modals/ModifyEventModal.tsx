@@ -9,7 +9,6 @@ import MyTextField from "../forms/MyTextField";
 import { useForm } from "react-hook-form";
 import MyButton from "../forms/MyButton";
 import MyDatePicker from "../forms/MyDatePicker";
-import MySelect from "../forms/MySelect";
 import { useEffect, useState } from "react";
 import { useAlert } from "../../contexts/AlertContext";
 
@@ -27,6 +26,26 @@ const style = {
 };
 
 interface Props {
+	id: string;
+	event: {
+		id: string;
+		title: string;
+		start: string;
+		end: string | null;
+		className: string;
+		description: string;
+		creator: string;
+		creator_id: string;
+		tasks: {
+			id: string;
+			task_name: string;
+			task_description: string;
+			assigned: string;
+			completion_status: boolean;
+			due_date: string;
+		}[];
+		is_creator: boolean;
+	};
 	open: boolean;
 	onClose: () => void;
 }
@@ -40,21 +59,19 @@ interface FormData {
 	created_by: string;
 }
 
-export default function CreateEventModal(props: Props) {
-	const [options, setOptions] = useState<any>([]);
-	const { handleSubmit, control, setError, clearErrors } = useForm<FormData>({
-		defaultValues: {
-			event_name: "",
-			start_date: new Date(),
-			end_date: null,
-			description: "",
-			event_type: "1",
-		},
-	});
+export default function ModifyEventModal(props: Props) {
+	const { handleSubmit, control, setError, clearErrors, reset } =
+		useForm<FormData>({
+			defaultValues: {
+				event_name: "",
+				start_date: new Date(),
+				end_date: null,
+				description: "",
+				event_type: "1",
+			},
+		});
 
 	const [loading, setLoading] = useState(true);
-
-	const token = localStorage.getItem("Token");
 
 	const { setAlert } = useAlert();
 
@@ -71,11 +88,10 @@ export default function CreateEventModal(props: Props) {
 			end_date: data.end_date
 				? data.end_date.toISOString().split("T")[0]
 				: null,
-			event_type: data.event_type,
 			description: data.description,
 		};
 
-		AxiosInstance.post(`timetable/create/${token}/`, payload)
+		AxiosInstance.put(`timetable/${props.id}/update/`, payload)
 			.then((response) => {
 				props.onClose();
 				setAlert(response.data.message, "success");
@@ -86,6 +102,8 @@ export default function CreateEventModal(props: Props) {
 					error.response.data &&
 					error.response.status === 400
 				) {
+					console.log(error);
+
 					const serverErrors = error.response.data;
 					Object.keys(serverErrors).forEach((field) => {
 						setError(field as keyof FormData, {
@@ -100,10 +118,17 @@ export default function CreateEventModal(props: Props) {
 			});
 	};
 
-	const getEventTypes = () => {
-		AxiosInstance.get("timetable/event_types/")
+	const getEventDetails = () => {
+		AxiosInstance.get(`timetable/${props.id}`)
 			.then((response) => {
-				setOptions(response.data);
+				const event = response.data;
+				reset({
+					event_name: event.title,
+					start_date: new Date(event.start),
+					end_date: event.end ? new Date(event.end) : null,
+					description: event.description,
+					event_type: event.className,
+				});
 				setLoading(false);
 			})
 			.catch((error: any) => {
@@ -113,8 +138,8 @@ export default function CreateEventModal(props: Props) {
 	};
 
 	useEffect(() => {
-		getEventTypes();
-	}, []);
+		getEventDetails();
+	}, [props.id]);
 
 	const handleClick = () => {
 		clearErrors();
@@ -251,27 +276,11 @@ export default function CreateEventModal(props: Props) {
 									</Box>
 								</Box>
 
-								<Box
-									sx={{
-										boxShadow: 3,
-										padding: "20px",
-										display: "flex",
-										flexDirection: "row",
-										marginBottom: "20px",
-									}}
-								>
-									<Box sx={{ fontWeight: "bold" }}>Typ wydarzenia: </Box>
-									<Box sx={{ marginLeft: "10px" }}>
-										<MySelect
-											label="Typ wydarzenia"
-											name="event_type"
-											options={options}
-											control={control}
-										/>
-									</Box>
-								</Box>
-
-								<MyButton label="Stwórz" type="submit" onClick={handleClick} />
+								<MyButton
+									label="Zatwierdź"
+									type="submit"
+									onClick={handleClick}
+								/>
 							</form>
 						</Box>
 					)}

@@ -1,5 +1,5 @@
 import "../App.css";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Box, Typography } from "@mui/material";
 import MyTextField from "./forms/MyTextField";
 import MyPassField from "./forms/MyPassField";
@@ -69,6 +69,13 @@ export default function Login() {
 				}
 			});
 	};
+
+	useEffect(() => {
+		const token = localStorage.getItem("Token");
+		if (token) {
+			navigate("/dashboard");
+		}
+	}, []);
 
 	return (
 		<Box

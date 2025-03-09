@@ -13,6 +13,7 @@ import ScheduleIcon from "@mui/icons-material/Schedule";
 import SchoolIcon from "@mui/icons-material/School";
 import EditNoteIcon from "@mui/icons-material/EditNote";
 import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
+import DatasetOutlinedIcon from "@mui/icons-material/DatasetOutlined";
 import { useState } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 
@@ -126,9 +127,9 @@ export default function Menu() {
 						to="/moderator_panel_tables"
 						selected={path === "/moderator_panel_tables"}
 					>
-						<CalendarMonthIcon>
+						<DatasetOutlinedIcon>
 							<StarBorder />
-						</CalendarMonthIcon>
+						</DatasetOutlinedIcon>
 						<ListItemText primary="Zarządzanie danymi" />
 					</ListItemButton>
 				</List>

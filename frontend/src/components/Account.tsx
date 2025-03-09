@@ -5,8 +5,11 @@ import CameraAltIcon from "@mui/icons-material/CameraAlt";
 // import { useEffect, useState } from "react";
 // import AxiosInstance from "./AxiosInstance";
 import { useAuth } from "../contexts/AuthContext";
+import MyButton from "./forms/MyButton";
+import { useNavigate } from "react-router-dom";
 
 export default function Account() {
+	const navigate = useNavigate();
 	const { user } = useAuth();
 	// const { setAlert } = useAlert();
 	// const [loading, setLoading] = useState(true);
@@ -67,9 +70,18 @@ export default function Account() {
 			<Box display="flex" alignItems="center" mb={1}>
 				<Typography variant="h6">{user?.email}</Typography>
 			</Box>
-			<Box display="flex" alignItems="center">
+			{/* <Box display="flex" alignItems="center">
 				<Typography variant="h6">Role</Typography>
-			</Box>
+			</Box> */}
+			<br />
+			<MyButton
+				label="Zmień hasło"
+				type="button"
+				color="primary"
+				onClick={() => {
+					navigate("/change_password");
+				}}
+			/>
 		</Box>
 		// 	)}
 		// </>

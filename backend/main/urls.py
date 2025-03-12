@@ -7,4 +7,5 @@ router.register('timetable', TimetableViewset, basename='timetable')
 router.register('login', LoginViewset, basename='login')
 router.register('moderator_panel', ModeratorPanelViewset, basename='moderator_panel')
 router.register('account', AccountViewset, basename='account')
+router.register('tasks', TasksViewset, basename='tasks')
 urlpatterns = router.urls

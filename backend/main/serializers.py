@@ -40,8 +40,21 @@ class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
         fields = ('id', 'first_name', 'last_name', 'email')
-
+        
 class TasksSerializer(serializers.ModelSerializer):
+    user = serializers.StringRelatedField()
+    event = serializers.StringRelatedField()
+    
+    def update(self, instance, validated_data):
+        instance.completion_status = validated_data.get('completion_status', instance.completion_status)
+        instance.save()
+        return instance
+    
+    class Meta:
+        model = Tasks
+        fields = ('id', 'task_name', 'description', 'user', 'completion_status', 'due_date', 'event', 'user_id', 'event_id')
+
+class Tasks_for_eventSerializer(serializers.ModelSerializer):
     task_description = serializers.CharField(source='description')
     assigned = serializers.StringRelatedField(source='user')
     class Meta:
@@ -60,8 +73,6 @@ class Timetable_eventsSerializer(serializers.ModelSerializer):
         
         
 class Timetable_eventsCreateSerializer(serializers.ModelSerializer):
-
-    
     def update(self, instance, validated_data):
         instance.event_name = validated_data.get('event_name', instance.event_name)
         instance.start_date = validated_data.get('start_date', instance.start_date)
@@ -81,7 +92,7 @@ class Timetable_eventsDetailsSerializer(serializers.ModelSerializer):
     className = serializers.StringRelatedField(source='event_type')
     creator = serializers.StringRelatedField(source='created_by')
     creator_id = serializers.IntegerField(source='created_by_id')
-    tasks = TasksSerializer(many=True)
+    tasks = Tasks_for_eventSerializer(many=True)
     
     class Meta:
         model = Timetable_events

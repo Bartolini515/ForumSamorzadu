@@ -218,6 +218,11 @@ class AccountViewset(viewsets.ViewSet):
     serializer_class = ProfileSerializer
     queryset = Profile.objects.all()
     
+    def list(self, request):
+        queryset = Profile.objects.all()
+        serializer = ProfileSerializer(queryset, many=True)
+        return Response(serializer.data)
+    
     @action(detail=False, methods=["post"], url_path="change_password/(?P<token>[^/.]+)")
     def change_password(self, request, token=None):
         serializer = Password_changeSerializer(data=request.data)
@@ -249,3 +254,24 @@ class AccountViewset(viewsets.ViewSet):
         data = serializer.data
             
         return Response({'user': data, 'isAdmin': user.is_staff})
+    
+class TasksViewset(viewsets.ViewSet):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = TasksSerializer
+    queryset = Tasks.objects.all()
+    
+    def list(self, request):
+        queryset = Tasks.objects.all()
+        serializer = TasksSerializer(queryset, many=True)
+        return Response(serializer.data)
+    
+    @action(detail=False, methods=["put"], url_path="(?P<pk>[^/.]+)/update_status")
+    def updateStatus(self, request, pk=None):
+        queryset = Tasks.objects.get(pk=pk)
+        serializer = TasksSerializer(queryset, data=request.data, partial=True)
+        
+        if serializer.is_valid():
+            serializer.save()
+            return message_response(serializer.data, "Status zaktualizowany")
+        else:
+            return Response(serializer.errors, status=400)

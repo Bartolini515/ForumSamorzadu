@@ -46,7 +46,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     # 'whitenoise.runserver_nostatic', # Narzędzie do wczytywania statycznych plików
-    # 'django.contrib.staticfiles',
+    'django.contrib.staticfiles',
     'debug_toolbar', # Narzędzie debugowania
     'corsheaders', # Narzędzie do obsługi API za pomocą CORS
     'rest_framework', # Narzędzie do obsługi API za pomocą REST
@@ -148,7 +148,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 # Definiowanie ścieżek plików statyczny oraz systemu ich obsługa w etapie produkcji
-# STATIC_URL = 'static/'
+STATIC_URL = 'static/'
 # STATIC_ROOT = BASE_DIR / 'staticfiles'
 # STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 # STATICFILES_DIRS = [

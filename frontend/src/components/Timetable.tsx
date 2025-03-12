@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import TimetableCalendar from "./calendar/TimetableCalendar";
 import FAB from "./forms/FAB";
 import AxiosInstance from "./AxiosInstance";
-import MultipleSelectChip from "./forms/MultiSelectChip";
+// import MultipleSelectChip from "./forms/MultiSelectChip";
 import { Box } from "@mui/material";
 import MultiSelectCheckbox from "./forms/MultiSelectCheckbox";
 import EventDetails from "./modals/EventDetailsModal";
@@ -17,20 +17,22 @@ export default function Timetable() {
 	const [createEventModal, setCreateEventModal] = useState<boolean>(false);
 
 	const { setAlert } = useAlert();
+	const [loading, setLoading] = useState(true);
 
+	// Filtracja wyświetlanych wydarzeń na bazie wybranych opcji
 	const filteredEvents: any = events.filter((event: any) =>
 		selectedOptions.includes(event.className)
 	);
-
-	const [loading, setLoading] = useState(true);
 
 	const GetData = () => {
 		AxiosInstance.get("timetable/")
 			.then((response) => {
 				setEvents(response.data);
+				// Stworzenie listy dostępnych typów wydarzeń
 				setOptions([
 					...new Set(response.data.map((event: any) => event.className)),
 				]);
+				// Ustawienie domyślnych typów wydarzeń (wszystkich)
 				setSelectedOptions([
 					...new Set(response.data.map((event: any) => event.className)),
 				]);
@@ -42,6 +44,7 @@ export default function Timetable() {
 				setAlert(error.message, "error");
 			});
 	};
+
 	useEffect(() => {
 		GetData();
 	}, []);
@@ -74,12 +77,12 @@ export default function Timetable() {
 							/>
 						</Box>
 						<Box sx={{ width: "30%" }}>
-							<MultipleSelectChip
+							{/* <MultipleSelectChip
 								label="Osoby"
 								options={[]}
 								setSelectedValue={[]}
 								selectedValue={[]}
-							/>
+							/> */}
 						</Box>
 						<Box sx={{ width: "30%" }}></Box>
 					</Box>

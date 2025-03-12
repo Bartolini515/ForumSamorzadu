@@ -9,10 +9,7 @@ import { Controller } from "react-hook-form";
 interface Props {
 	label: string;
 	name: string;
-	options: {
-		id: string;
-		event_type: string;
-	}[];
+	options: any[];
 	control: any;
 }
 

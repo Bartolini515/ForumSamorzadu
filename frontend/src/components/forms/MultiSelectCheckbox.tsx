@@ -46,10 +46,10 @@ export default function MultiSelectCheckbox(props: Props) {
 	return (
 		<div>
 			<FormControl sx={{ m: 1, width: "100%" }}>
-				<InputLabel id="demo-multiple-checkbox-label">{props.label}</InputLabel>
+				<InputLabel id="multiple-checkbox-label">{props.label}</InputLabel>
 				<Select
-					labelId="demo-multiple-checkbox-label"
-					id="demo-multiple-checkbox"
+					labelId="multiple-checkbox-label"
+					id="multiple-checkbox"
 					multiple
 					value={props.selectedValue}
 					onChange={handleChange}

@@ -2,6 +2,7 @@ import { Box, Chip, Typography } from "@mui/material";
 import { useAuth } from "../../contexts/AuthContext";
 import AxiosInstance from "../AxiosInstance";
 import { useAlert } from "../../contexts/AlertContext";
+import MyButton from "../forms/MyButton";
 
 interface Task {
 	id: string;
@@ -38,11 +39,27 @@ export default function Schedule(props: Props) {
 			});
 	};
 
+	const ChangeAssigned = (id: number, user_id: number | null) => {
+		const payload = user_id ? { user_id: null } : { user_id: user?.id }; // pozostałości po próbie funkcjonalności oddawania zadania
+		AxiosInstance.put(`tasks/${id}/update_assigned/`, payload)
+			.then((response) => {
+				setAlert(response.data.message, "success");
+				props.setRefresh(true);
+			})
+			.catch((error: any) => {
+				console.log(error);
+				setAlert(error.message, "error");
+			});
+	};
+
 	const handleCompletionStatusClick = (
 		id: string,
 		completion_status: boolean
 	) => {
 		ChangeStatus(parseInt(id), completion_status);
+	};
+	const handleTakeTask = (id: string, user_id: string | null) => {
+		ChangeAssigned(parseInt(id), user_id ? parseInt(user_id) : null);
 	};
 
 	return (
@@ -102,7 +119,7 @@ export default function Schedule(props: Props) {
 						<Typography sx={{ fontWeight: "bold" }} component="span">
 							Wydarzenie:
 						</Typography>{" "}
-						{task.event}
+						{task.event ? task.event : "Nieprzypisane"}
 					</Typography>
 					<Typography component="div">
 						<Typography sx={{ fontWeight: "bold" }} component="span">
@@ -118,6 +135,20 @@ export default function Schedule(props: Props) {
 							</Typography>{" "}
 							{task.due_date}
 						</Typography>
+					)}
+
+					{task.user === null && (
+						// (task.user_id && parseInt(task.user_id) === user?.id) // pozostałości po próbie funkcjonalności oddawania zadania
+						<MyButton
+							// label={task.user ? "Oddaj zadanie" : "Przypisz do siebie"}
+							label={"Przypisz do siebie"}
+							color="primary"
+							type={"button"}
+							style={{ marginTop: "auto" }}
+							onClick={() => {
+								handleTakeTask(task.id, task.user_id);
+							}}
+						/>
 					)}
 				</Box>
 			))}

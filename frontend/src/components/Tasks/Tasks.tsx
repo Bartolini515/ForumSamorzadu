@@ -34,20 +34,13 @@ export default function Tasks() {
 	const { user } = useAuth();
 
 	const filteredTasks: any = tasks.filter((task: any) => {
-		// const showUnassigned =
-		// 	selectedOptionAdditional.includes("Pokaż nieprzypisane") && !task.user;
-		// const showOverdue =
-		// 	selectedOptionAdditional.includes("Pokaż po terminie") &&
-		// 	task.due_date &&
-		// 	new Date(task.due_date) < new Date();
-		// const showCompleted =
-		// 	selectedOptionAdditional.includes("Pokaż ukończone") &&
-		// 	task.completion_status;
-
+		const unassignedUser = task.user_id === null && selectedOptionUser === 0;
 		const matchesUser = task.user_id === selectedOptionUser;
-		const matchesEvent = selectedOptionEvent.includes(task.event);
+		const matchesEvent =
+			selectedOptionEvent.includes(task.event) ||
+			(task.event === null && selectedOptionEvent.includes("Nieprzypisane"));
 
-		return matchesUser && matchesEvent;
+		return (matchesUser && matchesEvent) || (unassignedUser && matchesEvent);
 	});
 
 	const GetTasks = () => {
@@ -61,6 +54,7 @@ export default function Tasks() {
 							.filter((task: any) => task.event != null)
 							.map((task: any) => task.event)
 					),
+					"Nieprzypisane",
 				]);
 				setRefresh(false);
 				// Ustawienie domyślnych wybranych wydarzeń (wszystkich)
@@ -81,7 +75,7 @@ export default function Tasks() {
 	const GetUsers = () => {
 		AxiosInstance.get("account/")
 			.then((response) => {
-				let tempUsers: any = [];
+				let tempUsers: any = [{ id: 0, option: "Nieprzypisane" }];
 				// Tworzenie listy dostępnych użytkowników
 				// W przypadku braku imienia i nazwiska wyświetlany jest email
 				response.data.map((user: any) => {

@@ -275,3 +275,14 @@ class TasksViewset(viewsets.ViewSet):
             return message_response(serializer.data, "Status zmieniony")
         else:
             return Response(serializer.errors, status=400)
+        
+    @action(detail=False, methods=["put"], url_path="(?P<pk>[^/.]+)/update_assigned")
+    def updateAssigned(self, request, pk=None):
+        queryset = Tasks.objects.get(pk=pk)
+        serializer = TasksSerializer(queryset, data=request.data, partial=True)
+        
+        if serializer.is_valid():
+            serializer.save()
+            return message_response(serializer.data, "Przypisanie zmienione")
+        else:
+            return Response(serializer.errors, status=400)

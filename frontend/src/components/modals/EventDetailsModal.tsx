@@ -168,7 +168,9 @@ export default function EventDetails(props: Props) {
 								marginBottom: "20px",
 							}}
 						>
-							<Box sx={{ fontWeight: "bold" }}>Nazwa: </Box>
+							<Box sx={{ fontWeight: "bold", alignContent: "center" }}>
+								Nazwa:{" "}
+							</Box>
 							<Box sx={{ marginLeft: "10px" }}>{event.title}</Box>
 						</Box>
 
@@ -181,7 +183,9 @@ export default function EventDetails(props: Props) {
 								marginBottom: "20px",
 							}}
 						>
-							<Box sx={{ fontWeight: "bold" }}>Typ: </Box>
+							<Box sx={{ fontWeight: "bold", alignContent: "center" }}>
+								Typ:{" "}
+							</Box>
 							<Box sx={{ marginLeft: "10px" }}>{event.className}</Box>
 						</Box>
 						{event.end ? (
@@ -195,7 +199,9 @@ export default function EventDetails(props: Props) {
 										marginBottom: "20px",
 									}}
 								>
-									<Box sx={{ fontWeight: "bold" }}>Data rozpoczęcia: </Box>
+									<Box sx={{ fontWeight: "bold", alignContent: "center" }}>
+										Data rozpoczęcia:{" "}
+									</Box>
 									<Box sx={{ marginLeft: "10px" }}>{event.start}</Box>
 								</Box>
 
@@ -208,7 +214,9 @@ export default function EventDetails(props: Props) {
 										marginBottom: "20px",
 									}}
 								>
-									<Box sx={{ fontWeight: "bold" }}>Data zakończenia: </Box>
+									<Box sx={{ fontWeight: "bold", alignContent: "center" }}>
+										Data zakończenia:{" "}
+									</Box>
 									<Box sx={{ marginLeft: "10px" }}>{event.end}</Box>
 								</Box>
 							</>
@@ -222,7 +230,9 @@ export default function EventDetails(props: Props) {
 									marginBottom: "20px",
 								}}
 							>
-								<Box sx={{ fontWeight: "bold" }}>Data: </Box>
+								<Box sx={{ fontWeight: "bold", alignContent: "center" }}>
+									Data:{" "}
+								</Box>
 								<Box sx={{ marginLeft: "10px" }}>{event.start}</Box>
 							</Box>
 						)}
@@ -235,7 +245,9 @@ export default function EventDetails(props: Props) {
 								marginBottom: "20px",
 							}}
 						>
-							<Box sx={{ fontWeight: "bold" }}>Utworzył(a): </Box>
+							<Box sx={{ fontWeight: "bold", alignContent: "center" }}>
+								Utworzył(a):{" "}
+							</Box>
 							<Box sx={{ marginLeft: "10px" }}>{event.creator}</Box>
 						</Box>
 						{event.description ? (
@@ -249,7 +261,9 @@ export default function EventDetails(props: Props) {
 										marginBottom: "20px",
 									}}
 								>
-									<Box sx={{ fontWeight: "bold" }}>Opis: </Box>
+									<Box sx={{ fontWeight: "bold", alignContent: "center" }}>
+										Opis:{" "}
+									</Box>
 									<Box
 										sx={{
 											marginLeft: "10px",
@@ -276,7 +290,7 @@ export default function EventDetails(props: Props) {
 								marginBottom: "20px",
 							}}
 						>
-							<Box sx={{ fontWeight: "bold" }}>
+							<Box sx={{ fontWeight: "bold", alignContent: "center" }}>
 								Zadania:
 								<Box sx={{ marginLeft: "10px", fontWeight: "normal" }}>
 									<TasksList tasks={event.tasks} />

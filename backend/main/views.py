@@ -272,6 +272,6 @@ class TasksViewset(viewsets.ViewSet):
         
         if serializer.is_valid():
             serializer.save()
-            return message_response(serializer.data, "Status zaktualizowany")
+            return message_response(serializer.data, "Status zmieniony")
         else:
             return Response(serializer.errors, status=400)

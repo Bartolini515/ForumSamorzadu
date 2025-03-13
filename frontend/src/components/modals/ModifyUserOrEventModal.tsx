@@ -242,7 +242,7 @@ export default function ModifyUserOrEvent(props: Props) {
 											marginBottom: "20px",
 										}}
 									>
-										<Box sx={{ fontWeight: "bold" }}>
+										<Box sx={{ fontWeight: "bold", alignContent: "center" }}>
 											{props.option === "user"
 												? "Email"
 												: "Nazwa typu wydarzeń:"}
@@ -269,7 +269,11 @@ export default function ModifyUserOrEvent(props: Props) {
 													marginBottom: "20px",
 												}}
 											>
-												<Box sx={{ fontWeight: "bold" }}>Hasło: </Box>
+												<Box
+													sx={{ fontWeight: "bold", alignContent: "center" }}
+												>
+													Hasło:{" "}
+												</Box>
 												<Box sx={{ marginLeft: "10px" }}>
 													<MyPassField
 														label="Hasło"
@@ -288,7 +292,11 @@ export default function ModifyUserOrEvent(props: Props) {
 													marginBottom: "20px",
 												}}
 											>
-												<Box sx={{ fontWeight: "bold" }}>Imię: </Box>
+												<Box
+													sx={{ fontWeight: "bold", alignContent: "center" }}
+												>
+													Imię:{" "}
+												</Box>
 												<Box sx={{ marginLeft: "10px" }}>
 													<MyTextField
 														label="Imię"
@@ -307,7 +315,11 @@ export default function ModifyUserOrEvent(props: Props) {
 													marginBottom: "20px",
 												}}
 											>
-												<Box sx={{ fontWeight: "bold" }}>Nazwisko: </Box>
+												<Box
+													sx={{ fontWeight: "bold", alignContent: "center" }}
+												>
+													Nazwisko:{" "}
+												</Box>
 												<Box sx={{ marginLeft: "10px" }}>
 													<MyTextField
 														label="Nazwisko"

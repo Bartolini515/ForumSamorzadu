@@ -182,7 +182,14 @@ export default function CreateEventModal(props: Props) {
 										marginBottom: "20px",
 									}}
 								>
-									<Box sx={{ fontWeight: "bold" }}>Nazwa wydarzenia</Box>
+									<Box
+										sx={{
+											fontWeight: "bold",
+											alignContent: "center",
+										}}
+									>
+										Nazwa wydarzenia
+									</Box>
 									<Box sx={{ marginLeft: "10px" }}>
 										<MyTextField
 											label="Nazwa wydarzenia"
@@ -201,7 +208,9 @@ export default function CreateEventModal(props: Props) {
 										marginBottom: "20px",
 									}}
 								>
-									<Box sx={{ fontWeight: "bold" }}>Data wydarzenia: </Box>
+									<Box sx={{ fontWeight: "bold", alignContent: "center" }}>
+										Data wydarzenia:{" "}
+									</Box>
 									<Box sx={{ marginLeft: "10px" }}>
 										<MyDatePicker
 											label="Data wydarzenia"
@@ -221,7 +230,9 @@ export default function CreateEventModal(props: Props) {
 										marginBottom: "20px",
 									}}
 								>
-									<Box sx={{ fontWeight: "bold" }}>Data zakończenia: </Box>
+									<Box sx={{ fontWeight: "bold", alignContent: "center" }}>
+										Data zakończenia:{" "}
+									</Box>
 									<Box sx={{ marginLeft: "10px" }}>
 										<MyDatePicker
 											label="Data zakończenia"
@@ -242,7 +253,9 @@ export default function CreateEventModal(props: Props) {
 										marginBottom: "20px",
 									}}
 								>
-									<Box sx={{ fontWeight: "bold" }}>Opis: </Box>
+									<Box sx={{ fontWeight: "bold", alignContent: "center" }}>
+										Opis:{" "}
+									</Box>
 									<Box sx={{ marginLeft: "10px" }}>
 										<MyTextField
 											label="Opis"
@@ -263,7 +276,9 @@ export default function CreateEventModal(props: Props) {
 										marginBottom: "20px",
 									}}
 								>
-									<Box sx={{ fontWeight: "bold" }}>Typ wydarzenia: </Box>
+									<Box sx={{ fontWeight: "bold", alignContent: "center" }}>
+										Typ wydarzenia:{" "}
+									</Box>
 									<Box sx={{ marginLeft: "10px" }}>
 										<MySelect
 											label="Typ wydarzenia"

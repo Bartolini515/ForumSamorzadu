@@ -21,7 +21,7 @@ interface Props {
 }
 
 export default function Schedule(props: Props) {
-	const { user } = useAuth();
+	const { user, isAdmin } = useAuth();
 	const { setAlert } = useAlert();
 
 	const ChangeStatus = (id: number, completion_status: boolean) => {
@@ -75,7 +75,8 @@ export default function Schedule(props: Props) {
 						label={<Typography variant="h6">{task.task_name}</Typography>}
 						color={task.completion_status ? "success" : "error"}
 						onClick={
-							user?.id == (task.user_id ? parseInt(task.user_id) : null)
+							user?.id == (task.user_id ? parseInt(task.user_id) : null) ||
+							isAdmin
 								? () =>
 										handleCompletionStatusClick(task.id, task.completion_status)
 								: undefined

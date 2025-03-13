@@ -37,6 +37,12 @@ export default function Calendar(props: Props) {
 				eventClick={(clicked_event) => {
 					props.setClickedEventId(clicked_event.event.id);
 				}}
+				eventMouseEnter={() => {
+					document.body.style.cursor = "pointer";
+				}}
+				eventMouseLeave={() => {
+					document.body.style.cursor = "auto";
+				}}
 				headerToolbar={{
 					left: "dayGridWeek,dayGridMonth",
 					center: "title",

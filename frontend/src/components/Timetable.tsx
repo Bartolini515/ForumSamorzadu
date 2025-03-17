@@ -105,7 +105,7 @@ export default function Timetable() {
 								}}
 							/>
 						)}
-						<FAB handleClick={handleClickFAB} />
+						<FAB handleClick={handleClickFAB} color="secondary" />
 						{createEventModal && (
 							<CreateEventModal
 								open={createEventModal}

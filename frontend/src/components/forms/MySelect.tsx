@@ -1,4 +1,3 @@
-import { useState } from "react";
 import Box from "@mui/material/Box";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
@@ -9,15 +8,17 @@ import { Controller } from "react-hook-form";
 interface Props {
 	label: string;
 	name: string;
-	options: any[];
+	options: { id: number; option: string }[];
 	control: any;
+	selectedOption: any;
+	setSelectedOption: (value: any) => void;
+	style?: import("@mui/system").SxProps<import("@mui/material").Theme>;
+	disabled?: boolean;
 }
 
 export default function MySelect(props: Props) {
-	const [option, setOption] = useState(props.options[0].id || "");
-
 	const handleChange = (event: SelectChangeEvent) => {
-		setOption(event.target.value as string);
+		props.setSelectedOption(event.target.value as string);
 	};
 
 	return (
@@ -25,13 +26,13 @@ export default function MySelect(props: Props) {
 			name={props.name}
 			control={props.control}
 			render={({ field: { onChange, value }, fieldState: { error } }) => (
-				<Box sx={{ minWidth: 120 }}>
+				<Box sx={{ minWidth: "20%" }}>
 					<FormControl fullWidth>
 						<InputLabel id="simple-select-label">{props.label}</InputLabel>
 						<Select
 							labelId="simple-select-label"
 							id="simple-select"
-							value={value || option}
+							value={value || props.selectedOption}
 							label={props.label}
 							onChange={(e) => {
 								handleChange(e);
@@ -39,10 +40,12 @@ export default function MySelect(props: Props) {
 							}}
 							name={props.name}
 							className={"myForm"}
+							sx={props.style}
+							disabled={props.disabled}
 						>
 							{props.options.map((option) => (
 								<MenuItem key={option.id} value={option.id}>
-									{option.event_type}
+									{option.option}
 								</MenuItem>
 							))}
 						</Select>

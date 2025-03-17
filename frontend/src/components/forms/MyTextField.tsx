@@ -7,6 +7,7 @@ interface Props {
 	name: string;
 	control: any;
 	variant?: "standard" | "filled" | "outlined";
+	style?: import("@mui/system").SxProps<import("@mui/material").Theme>;
 	multiline?: boolean;
 	maxRows?: number;
 }
@@ -23,6 +24,7 @@ export default function MyTextField(props: Props) {
 					value={value || ""}
 					label={props.label}
 					variant={props.variant || "outlined"}
+					sx={props.style}
 					multiline={props.multiline || false}
 					maxRows={props.maxRows || 1}
 					className={"myForm"}

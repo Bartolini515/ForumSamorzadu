@@ -4,13 +4,15 @@ import Modal from "@mui/material/Modal";
 import Fade from "@mui/material/Fade";
 import { useState, useEffect } from "react";
 import AxiosInstance from "../AxiosInstance";
-import { Button, Typography } from "@mui/material";
+import { Button, IconButton, Typography } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import TasksList from "../lists/TasksList";
 import MyButton from "../forms/MyButton";
 import { useAuth } from "../../contexts/AuthContext";
 import { useAlert } from "../../contexts/AlertContext";
 import ModifyEventModal from "./ModifyEventModal";
+import AddCircleOutlineOutlinedIcon from "@mui/icons-material/AddCircleOutlineOutlined";
+import CreateTaskModal from "./CreateTaskModal";
 
 const style = {
 	position: "absolute",
@@ -29,13 +31,13 @@ const style = {
 };
 
 interface Props {
-	id: string;
+	id: number;
 	setClickedEventId: any;
 	onClose: () => void;
 }
 
 interface EventData {
-	id: string;
+	id: number;
 	title: string;
 	start: string;
 	end: string | null;
@@ -57,8 +59,9 @@ interface EventData {
 export default function EventDetails(props: Props) {
 	const [open, setOpen] = useState(false);
 	const [openModify, setOpenModify] = useState(false);
+	const [openCreateTask, setOpenCreateTask] = useState(false);
 	const [event, setEvent] = useState<EventData>({
-		id: "",
+		id: 0,
 		title: "",
 		start: "",
 		end: null,
@@ -113,6 +116,10 @@ export default function EventDetails(props: Props) {
 	useEffect(() => {
 		GetData();
 	}, [props.id]);
+	function handleAddTaskClick() {
+		setOpenCreateTask(true);
+	}
+
 	return (
 		<>
 			<Modal
@@ -292,10 +299,26 @@ export default function EventDetails(props: Props) {
 						>
 							<Box sx={{ fontWeight: "bold", alignContent: "center" }}>
 								Zadania:
-								<Box sx={{ marginLeft: "10px", fontWeight: "normal" }}>
-									<TasksList tasks={event.tasks} />
-								</Box>
 							</Box>
+							<Box
+								sx={{
+									marginLeft: "10px",
+									fontWeight: "normal",
+									marginTop: "6px",
+								}}
+							>
+								{event.tasks && event.tasks.length > 0 ? (
+									<TasksList tasks={event.tasks} />
+								) : (
+									"Brak zadań"
+								)}
+							</Box>
+							{(event.end ? event.end : event.start) >=
+								new Date().toISOString().split("T")[0] && (
+								<IconButton onClick={handleAddTaskClick}>
+									<AddCircleOutlineOutlinedIcon fontSize="small" />
+								</IconButton>
+							)}
 						</Box>
 
 						{(event.is_creator || isAdmin) && (
@@ -324,6 +347,16 @@ export default function EventDetails(props: Props) {
 									handleClose();
 									setOpenModify(false);
 								}}
+							/>
+						)}
+
+						{openCreateTask && (
+							<CreateTaskModal
+								open={openCreateTask}
+								onClose={() => {
+									setOpenCreateTask(false);
+								}}
+								event_id={props.id}
 							/>
 						)}
 					</Box>

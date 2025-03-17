@@ -63,6 +63,13 @@ class Timetable_events(models.Model):
     def __str__(self):
         return self.event_name
     
+class TasksManager(models.Manager):
+    def create_task(self, task_name, description, user_id, due_date, event):
+        task = self.model(task_name=task_name, description=description, user=user_id, completion_status=False, due_date=due_date, event=event)
+        task.save(using=self._db)
+        return task
+
+    
 class Tasks(models.Model):
     task_name = models.CharField(max_length=255)
     description = models.TextField(null=True, blank=True)
@@ -73,5 +80,6 @@ class Tasks(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     event = models.ForeignKey(Timetable_events, on_delete=models.CASCADE, related_name='tasks', null=True, blank=True)
     
+    objects = TasksManager()
     def __str__(self):
         return self.task_name

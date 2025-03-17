@@ -7,6 +7,7 @@ interface Props {
 	name: string;
 	helperText?: string;
 	disablePast?: boolean;
+	maxDate?: Date | null | undefined;
 	defaultValue?: Date | null | undefined;
 	control: any;
 	views?: ["year", "month", "day"];
@@ -22,6 +23,7 @@ export default function MyDatePicker(props: Props) {
 					name={props.name}
 					label={props.label}
 					disablePast={props.disablePast}
+					maxDate={props.maxDate}
 					defaultValue={props.defaultValue}
 					views={props.views}
 					slotProps={{

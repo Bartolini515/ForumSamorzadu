@@ -32,54 +32,56 @@ const style = {
 interface Props {
 	open: boolean;
 	onClose: () => void;
+	event_id?: number | null;
 }
 
 interface FormData {
-	event_name: string;
-	start_date: Date;
-	end_date?: Date | null;
-	description?: string;
-	event_type: string;
-	created_by: string;
+	task_name: string;
+	description: string;
+	event?: number | null;
+	due_date?: Date | null;
+}
+
+interface Event {
+	id: number;
+	title: string;
+	start: Date;
+	end: Date | null;
+	description: string | null;
 }
 
 export default function CreateEventModal(props: Props) {
 	const [options, setOptions] = useState<any>([]);
-	const [selectedOption, setSelectedOption] = useState<any>(null);
-	const { handleSubmit, control, setError, clearErrors } = useForm<FormData>({
-		defaultValues: {
-			event_name: "",
-			start_date: new Date(),
-			end_date: null,
-			description: "",
-			event_type: "",
-		},
-	});
+	const [selectedOption, setSelectedOption] = useState<number | null>(
+		props.event_id ? props.event_id : null
+	);
+	const [events, setEvents] = useState<Event[]>([]);
+	const [maxDate, setMaxDate] = useState<Date | null>(null);
+	const { handleSubmit, control, setError, clearErrors, resetField } =
+		useForm<FormData>({
+			defaultValues: {
+				task_name: "",
+				description: "",
+				event: props.event_id ? props.event_id : null,
+				due_date: null,
+			},
+		});
 
 	const [loading, setLoading] = useState(true);
-
-	const token = localStorage.getItem("Token");
 
 	const { setAlert } = useAlert();
 
 	const submission = (data: FormData) => {
-		if (data.end_date) {
-			const date = new Date(data.end_date);
-			date.setDate(date.getDate() + 2);
-			data.end_date = new Date(date);
-		}
-
 		const payload = {
-			event_name: data.event_name,
-			start_date: data.start_date.toISOString().split("T")[0],
-			end_date: data.end_date
-				? data.end_date.toISOString().split("T")[0]
-				: null,
-			event_type: data.event_type,
+			task_name: data.task_name,
 			description: data.description,
+			due_date: data.due_date
+				? data.due_date.toISOString().split("T")[0]
+				: null,
+			event: data.event,
+			user_id: null,
 		};
-
-		AxiosInstance.post(`timetable/create/${token}/`, payload)
+		AxiosInstance.post(`tasks/create/`, payload)
 			.then((response) => {
 				props.onClose();
 				setAlert(response.data.message, "success");
@@ -104,12 +106,18 @@ export default function CreateEventModal(props: Props) {
 			});
 	};
 
-	const getEventTypes = () => {
-		AxiosInstance.get("timetable/event_types/")
+	const getEvents = () => {
+		AxiosInstance.get("timetable/")
 			.then((response) => {
+				setEvents(response.data);
 				let tempOptions: { id: number; option: string }[] = [];
 				response.data.forEach((element: any) => {
-					tempOptions.push({ id: element.id, option: element.event_type });
+					if (
+						(element.end ? element.end : element.start) >=
+						new Date().toISOString().split("T")[0]
+					) {
+						tempOptions.push({ id: element.id, option: element.title });
+					}
 				});
 				setOptions(tempOptions);
 				setLoading(false);
@@ -121,8 +129,22 @@ export default function CreateEventModal(props: Props) {
 	};
 
 	useEffect(() => {
-		getEventTypes();
+		getEvents();
 	}, []);
+
+	useEffect(() => {
+		let selectedEvent = events.find(
+			(event) => event.id === Number(selectedOption)
+		);
+
+		if (selectedEvent) {
+			let date = selectedEvent.end
+				? new Date(selectedEvent.end)
+				: new Date(selectedEvent.start);
+			resetField("due_date", { defaultValue: date });
+			setMaxDate(date);
+		}
+	}, [selectedOption, loading]);
 
 	const handleClick = () => {
 		clearErrors();
@@ -161,7 +183,7 @@ export default function CreateEventModal(props: Props) {
 									variant="h5"
 									component="h2"
 								>
-									Stwórz wydarzenie
+									Stwórz zadanie
 								</Typography>
 							</Box>
 							<Button
@@ -193,58 +215,13 @@ export default function CreateEventModal(props: Props) {
 											alignContent: "center",
 										}}
 									>
-										Nazwa wydarzenia
+										Nazwa zadania:{" "}
 									</Box>
 									<Box sx={{ marginLeft: "10px" }}>
 										<MyTextField
-											label="Nazwa wydarzenia"
-											name="event_name"
+											label="Nazwa zadania"
+											name="task_name"
 											control={control}
-										/>
-									</Box>
-								</Box>
-
-								<Box
-									sx={{
-										boxShadow: 3,
-										padding: "20px",
-										display: "flex",
-										flexDirection: "row",
-										marginBottom: "20px",
-									}}
-								>
-									<Box sx={{ fontWeight: "bold", alignContent: "center" }}>
-										Data wydarzenia:{" "}
-									</Box>
-									<Box sx={{ marginLeft: "10px" }}>
-										<MyDatePicker
-											label="Data wydarzenia"
-											name="start_date"
-											control={control}
-											disablePast={true}
-										/>
-									</Box>
-								</Box>
-
-								<Box
-									sx={{
-										boxShadow: 3,
-										padding: "20px",
-										display: "flex",
-										flexDirection: "row",
-										marginBottom: "20px",
-									}}
-								>
-									<Box sx={{ fontWeight: "bold", alignContent: "center" }}>
-										Data zakończenia:{" "}
-									</Box>
-									<Box sx={{ marginLeft: "10px" }}>
-										<MyDatePicker
-											label="Data zakończenia"
-											name="end_date"
-											control={control}
-											helperText="W przypadku gdy trwa kilka dni"
-											disablePast={true}
 										/>
 									</Box>
 								</Box>
@@ -283,16 +260,40 @@ export default function CreateEventModal(props: Props) {
 									}}
 								>
 									<Box sx={{ fontWeight: "bold", alignContent: "center" }}>
-										Typ wydarzenia:{" "}
+										Wydarzenie:{" "}
 									</Box>
-									<Box sx={{ marginLeft: "10px", width: "40%" }}>
+									<Box sx={{ marginLeft: "10px", width: "60%" }}>
 										<MySelect
-											label="Typ wydarzenia"
-											name="event_type"
+											label="Wydarzenie"
+											name="event"
 											options={options}
 											control={control}
 											selectedOption={selectedOption}
 											setSelectedOption={setSelectedOption}
+											disabled={props.event_id ? true : false}
+										/>
+									</Box>
+								</Box>
+
+								<Box
+									sx={{
+										boxShadow: 3,
+										padding: "20px",
+										display: "flex",
+										flexDirection: "row",
+										marginBottom: "20px",
+									}}
+								>
+									<Box sx={{ fontWeight: "bold", alignContent: "center" }}>
+										Termin:{" "}
+									</Box>
+									<Box sx={{ marginLeft: "10px" }}>
+										<MyDatePicker
+											label="Termin"
+											name="due_date"
+											control={control}
+											disablePast={true}
+											maxDate={maxDate}
 										/>
 									</Box>
 								</Box>

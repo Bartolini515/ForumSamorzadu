@@ -6,6 +6,8 @@ import DisplayTasks from "./DisplayTasks";
 import SingleSelect from "../forms/SingleSelect";
 import MultiSelectCheckbox from "../forms/MultiSelectCheckbox";
 import { useAuth } from "../../contexts/AuthContext";
+import FAB from "../forms/FAB";
+import CreateTaskModal from "../modals/CreateTaskModal";
 
 interface Task {
 	id: string;
@@ -24,9 +26,8 @@ export default function Tasks() {
 	const [optionsUsers, setOptionsUsers] = useState<any>([]);
 	const [selectedOptionUser, setSelectedOptionUser] = useState<number>(0);
 	const [selectedOptionEvent, setSelectedOptionEvent] = useState<any>([]);
-	// const [selectedOptionAdditional, setSelectedOptionAdditional] = useState<any>(
-	// 	[]
-	// );
+	const [createTaskModal, setCreateTaskModal] = useState(false);
+
 	const [loading, setLoading] = useState(true);
 	const [refresh, setRefresh] = useState(false);
 
@@ -38,7 +39,7 @@ export default function Tasks() {
 		const matchesUser = task.user_id === selectedOptionUser;
 		const matchesEvent =
 			selectedOptionEvent.includes(task.event) ||
-			(task.event === null && selectedOptionEvent.includes("Nieprzypisane"));
+			(task.event === null && selectedOptionEvent.includes("Bez wydarzenia"));
 
 		return (matchesUser && matchesEvent) || (unassignedUser && matchesEvent);
 	});
@@ -46,25 +47,29 @@ export default function Tasks() {
 	const GetTasks = () => {
 		AxiosInstance.get("tasks/")
 			.then((response) => {
-				setTasks(response.data);
+				// Filtrowanie zadań które mają datę ukończenia nadal możliwą do wykonania
+				// lub nie mają daty ukończenia i nie są ukończone
+				// Celem jest wyświetlenie zadań które są aktualne
+				let tempTasks: any[] = [];
+				response.data.forEach((element: any) => {
+					if (
+						element.due_date >= new Date().toISOString().split("T")[0] ||
+						(element.due_date === null && element.completion_status === false)
+					) {
+						tempTasks.push(element);
+					}
+				});
+				setTasks(tempTasks);
 				// Stworzenie listy dostępnych wydarzeń
 				setOptionsEvents([
 					...new Set(
-						response.data
+						tempTasks
 							.filter((task: any) => task.event != null)
 							.map((task: any) => task.event)
 					),
-					"Nieprzypisane",
+					"Bez wydarzenia",
 				]);
 				setRefresh(false);
-				// Ustawienie domyślnych wybranych wydarzeń (wszystkich)
-				// setSelectedOptionEvent([
-				// 	...new Set(
-				// 		response.data
-				// 			.filter((task: any) => task.event != null)
-				// 			.map((task: any) => task.event)
-				// 	),
-				// ]);
 			})
 			.catch((error: any) => {
 				console.log(error);
@@ -75,7 +80,7 @@ export default function Tasks() {
 	const GetUsers = () => {
 		AxiosInstance.get("account/")
 			.then((response) => {
-				let tempUsers: any = [{ id: 0, option: "Nieprzypisane" }];
+				let tempUsers: any = [{ id: 0, option: "Bez wydarzenia" }];
 				// Tworzenie listy dostępnych użytkowników
 				// W przypadku braku imienia i nazwiska wyświetlany jest email
 				response.data.map((user: any) => {
@@ -108,6 +113,10 @@ export default function Tasks() {
 	useEffect(() => {
 		GetTasks();
 	}, [refresh]);
+
+	const handleClickFAB = () => {
+		setCreateTaskModal(true);
+	};
 
 	return (
 		// Generalnie to to musi być tak że są 2 sortowania, jedno po osobach a drugie po wydarzeniach. W osobach da się wybrać nieprzypisane i wtedy tam można je claimować (a i jeszcze sposób odclaimowania)( i to później też wszystko połączyć że da się z wydarzeń claimować)
@@ -157,6 +166,16 @@ export default function Tasks() {
 						refresh={refresh}
 						setRefresh={setRefresh}
 					></DisplayTasks>
+					<FAB handleClick={handleClickFAB} color="secondary"></FAB>
+					{createTaskModal && (
+						<CreateTaskModal
+							open={createTaskModal}
+							onClose={() => {
+								setCreateTaskModal(false);
+								setRefresh(true);
+							}}
+						/>
+					)}
 				</>
 			)}
 		</>

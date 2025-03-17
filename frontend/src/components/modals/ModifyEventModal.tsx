@@ -29,9 +29,9 @@ const style = {
 };
 
 interface Props {
-	id: string;
+	id: number;
 	event: {
-		id: string;
+		id: number;
 		title: string;
 		start: string;
 		end: string | null;
@@ -276,10 +276,11 @@ export default function ModifyEventModal(props: Props) {
 									<Box sx={{ fontWeight: "bold", alignContent: "center" }}>
 										Opis:{" "}
 									</Box>
-									<Box sx={{ marginLeft: "10px" }}>
+									<Box sx={{ marginLeft: "10px", width: "100%" }}>
 										<MyTextField
 											label="Opis"
 											name="description"
+											style={{ width: "100%" }}
 											control={control}
 											multiline={true}
 											maxRows={4}

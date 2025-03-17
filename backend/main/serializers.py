@@ -42,15 +42,24 @@ class ProfileSerializer(serializers.ModelSerializer):
         fields = ('id', 'first_name', 'last_name', 'email')
         
 class TasksSerializer(serializers.ModelSerializer):
-    user = serializers.StringRelatedField()
-    user_id = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), source='user')
-    event = serializers.StringRelatedField()
+    user_id = serializers.IntegerField(allow_null=True)
+    
+    def create(self, validated_data):
+        return Tasks.objects.create_task(**validated_data)
     
     def update(self, instance, validated_data):
         instance.completion_status = validated_data.get('completion_status', instance.completion_status)
-        instance.user = validated_data.get('user', instance.user)
+        instance.user_id = validated_data.get('user_id', instance.user_id)
         instance.save()
         return instance
+    
+    class Meta:
+        model = Tasks
+        fields = ('id', 'task_name', 'description', 'user', 'completion_status', 'due_date', 'event', 'user_id')
+        
+class Tasks_for_displaySerializer(serializers.ModelSerializer):
+    user = serializers.StringRelatedField()
+    event = serializers.StringRelatedField()
     
     class Meta:
         model = Tasks

@@ -262,8 +262,17 @@ class TasksViewset(viewsets.ViewSet):
     
     def list(self, request):
         queryset = Tasks.objects.all()
-        serializer = TasksSerializer(queryset, many=True)
+        serializer = Tasks_for_displaySerializer(queryset, many=True)
         return Response(serializer.data)
+    
+    @action(detail=False, methods=["post"], url_path="create")
+    def createEvent_type(self, request):
+        serializer = TasksSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return message_response(serializer.data, "Dodano zadanie")
+        else:
+            return Response(serializer.errors, status=400)
     
     @action(detail=False, methods=["put"], url_path="(?P<pk>[^/.]+)/update_status")
     def updateStatus(self, request, pk=None):
@@ -280,6 +289,7 @@ class TasksViewset(viewsets.ViewSet):
     def updateAssigned(self, request, pk=None):
         queryset = Tasks.objects.get(pk=pk)
         serializer = TasksSerializer(queryset, data=request.data, partial=True)
+
         
         if serializer.is_valid():
             serializer.save()

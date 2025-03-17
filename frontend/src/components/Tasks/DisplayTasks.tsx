@@ -40,7 +40,7 @@ export default function Schedule(props: Props) {
 	};
 
 	const ChangeAssigned = (id: number, user_id: number | null) => {
-		const payload = user_id ? { user_id: null } : { user_id: user?.id }; // pozostałości po próbie funkcjonalności oddawania zadania
+		const payload = user_id ? { user_id: null } : { user_id: user?.id };
 		AxiosInstance.put(`tasks/${id}/update_assigned/`, payload)
 			.then((response) => {
 				setAlert(response.data.message, "success");
@@ -119,7 +119,7 @@ export default function Schedule(props: Props) {
 						<Typography sx={{ fontWeight: "bold" }} component="span">
 							Wydarzenie:
 						</Typography>{" "}
-						{task.event ? task.event : "Nieprzypisane"}
+						{task.event ? task.event : "Bez wydarzenia"}
 					</Typography>
 					<Typography component="div">
 						<Typography sx={{ fontWeight: "bold" }} component="span">
@@ -137,11 +137,10 @@ export default function Schedule(props: Props) {
 						</Typography>
 					)}
 
-					{task.user === null && (
-						// (task.user_id && parseInt(task.user_id) === user?.id) // pozostałości po próbie funkcjonalności oddawania zadania
+					{(task.user === null ||
+						(task.user_id && parseInt(task.user_id) === user?.id)) && (
 						<MyButton
-							// label={task.user ? "Oddaj zadanie" : "Przypisz do siebie"}
-							label={"Przypisz do siebie"}
+							label={task.user ? "Oddaj zadanie" : "Przypisz do siebie"}
 							color="primary"
 							type={"button"}
 							style={{ marginTop: "auto" }}

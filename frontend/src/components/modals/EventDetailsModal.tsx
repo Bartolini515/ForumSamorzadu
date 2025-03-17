@@ -60,6 +60,7 @@ export default function EventDetails(props: Props) {
 	const [open, setOpen] = useState(false);
 	const [openModify, setOpenModify] = useState(false);
 	const [openCreateTask, setOpenCreateTask] = useState(false);
+	const [refresh, setRefresh] = useState(false);
 	const [event, setEvent] = useState<EventData>({
 		id: 0,
 		title: "",
@@ -115,7 +116,7 @@ export default function EventDetails(props: Props) {
 
 	useEffect(() => {
 		GetData();
-	}, [props.id]);
+	}, [props.id, refresh]);
 	function handleAddTaskClick() {
 		setOpenCreateTask(true);
 	}
@@ -344,7 +345,7 @@ export default function EventDetails(props: Props) {
 								event={event}
 								open={openModify}
 								onClose={() => {
-									handleClose();
+									setRefresh(!refresh);
 									setOpenModify(false);
 								}}
 							/>
@@ -354,6 +355,7 @@ export default function EventDetails(props: Props) {
 							<CreateTaskModal
 								open={openCreateTask}
 								onClose={() => {
+									setRefresh(!refresh);
 									setOpenCreateTask(false);
 								}}
 								event_id={props.id}

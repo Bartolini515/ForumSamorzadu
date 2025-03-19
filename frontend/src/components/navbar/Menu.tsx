@@ -94,7 +94,7 @@ export default function Menu() {
 				</List>
 			</Collapse>
 
-			<ListItemButton
+			{/* <ListItemButton
 				component={Link}
 				to="/schedule"
 				selected={path === "/schedule"}
@@ -103,7 +103,7 @@ export default function Menu() {
 					<SchoolIcon />
 				</ListItemIcon>
 				<ListItemText primary="Plan lekcji" />
-			</ListItemButton>
+			</ListItemButton> */}
 
 			<ListItemButton
 				onClick={handleClickModerator}

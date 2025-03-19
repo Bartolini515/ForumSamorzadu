@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import TimetableCalendar from "./calendar/TimetableCalendar";
+import TimetableCalendar from "./calendars/TimetableCalendar";
 import FAB from "./forms/FAB";
 import AxiosInstance from "./AxiosInstance";
 // import MultipleSelectChip from "./forms/MultiSelectChip";
@@ -13,7 +13,7 @@ export default function Timetable() {
 	const [events, setEvents] = useState([]);
 	const [options, setOptions] = useState<any>([]);
 	const [selectedOptions, setSelectedOptions] = useState<any>([]);
-	const [clickedEventId, setClickedEventId] = useState<string>("");
+	const [clickedEventId, setClickedEventId] = useState<number>(0);
 	const [createEventModal, setCreateEventModal] = useState<boolean>(false);
 
 	const { setAlert } = useAlert();

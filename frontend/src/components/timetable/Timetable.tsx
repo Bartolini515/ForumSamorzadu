@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
-import TimetableCalendar from "./calendars/TimetableCalendar";
-import FAB from "./forms/FAB";
-import AxiosInstance from "./AxiosInstance";
+import TimetableCalendar from "./TimetableCalendar";
+import FAB from "../forms/FAB";
+import AxiosInstance from "../AxiosInstance";
 // import MultipleSelectChip from "./forms/MultiSelectChip";
 import { Box } from "@mui/material";
-import MultiSelectCheckbox from "./forms/MultiSelectCheckbox";
-import EventDetails from "./modals/EventDetailsModal";
-import CreateEventModal from "./modals/CreateEventModal";
-import { useAlert } from "../contexts/AlertContext";
+import MultiSelectCheckbox from "../forms/MultiSelectCheckbox";
+import EventDetails from "../modals/EventDetailsModal";
+import CreateEventModal from "../modals/CreateEventModal";
+import { useAlert } from "../../contexts/AlertContext";
 
 export default function Timetable() {
 	const [events, setEvents] = useState([]);

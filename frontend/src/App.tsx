@@ -1,10 +1,10 @@
 import { Routes, Route, useLocation } from "react-router";
 import "./App.css";
-import Dashboard from "./components/Dashboard";
+import Dashboard from "./components/dashboard/Dashboard";
 import Login from "./components/Login";
 import Register from "./components/Register";
 import Schedule from "./components/Schedule";
-import Timetable from "./components/Timetable";
+import Timetable from "./components/timetable/Timetable";
 import Tasks from "./components/Tasks/Tasks";
 import Navbar from "./components/navbar/Navbar";
 import TablesModeratorPanel from "./components/TablesModeratorPanel";

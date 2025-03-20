@@ -80,7 +80,7 @@ export default function Tasks() {
 	const GetUsers = () => {
 		AxiosInstance.get("account/")
 			.then((response) => {
-				let tempUsers: any = [{ id: 0, option: "Bez wydarzenia" }];
+				let tempUsers: any = [{ id: 0, option: "Nieprzypisane" }];
 				// Tworzenie listy dostępnych użytkowników
 				// W przypadku braku imienia i nazwiska wyświetlany jest email
 				response.data.map((user: any) => {
@@ -119,7 +119,6 @@ export default function Tasks() {
 	};
 
 	return (
-		// Generalnie to to musi być tak że są 2 sortowania, jedno po osobach a drugie po wydarzeniach. W osobach da się wybrać nieprzypisane i wtedy tam można je claimować (a i jeszcze sposób odclaimowania)( i to później też wszystko połączyć że da się z wydarzeń claimować)
 		<>
 			{loading ? (
 				<p>Pobieranie danych</p>

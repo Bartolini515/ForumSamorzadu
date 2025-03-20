@@ -3,6 +3,7 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import plLocale from "@fullcalendar/core/locales/pl";
 import { useNavigate } from "react-router-dom";
+import { useMediaQuery, useTheme } from "@mui/material";
 
 interface Props {
 	events: {
@@ -28,12 +29,21 @@ export default function Calendar(props: Props) {
 	}));
 
 	const navigate = useNavigate();
+	const theme = useTheme();
+	const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
 
 	return (
 		<>
 			<FullCalendar
 				plugins={[dayGridPlugin, interactionPlugin]}
-				initialView="dayGridWeek"
+				initialView={isSmallScreen ? "customThreeDay" : "dayGridWeek"}
+				views={{
+					customThreeDay: {
+						type: "dayGrid",
+						duration: { days: 3 },
+						buttonText: "3 dni",
+					},
+				}}
 				events={correctedEvents}
 				customButtons={{
 					TimetableButton: {
@@ -42,21 +52,14 @@ export default function Calendar(props: Props) {
 							navigate("/timetable");
 						},
 					},
-                    
 				}}
-				eventMouseEnter={() => {
-					document.body.style.cursor = "pointer";
-				}}
-				eventMouseLeave={() => {
-					document.body.style.cursor = "auto";
-				}}
+				height={"100%"}
 				headerToolbar={{
-					left: "dayGridWeek,dayGridMonth",
-					center: "title",
+					left: "",
+					center: "",
 					right: "TimetableButton",
 				}}
 				locale={plLocale}
-				contentHeight={800}
 			/>
 		</>
 	);

@@ -12,6 +12,7 @@ import Logout from "@mui/icons-material/Logout";
 import AxiosInstance from "../AxiosInstance";
 import { useNavigate } from "react-router-dom";
 import { useAlert } from "../../contexts/AlertContext";
+import { useAuth } from "../../contexts/AuthContext";
 
 export default function AccountMenu() {
 	const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -24,6 +25,7 @@ export default function AccountMenu() {
 	};
 	const navigate = useNavigate();
 	const { setAlert } = useAlert();
+	const { user } = useAuth();
 
 	const logoutUser = () => {
 		AxiosInstance.post(`logout/`, {}).then(() => {
@@ -36,7 +38,7 @@ export default function AccountMenu() {
 	return (
 		<React.Fragment>
 			<Box sx={{ display: "flex", alignItems: "center", textAlign: "center" }}>
-				<Tooltip title="Ustawienia konta">
+				<Tooltip title="Konto">
 					<IconButton
 						onClick={handleClick}
 						size="small"
@@ -92,7 +94,7 @@ export default function AccountMenu() {
 						navigate("/account");
 					}}
 				>
-					<Avatar /> Moje konto
+					<Avatar /> {user?.first_name} {user?.last_name}
 				</MenuItem>
 				<Divider />
 				{/* <MenuItem onClick={handleClose}>

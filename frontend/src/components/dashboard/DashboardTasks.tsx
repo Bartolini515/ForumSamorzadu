@@ -17,51 +17,9 @@ interface Task {
 
 interface Props {
 	tasks: Task[];
-	refresh: boolean;
-	setRefresh: any;
 }
 
 export default function Schedule(props: Props) {
-	const { user, isAdmin } = useAuth();
-	const { setAlert } = useAlert();
-
-	const ChangeStatus = (id: number, completion_status: boolean) => {
-		AxiosInstance.put(`tasks/${id}/update_status/`, {
-			completion_status: completion_status ? false : true,
-		})
-			.then((response) => {
-				setAlert(response.data.message, "success");
-				props.setRefresh(true);
-			})
-			.catch((error: any) => {
-				console.log(error);
-				setAlert(error.message, "error");
-			});
-	};
-
-	const ChangeAssigned = (id: number, user_id: number | null) => {
-		const payload = user_id ? { user_id: null } : { user_id: user?.id };
-		AxiosInstance.put(`tasks/${id}/update_assigned/`, payload)
-			.then((response) => {
-				setAlert(response.data.message, "success");
-				props.setRefresh(true);
-			})
-			.catch((error: any) => {
-				console.log(error);
-				setAlert(error.message, "error");
-			});
-	};
-
-	const handleCompletionStatusClick = (
-		id: number,
-		completion_status: boolean
-	) => {
-		ChangeStatus(id, completion_status);
-	};
-	const handleTakeTask = (id: number, user_id: string | null) => {
-		ChangeAssigned(id, user_id ? parseInt(user_id) : null);
-	};
-
 	return (
 		<Box
 			sx={{
@@ -91,13 +49,6 @@ export default function Schedule(props: Props) {
 					<Chip
 						label={<Typography variant="h6">{task.task_name}</Typography>}
 						color={task.completion_status ? "success" : "error"}
-						onClick={
-							user?.id == (task.user_id ? parseInt(task.user_id) : null) ||
-							isAdmin
-								? () =>
-										handleCompletionStatusClick(task.id, task.completion_status)
-								: undefined
-						}
 					/>
 
 					<Box>
@@ -135,19 +86,6 @@ export default function Schedule(props: Props) {
 							</Typography>{" "}
 							{task.due_date}
 						</Typography>
-					)}
-
-					{(task.user === null ||
-						(task.user_id && parseInt(task.user_id) === user?.id)) && (
-						<MyButton
-							label={task.user ? "Oddaj zadanie" : "Przypisz do siebie"}
-							color="primary"
-							type={"button"}
-							style={{ marginTop: "auto" }}
-							onClick={() => {
-								handleTakeTask(task.id, task.user_id);
-							}}
-						/>
 					)}
 				</Box>
 			))}

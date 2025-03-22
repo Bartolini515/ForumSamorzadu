@@ -3,7 +3,8 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import plLocale from "@fullcalendar/core/locales/pl";
 import { useNavigate } from "react-router-dom";
-import { useMediaQuery, useTheme } from "@mui/material";
+import { Box, Typography, useMediaQuery, useTheme } from "@mui/material";
+import MyButton from "../forms/MyButton";
 
 interface Props {
 	events: {
@@ -34,30 +35,47 @@ export default function Calendar(props: Props) {
 
 	return (
 		<>
+			<Box
+				sx={{
+					position: "relative",
+					display: "flex",
+					justifyContent: "space-between",
+					marginBottom: "10px",
+				}}
+			>
+				<Typography variant="h5">Najbliższe wydarzenia</Typography>
+				<MyButton
+					label={"Zobacz wszystkie zadania"}
+					type={"button"}
+					onClick={() => {
+						navigate("/timetable");
+					}}
+					variant="text"
+					style={{ color: "black", textDecoration: "underline" }}
+				></MyButton>
+			</Box>
 			<FullCalendar
 				plugins={[dayGridPlugin, interactionPlugin]}
-				initialView={isSmallScreen ? "customThreeDay" : "dayGridWeek"}
+				initialView={isSmallScreen ? "customThreeDay" : "customWeek"}
 				views={{
 					customThreeDay: {
 						type: "dayGrid",
 						duration: { days: 3 },
 						buttonText: "3 dni",
 					},
-				}}
-				events={correctedEvents}
-				customButtons={{
-					TimetableButton: {
-						text: "Zobacz wszystkie wydarzenia",
-						click: () => {
-							navigate("/timetable");
-						},
+					customWeek: {
+						type: "dayGrid",
+						duration: { days: 7 },
+						buttonText: "Tydzień",
 					},
 				}}
+				events={correctedEvents}
 				height={"100%"}
+				contentHeight={"auto"}
 				headerToolbar={{
 					left: "",
 					center: "",
-					right: "TimetableButton",
+					right: "",
 				}}
 				locale={plLocale}
 			/>

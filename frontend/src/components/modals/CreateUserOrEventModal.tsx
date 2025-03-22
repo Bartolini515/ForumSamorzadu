@@ -251,7 +251,12 @@ export default function CreateUserOrEvent(props: Props) {
 									</Box>
 								</>
 							)}
-							<MyButton label="Stwórz" type="submit" onClick={clearErrors} />
+							<MyButton
+								label="Stwórz"
+								type="submit"
+								onClick={clearErrors}
+								style={{ width: "100%" }}
+							/>
 						</form>
 					</Box>
 				</Fade>

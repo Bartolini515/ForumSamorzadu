@@ -334,6 +334,7 @@ export default function ModifyUserOrEvent(props: Props) {
 										label="Zatwierdź"
 										type="submit"
 										onClick={clearErrors}
+										style={{ width: "100%" }}
 									/>
 								</form>
 							</>

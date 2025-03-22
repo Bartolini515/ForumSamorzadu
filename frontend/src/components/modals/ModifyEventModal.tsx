@@ -292,6 +292,7 @@ export default function ModifyEventModal(props: Props) {
 									label="Zatwierdź"
 									type="submit"
 									onClick={handleClick}
+									style={{ width: "100%" }}
 								/>
 							</form>
 						</Box>

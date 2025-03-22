@@ -12,7 +12,7 @@ interface Task {
 	completion_status: boolean;
 	due_date: string | null;
 	event: string | null;
-	user_id: string | null;
+	user_id: number | null;
 }
 
 interface Props {
@@ -21,7 +21,7 @@ interface Props {
 	setRefresh: any;
 }
 
-export default function Schedule(props: Props) {
+export default function DisplayTasks(props: Props) {
 	const { user, isAdmin } = useAuth();
 	const { setAlert } = useAlert();
 
@@ -58,99 +58,109 @@ export default function Schedule(props: Props) {
 	) => {
 		ChangeStatus(id, completion_status);
 	};
-	const handleTakeTask = (id: number, user_id: string | null) => {
-		ChangeAssigned(id, user_id ? parseInt(user_id) : null);
+	const handleTakeTask = (id: number, user_id: number | null) => {
+		ChangeAssigned(id, user_id ? user_id : null);
 	};
 
 	return (
-		<Box
-			sx={{
-				boxShadow: 3,
-				padding: "20px",
-				display: "flex",
-				flexDirection: "row",
-				flexWrap: "wrap",
-				justifyContent: "center",
-				gap: "20px",
-			}}
-		>
-			{props.tasks.map((task) => (
+		<>
+			{props.tasks.length > 0 && (
 				<Box
-					key={task.id}
 					sx={{
 						boxShadow: 3,
 						padding: "20px",
 						display: "flex",
-						flexDirection: "column",
-						minHeight: "350px",
-						maxHeight: "max-content",
-						minWidth: "300px",
-						gap: "10px",
+						flexDirection: "row",
+						flexWrap: "wrap",
+						justifyContent: "center",
+						gap: "20px",
 					}}
 				>
-					<Chip
-						label={<Typography variant="h6">{task.task_name}</Typography>}
-						color={task.completion_status ? "success" : "error"}
-						onClick={
-							user?.id == (task.user_id ? parseInt(task.user_id) : null) ||
-							isAdmin
-								? () =>
-										handleCompletionStatusClick(task.id, task.completion_status)
-								: undefined
-						}
-					/>
-
-					<Box>
-						<Typography
-							sx={{ overflow: "auto", maxWidth: "300px", maxHeight: "100px" }}
-							component="div"
-						>
-							{" "}
-							<Typography
-								sx={{ fontWeight: "bold", padding: "0px", margin: "0px" }}
-								component="div"
-							>
-								Opis:
-							</Typography>{" "}
-							{task.description ? task.description : "Brak"}
-						</Typography>
-					</Box>
-					<Typography component="div">
-						<Typography sx={{ fontWeight: "bold" }} component="span">
-							Wydarzenie:
-						</Typography>{" "}
-						{task.event ? task.event : "Bez wydarzenia"}
-					</Typography>
-					<Typography component="div">
-						<Typography sx={{ fontWeight: "bold" }} component="span">
-							Przypisane do:
-						</Typography>{" "}
-						{task.user ? task.user : "Nieprzypisane"}
-					</Typography>
-
-					{task.due_date && (
-						<Typography component="div">
-							<Typography sx={{ fontWeight: "bold" }} component="span">
-								Termin:
-							</Typography>{" "}
-							{task.due_date}
-						</Typography>
-					)}
-
-					{(task.user === null ||
-						(task.user_id && parseInt(task.user_id) === user?.id)) && (
-						<MyButton
-							label={task.user ? "Oddaj zadanie" : "Przypisz do siebie"}
-							color="primary"
-							type={"button"}
-							style={{ marginTop: "auto" }}
-							onClick={() => {
-								handleTakeTask(task.id, task.user_id);
+					{props.tasks.map((task) => (
+						<Box
+							key={task.id}
+							sx={{
+								boxShadow: 3,
+								padding: "20px",
+								display: "flex",
+								flexDirection: "column",
+								minHeight: "350px",
+								maxHeight: "max-content",
+								minWidth: "300px",
+								gap: "10px",
 							}}
-						/>
-					)}
+						>
+							<Chip
+								label={<Typography variant="h6">{task.task_name}</Typography>}
+								color={task.completion_status ? "success" : "error"}
+								onClick={
+									user?.id == (task.user_id ? task.user_id : null) || isAdmin
+										? () =>
+												handleCompletionStatusClick(
+													task.id,
+													task.completion_status
+												)
+										: undefined
+								}
+							/>
+
+							<Box>
+								<Typography
+									sx={{
+										overflow: "auto",
+										maxWidth: "300px",
+										maxHeight: "100px",
+									}}
+									component="div"
+								>
+									{" "}
+									<Typography
+										sx={{ fontWeight: "bold", padding: "0px", margin: "0px" }}
+										component="div"
+									>
+										Opis:
+									</Typography>{" "}
+									{task.description ? task.description : "Brak"}
+								</Typography>
+							</Box>
+							<Typography component="div">
+								<Typography sx={{ fontWeight: "bold" }} component="span">
+									Wydarzenie:
+								</Typography>{" "}
+								{task.event ? task.event : "Bez wydarzenia"}
+							</Typography>
+							<Typography component="div">
+								<Typography sx={{ fontWeight: "bold" }} component="span">
+									Przypisane do:
+								</Typography>{" "}
+								{task.user ? task.user : "Nieprzypisane"}
+							</Typography>
+
+							{task.due_date && (
+								<Typography component="div">
+									<Typography sx={{ fontWeight: "bold" }} component="span">
+										Termin:
+									</Typography>{" "}
+									{task.due_date}
+								</Typography>
+							)}
+
+							{(task.user === null ||
+								(task.user_id && task.user_id === user?.id)) && (
+								<MyButton
+									label={task.user ? "Oddaj zadanie" : "Przypisz do siebie"}
+									color="primary"
+									type={"button"}
+									style={{ marginTop: "auto" }}
+									onClick={() => {
+										handleTakeTask(task.id, task.user_id);
+									}}
+								/>
+							)}
+						</Box>
+					))}
 				</Box>
-			))}
-		</Box>
+			)}
+		</>
 	);
 }

@@ -14,7 +14,7 @@ interface Task {
 	completion_status: boolean;
 	due_date: string | null;
 	event: string | null;
-	user_id: string | null;
+	user_id: number | null;
 }
 
 export default function Dashboard() {
@@ -29,7 +29,6 @@ export default function Dashboard() {
 		AxiosInstance.get("timetable/")
 			.then((response) => {
 				setEvents(response.data);
-				setLoading(false);
 			})
 			.catch((error: any) => {
 				console.log(error);
@@ -37,18 +36,28 @@ export default function Dashboard() {
 			});
 		AxiosInstance.get("tasks/")
 			.then((response) => {
-				for (const element of response.data) {
+				let tempTasks: Task[] = [];
+				response.data.forEach((task: Task) => {
 					if (
-						(element.due_date >= new Date().toISOString().split("T")[0] ||
-							(element.due_date === null &&
-								element.completion_status === false)) &&
-						element.user_id === user?.id
+						((task.due_date &&
+							task.due_date >= new Date().toISOString().split("T")[0]) ||
+							(task.due_date === null && task.completion_status === false)) &&
+						task.user_id === user?.id
 					) {
-						setTasks(element);
-						break;
-						// TODO aby znajdowało taska który jest najbliżej terminu
+						tempTasks.push(task);
 					}
-				}
+				});
+				tempTasks.sort((a, b) => {
+					if (a.due_date && b.due_date) {
+						return a.due_date.localeCompare(b.due_date);
+					}
+					return 0;
+				});
+				setTasks(tempTasks);
+				console.log(tasks);
+				console.log("\n" + tempTasks);
+
+				setLoading(false);
 			})
 			.catch((error: any) => {
 				console.log(error);
@@ -58,7 +67,7 @@ export default function Dashboard() {
 
 	useEffect(() => {
 		GetData();
-	}, []);
+	}, [user]);
 
 	return (
 		<Box
@@ -79,7 +88,8 @@ export default function Dashboard() {
 				<Box
 					sx={{
 						flex: { sm: 1, xs: "none" },
-						height: 200,
+						height: "100%",
+						minHeight: "auto",
 						boxShadow: 3,
 						padding: "20px",
 					}}
@@ -93,13 +103,20 @@ export default function Dashboard() {
 				<Box
 					sx={{
 						flex: { sm: 1, xs: "none" },
-						height: 200,
+						height: "100%",
 						boxShadow: 3,
 						padding: "20px",
 					}}
 				></Box>
 			</Box>
-			<Box sx={{ height: { sm: 350, xs: 300 }, boxShadow: 3, padding: "20px" }}>
+			<Box
+				sx={{
+					maxheight: { sm: 350, xs: 300 },
+					minHeight: "auto",
+					boxShadow: 3,
+					padding: "20px",
+				}}
+			>
 				{loading ? (
 					<p>Pobieranie danych</p>
 				) : (

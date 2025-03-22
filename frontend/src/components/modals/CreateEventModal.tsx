@@ -297,7 +297,12 @@ export default function CreateEventModal(props: Props) {
 									</Box>
 								</Box>
 
-								<MyButton label="Stwórz" type="submit" onClick={handleClick} />
+								<MyButton
+									label="Stwórz"
+									type="submit"
+									onClick={handleClick}
+									style={{ width: "100%" }}
+								/>
 							</form>
 						</Box>
 					)}

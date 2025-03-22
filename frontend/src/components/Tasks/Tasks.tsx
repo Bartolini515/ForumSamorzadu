@@ -17,7 +17,7 @@ interface Task {
 	completion_status: boolean;
 	due_date: string | null;
 	event: string | null;
-	user_id: string | null;
+	user_id: number | null;
 }
 
 export default function Tasks() {

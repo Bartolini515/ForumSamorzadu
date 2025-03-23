@@ -15,6 +15,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import { blue, red } from "@mui/material/colors";
 import { useAlert } from "../../contexts/AlertContext";
 import ModifyUserOrEvent from "../modals/ModifyUserOrEventModal";
+import { toDate } from "date-fns";
 
 interface Props {
 	headers: string[];
@@ -35,6 +36,15 @@ export default function ModeratorPanelTable(props: Props) {
 		AxiosInstance.get(`moderator_panel/${props.option}/`)
 			.then((response) => {
 				const sortedData = response.data.sort((a: any, b: any) => a.id - b.id);
+				if (props.option === "user") {
+					sortedData.forEach((element: any) => {
+						element["last_login"]
+							? (element["last_login"] = toDate(
+									new Date(element["last_login"])
+							  ).toLocaleString())
+							: (element["last_login"] = "Brak logowania");
+					});
+				}
 				setData(sortedData);
 
 				props.setRefresh(false);

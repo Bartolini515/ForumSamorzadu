@@ -4,15 +4,18 @@ import { BrowserRouter } from "react-router";
 import App from "./App.tsx";
 import { AuthProvider } from "./contexts/AuthContext.tsx";
 import { AlertProvider } from "./contexts/AlertContext.tsx";
+import { CalendarResizeProvider } from "./contexts/CalendarResizeContext.tsx";
 
 createRoot(document.getElementById("root")!).render(
 	<AuthProvider>
 		<AlertProvider>
-			<StrictMode>
-				<BrowserRouter>
-					<App />
-				</BrowserRouter>
-			</StrictMode>
+			<CalendarResizeProvider>
+				<StrictMode>
+					<BrowserRouter>
+						<App />
+					</BrowserRouter>
+				</StrictMode>
+			</CalendarResizeProvider>
 		</AlertProvider>
 	</AuthProvider>
 );

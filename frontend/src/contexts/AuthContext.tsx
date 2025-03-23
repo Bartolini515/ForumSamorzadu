@@ -3,9 +3,7 @@ import {
 	useState,
 	useContext,
 	ReactNode,
-	useEffect,
 } from "react";
-import AxiosInstance from "../components/AxiosInstance";
 
 interface AuthContextType {
 	isAdmin: boolean;

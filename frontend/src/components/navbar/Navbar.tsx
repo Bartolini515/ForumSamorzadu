@@ -13,6 +13,8 @@ import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import Menu from "./Menu";
 import AccountMenu from "./AccountMenu";
+import { useLocation } from "react-router-dom";
+import { useCalendarResize } from "../../contexts/CalendarResizeContext";
 
 const drawerWidth = 240;
 
@@ -82,12 +84,26 @@ export default function Navbar({ content }: NavbarProps) {
 	const theme = useTheme();
 	const [open, setOpen] = React.useState(false);
 
+	const location = useLocation();
+	const path = location.pathname;
+	const { resizeCalendar } = useCalendarResize();
+
 	const handleDrawerOpen = () => {
 		setOpen(true);
+		handleCalendarResize();
 	};
 
 	const handleDrawerClose = () => {
 		setOpen(false);
+		handleCalendarResize();
+	};
+
+	const handleCalendarResize = () => {
+		if (path === "/dashboard" || path === "/timetable") {
+			setTimeout(() => {
+				resizeCalendar();
+			}, theme.transitions.duration.leavingScreen);
+		}
 	};
 
 	return (

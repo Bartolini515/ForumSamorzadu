@@ -5,6 +5,8 @@ import plLocale from "@fullcalendar/core/locales/pl";
 import { useNavigate } from "react-router-dom";
 import { Box, Typography, useMediaQuery, useTheme } from "@mui/material";
 import MyButton from "../forms/MyButton";
+import { useRef, useEffect } from "react";
+import { useCalendarResize } from "../../contexts/CalendarResizeContext";
 
 interface Props {
 	events: {
@@ -33,6 +35,13 @@ export default function Calendar(props: Props) {
 	const theme = useTheme();
 	const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
 
+	const { setCalendarRef } = useCalendarResize();
+	const reference = useRef<FullCalendar>(null);
+
+	useEffect(() => {
+		setCalendarRef(reference.current);
+	}, []);
+
 	return (
 		<>
 			<Box
@@ -45,7 +54,7 @@ export default function Calendar(props: Props) {
 			>
 				<Typography variant="h5">Najbliższe wydarzenia</Typography>
 				<MyButton
-					label={"Zobacz wszystkie zadania"}
+					label={"Zobacz wszystkie wydarzenia"}
 					type={"button"}
 					onClick={() => {
 						navigate("/timetable");
@@ -55,6 +64,7 @@ export default function Calendar(props: Props) {
 				></MyButton>
 			</Box>
 			<FullCalendar
+				ref={reference}
 				plugins={[dayGridPlugin, interactionPlugin]}
 				initialView={isSmallScreen ? "customThreeDay" : "customWeek"}
 				views={{

@@ -24,7 +24,7 @@ export default function MyTextField(props: Props) {
 					value={value || ""}
 					label={props.label}
 					variant={props.variant || "outlined"}
-					sx={props.style}
+					sx={props.style || { width: "100%" }}
 					multiline={props.multiline || false}
 					maxRows={props.maxRows || 1}
 					className={"myForm"}

@@ -13,6 +13,7 @@ interface Props {
 	label: string;
 	name: string;
 	control: any;
+	style?: import("@mui/system").SxProps<import("@mui/material").Theme>;
 }
 
 export default function MyPassField(props: Props) {
@@ -29,7 +30,11 @@ export default function MyPassField(props: Props) {
 			name={props.name}
 			control={props.control}
 			render={({ field: { onChange, value }, fieldState: { error } }) => (
-				<FormControl variant="outlined" className={"myForm"}>
+				<FormControl
+					variant="outlined"
+					className={"myForm"}
+					sx={props.style || { width: "100%" }}
+				>
 					<InputLabel htmlFor="outlined-adornment-password">
 						{props.label}
 					</InputLabel>

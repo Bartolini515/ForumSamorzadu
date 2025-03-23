@@ -13,6 +13,9 @@ export default function ProtectedRoutes() {
 	if (!user) {
 		AxiosInstance.get("account/getuser/")
 			.then((response) => {
+				if (response.data.user.profile_picture) {
+					response.data.user.profile_picture = `${AxiosInstance.defaults.baseURL}${response.data.user.profile_picture}`;
+				}
 				setUser(response.data.user);
 				setIsAdmin(response.data.isAdmin);
 			})

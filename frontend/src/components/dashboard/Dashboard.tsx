@@ -54,9 +54,6 @@ export default function Dashboard() {
 					return 0;
 				});
 				setTasks(tempTasks);
-				console.log(tasks);
-				console.log("\n" + tempTasks);
-
 				setLoading(false);
 			})
 			.catch((error: any) => {

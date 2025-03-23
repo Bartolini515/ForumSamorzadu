@@ -1,42 +1,25 @@
-import { Avatar, IconButton, Typography, Box } from "@mui/material";
-// import EditIcon from "@mui/icons-material/Edit";
-import CameraAltIcon from "@mui/icons-material/CameraAlt";
-// import { useAlert } from "../contexts/AlertContext";
-// import { useEffect, useState } from "react";
-// import AxiosInstance from "./AxiosInstance";
+import { Avatar, Typography, Box } from "@mui/material";
 import { useAuth } from "../contexts/AuthContext";
 import MyButton from "./forms/MyButton";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import ChangeAvatarModal from "./modals/ChangeAvatarModal";
 
 export default function Account() {
+	const [openChangeAvatarModal, setOpenChangeAvatarModal] = useState(false);
+
 	const navigate = useNavigate();
 	const { user } = useAuth();
-	// const { setAlert } = useAlert();
-	// const [loading, setLoading] = useState(true);
 
-	// const GetData = () => {
-	// 	AxiosInstance.get("")
-	// 		.then(() => {
-	// 			setLoading(false);
-	// 		})
-	// 		.catch((error: any) => {
-	// 			console.log(error);
-	// 			setAlert(error.message, "error");
-	// 		});
-	// };
-	// useEffect(() => {
-	// 	GetData();
-	// }, []);
+	const handleClickAvatar = () => {
+		setOpenChangeAvatarModal(true);
+	};
 
 	return (
-		// <>
-		// 	{loading ? (
-		// 		<p>Pobieranie danych</p>
-		// 	) : (
 		<Box
 			sx={{
 				boxShadow: 24,
-				minWidth: "260px",
+				minWidth: "max-content",
 				width: "20%",
 				p: 2,
 				alignItems: "center",
@@ -49,18 +32,26 @@ export default function Account() {
 			}}
 		>
 			<Box position="relative" mb={2}>
-				<Avatar sx={{ width: 100, height: 100, "&:hover": { opacity: 0.7 } }} />
-				<IconButton
+				<Avatar
 					sx={{
-						position: "absolute",
-						bottom: 0,
-						right: 0,
-						backgroundColor: "white",
-						"&:hover": { backgroundColor: "lightgray" },
+						width: 100,
+						height: 100,
+						"&:hover": {
+							filter: "brightness(0.8)",
+							cursor: "pointer",
+							transition: "0.5s",
+						},
 					}}
-				>
-					<CameraAltIcon />
-				</IconButton>
+					alt="Profile picture"
+					src={
+						typeof user?.profile_picture === "string"
+							? user.profile_picture
+							: undefined
+					}
+					onClick={() => {
+						handleClickAvatar();
+					}}
+				/>
 			</Box>
 			<Box display="flex" alignItems="center" mb={1}>
 				<Typography variant="h6">
@@ -73,7 +64,7 @@ export default function Account() {
 			{/* <Box display="flex" alignItems="center">
 				<Typography variant="h6">Role</Typography>
 			</Box> */}
-			<br />
+
 			<MyButton
 				label="Zmień hasło"
 				type="button"
@@ -81,9 +72,15 @@ export default function Account() {
 				onClick={() => {
 					navigate("/change_password");
 				}}
+				style={{ marginTop: "10px" }}
 			/>
+
+			{openChangeAvatarModal && (
+				<ChangeAvatarModal
+					open={openChangeAvatarModal}
+					onClose={() => setOpenChangeAvatarModal(false)}
+				/>
+			)}
 		</Box>
-		// 	)}
-		// </>
 	);
 }

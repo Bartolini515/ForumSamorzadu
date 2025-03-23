@@ -1,3 +1,4 @@
+import os
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.base_user import BaseUserManager
@@ -17,14 +18,16 @@ class ProfileManager(BaseUserManager):
         extra_fields.setdefault( 'is_superuser', True )
         return self.create_user(email, password, **extra_fields)
         
-        
+
+def user_profile_picture(instance, filename):
+    return os.path.join('profile_pictures', filename)
 
 class Profile(AbstractUser):
     email = models.EmailField(max_length=255, unique=True)
     username = models.CharField(max_length=255, null=True, blank=True)
     first_name = models.CharField(max_length=255, null=True, blank=True)
     last_name = models.CharField(max_length=255, null=True, blank=True)
-    # profile_picture = models.ImageField()
+    profile_picture = models.ImageField(null=True, blank=True, upload_to=user_profile_picture)
     
     
     objects = ProfileManager()
@@ -32,8 +35,23 @@ class Profile(AbstractUser):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
     
+    def save(self, *args, **kwargs):
+        # Check if the instance already has a file and delete it if a new file is being uploaded
+        if self.pk:
+            old_instance = Profile.objects.filter(pk=self.pk).first()
+            if old_instance and old_instance.profile_picture and self.profile_picture != old_instance.profile_picture:
+                if os.path.isfile(old_instance.profile_picture.path):
+                    os.remove(old_instance.profile_picture.path)
+        super().save(*args, **kwargs)
+
     def __str__(self):
-        return self.first_name + ' ' + self.last_name if self.first_name and self.last_name is not None else self.username if self.username is not None else self.email
+        return (
+            self.first_name + ' ' + self.last_name
+            if self.first_name and self.last_name is not None
+            else self.username
+            if self.username is not None
+            else self.email
+        )
 
 
 class Event_typesManager(models.Manager):

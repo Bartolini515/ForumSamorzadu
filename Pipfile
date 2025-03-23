@@ -12,6 +12,7 @@ django-debug-toolbar = "*"
 django-environ = "*"
 django-cors-headers = "*"
 django-rest-knox = "*"
+pillow = "*"
 
 [dev-packages]
 

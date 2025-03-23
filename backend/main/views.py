@@ -6,6 +6,9 @@ from .models import *
 from django.contrib.auth import get_user_model, authenticate
 from django.utils import timezone
 from knox.models import AuthToken
+from PIL import Image
+import os
+from django.core.files.base import ContentFile
 User = get_user_model()
 
 def message_response(data, message="Operacja się powiodła"):
@@ -254,6 +257,35 @@ class AccountViewset(viewsets.ViewSet):
         data = serializer.data
             
         return Response({'user': data, 'isAdmin': user.is_staff})
+    
+    @action(detail=False, methods=["post"], url_path="change_profile_picture")
+    def change_profile_picture(self, request):
+        try:
+            token = request.headers['Authorization'][6:21]
+            auth_token = AuthToken.objects.get(token_key=token[:15])
+            user = auth_token.user
+        except AuthToken.DoesNotExist:
+            return Response({"message": "Invalid token"}, status=400)
+        
+        queryset = Profile.objects.get(pk=user.id)
+        serializer = ProfileSerializer(queryset, data=request.data, partial=True)
+        
+        if serializer.is_valid():
+            profile_picture = request.data.get('profile_picture')
+            if profile_picture:
+                image = Image.open(profile_picture)
+                image = image.resize((256, 256))
+                temp_file = ContentFile(b"")
+                image.save(temp_file, format="PNG")
+                temp_file.seek(0)
+                temp_file.name = f"user_{user.id}_profile_picture.png"
+                serializer.validated_data['profile_picture'] = temp_file  
+                
+            serializer.save()
+            
+            return message_response(serializer.data, "Zmieniono zdjęcie profilowe")
+        else:
+            return Response(serializer.errors, status=400)
     
 class TasksViewset(viewsets.ViewSet):
     permission_classes = [permissions.IsAuthenticated]

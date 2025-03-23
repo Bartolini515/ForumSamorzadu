@@ -36,7 +36,7 @@ export default function AccountMenu() {
 	};
 
 	return (
-		<React.Fragment>
+		<>
 			<Box sx={{ display: "flex", alignItems: "center", textAlign: "center" }}>
 				<Tooltip title="Konto">
 					<IconButton
@@ -47,7 +47,14 @@ export default function AccountMenu() {
 						aria-haspopup="true"
 						aria-expanded={open ? "true" : undefined}
 					>
-						<Avatar sx={{ width: 32, height: 32 }}></Avatar>
+						<Avatar
+							sx={{ width: 32, height: 32 }}
+							src={
+								typeof user?.profile_picture === "string"
+									? user.profile_picture
+									: undefined
+							}
+						></Avatar>
 					</IconButton>
 				</Tooltip>
 			</Box>
@@ -94,7 +101,14 @@ export default function AccountMenu() {
 						navigate("/account");
 					}}
 				>
-					<Avatar /> {user?.first_name} {user?.last_name}
+					<Avatar
+						src={
+							typeof user?.profile_picture === "string"
+								? user.profile_picture
+								: undefined
+						}
+					/>{" "}
+					{user?.first_name} {user?.last_name}
 				</MenuItem>
 				<Divider />
 				{/* <MenuItem onClick={handleClose}>
@@ -115,6 +129,6 @@ export default function AccountMenu() {
 					Wyloguj
 				</MenuItem>
 			</Menu>
-		</React.Fragment>
+		</>
 	);
 }

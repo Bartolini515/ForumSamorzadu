@@ -40,7 +40,7 @@ export default function MySelect(props: Props) {
 							}}
 							name={props.name}
 							className={"myForm"}
-							sx={props.style}
+							sx={props.style || { width: "100%" }}
 							disabled={props.disabled}
 						>
 							{props.options.map((option) => (

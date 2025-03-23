@@ -1,4 +1,11 @@
-import { createContext, useState, useContext, ReactNode } from "react";
+import {
+	createContext,
+	useState,
+	useContext,
+	ReactNode,
+	useEffect,
+} from "react";
+import AxiosInstance from "../components/AxiosInstance";
 
 interface AuthContextType {
 	isAdmin: boolean;
@@ -13,6 +20,7 @@ interface UserType {
 	first_name: String | null;
 	last_name: String | null;
 	last_login: String;
+	profile_picture: String | null;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);

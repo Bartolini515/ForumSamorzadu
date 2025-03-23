@@ -242,7 +242,6 @@ export default function CreateEventModal(props: Props) {
 										<MyTextField
 											label="Opis"
 											name="description"
-											style={{ width: "100%" }}
 											control={control}
 											multiline={true}
 											maxRows={4}

@@ -36,10 +36,16 @@ class Password_changeSerializer(serializers.Serializer):
         return ret
     
 class ProfileSerializer(serializers.ModelSerializer):
+    profile_picture = serializers.ImageField(allow_null=True)
+    
+    def update(self, instance, validated_data):
+        instance.profile_picture = validated_data.get('profile_picture', instance.profile_picture)
+        instance.save()
+        return instance
     
     class Meta:
         model = Profile
-        fields = ('id', 'first_name', 'last_name', 'email')
+        fields = ('id', 'first_name', 'last_name', 'email', 'last_login', 'profile_picture')
         
 class TasksSerializer(serializers.ModelSerializer):
     user_id = serializers.IntegerField(allow_null=True)

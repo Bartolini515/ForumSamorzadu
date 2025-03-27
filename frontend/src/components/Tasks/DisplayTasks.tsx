@@ -82,7 +82,7 @@ export default function DisplayTasks(props: Props) {
 			{props.tasks.length > 0 && (
 				<Box
 					sx={{
-						boxShadow: 3,
+						boxShadow: 0,
 						padding: "20px",
 						display: "flex",
 						flexDirection: "row",
@@ -173,37 +173,37 @@ export default function DisplayTasks(props: Props) {
 								</Box>
 							</Box>
 
-						<Box>
-							<Typography
-								sx={{
-									overflow: "auto",
-									maxWidth: "300px",
-									maxHeight: "100px",
-								}}
-								component="div"
-							>
-								{" "}
+							<Box>
 								<Typography
-									sx={{ fontWeight: "bold", padding: "0px", margin: "0px" }}
+									sx={{
+										overflow: "auto",
+										maxWidth: "300px",
+										maxHeight: "100px",
+									}}
 									component="div"
 								>
-									Opis:
+									{" "}
+									<Typography
+										sx={{ fontWeight: "bold", padding: "0px", margin: "0px" }}
+										component="div"
+									>
+										Opis:
+									</Typography>{" "}
+									{task.description ? task.description : "Brak"}
+								</Typography>
+							</Box>
+							<Typography component="div">
+								<Typography sx={{ fontWeight: "bold" }} component="span">
+									Wydarzenie:
 								</Typography>{" "}
-								{task.description ? task.description : "Brak"}
+								{task.event ? task.event : "Bez wydarzenia"}
 							</Typography>
-						</Box>
-						<Typography component="div">
-							<Typography sx={{ fontWeight: "bold" }} component="span">
-								Wydarzenie:
-							</Typography>{" "}
-							{task.event ? task.event : "Bez wydarzenia"}
-						</Typography>
-						<Typography component="div">
-							<Typography sx={{ fontWeight: "bold" }} component="span">
-								Przypisane do:
-							</Typography>{" "}
-							{task.user ? task.user : "Nieprzypisane"}
-						</Typography>
+							<Typography component="div">
+								<Typography sx={{ fontWeight: "bold" }} component="span">
+									Przypisane do:
+								</Typography>{" "}
+								{task.user ? task.user : "Nieprzypisane"}
+							</Typography>
 
 							{task.due_date && (
 								<Typography component="div">
@@ -229,21 +229,22 @@ export default function DisplayTasks(props: Props) {
 								</Typography>
 							)}
 
-						{(task.user === null ||
-							(task.user_id && task.user_id === user?.id)) && (
-							<MyButton
-								label={task.user ? "Oddaj zadanie" : "Przypisz do siebie"}
-								color="primary"
-								type={"button"}
-								style={{ marginTop: "auto" }}
-								onClick={() => {
-									handleTakeTask(task.id, task.user_id);
-								}}
-							/>
-						)}
-					</Box>
-				))}
-			</Box>
+							{(task.user === null ||
+								(task.user_id && task.user_id === user?.id)) && (
+								<MyButton
+									label={task.user ? "Oddaj zadanie" : "Przypisz do siebie"}
+									color="primary"
+									type={"button"}
+									style={{ marginTop: "auto" }}
+									onClick={() => {
+										handleTakeTask(task.id, task.user_id);
+									}}
+								/>
+							)}
+						</Box>
+					))}
+				</Box>
+			)}
 		</>
 	);
 }

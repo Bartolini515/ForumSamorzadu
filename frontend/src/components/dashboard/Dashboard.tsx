@@ -40,9 +40,14 @@ export default function Dashboard() {
 				response.data.forEach((task: Task) => {
 					if (
 						((task.due_date &&
-							task.due_date >= new Date().toISOString().split("T")[0]) ||
+							task.due_date >= new Date().toISOString().split("T")[0] &&
+							task.due_date <=
+								new Date(new Date().setDate(new Date().getDate() + 7))
+									.toISOString()
+									.split("T")[0]) ||
 							(task.due_date === null && task.completion_status === false)) &&
-						task.user_id === user?.id
+						task.user_id === user?.id &&
+						task.completion_status === false
 					) {
 						tempTasks.push(task);
 					}

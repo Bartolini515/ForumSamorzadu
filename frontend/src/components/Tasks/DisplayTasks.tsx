@@ -3,6 +3,7 @@ import { useAuth } from "../../contexts/AuthContext";
 import AxiosInstance from "../AxiosInstance";
 import { useAlert } from "../../contexts/AlertContext";
 import MyButton from "../forms/MyButton";
+import { differenceInCalendarDays } from "date-fns";
 
 interface Task {
 	id: number;
@@ -20,6 +21,19 @@ interface Props {
 	refresh: boolean;
 	setRefresh: any;
 }
+
+const statusMap = {
+	true: {
+		backgroundColor: "#44FF44",
+		color: "#464646",
+		statusText: "Ukończone",
+	},
+	false: {
+		backgroundColor: "#FF4444",
+		color: "#242424",
+		statusText: "Nieukończone",
+	},
+};
 
 export default function DisplayTasks(props: Props) {
 	const { user, isAdmin } = useAuth();
@@ -58,6 +72,7 @@ export default function DisplayTasks(props: Props) {
 	) => {
 		ChangeStatus(id, completion_status);
 	};
+
 	const handleTakeTask = (id: number, user_id: number | null) => {
 		ChangeAssigned(id, user_id ? user_id : null);
 	};
@@ -90,19 +105,73 @@ export default function DisplayTasks(props: Props) {
 								gap: "10px",
 							}}
 						>
-							<Chip
-								label={<Typography variant="h6">{task.task_name}</Typography>}
-								color={task.completion_status ? "success" : "error"}
-								onClick={
-									user?.id == (task.user_id ? task.user_id : null) || isAdmin
-										? () =>
-												handleCompletionStatusClick(
-													task.id,
-													task.completion_status
-												)
-										: undefined
-								}
-							/>
+							<Box
+								sx={{
+									display: "flex",
+									position: "relative",
+									flexDirection: "column",
+									marginBottom: "10px",
+								}}
+							>
+								<Chip
+									label={<Typography variant="h6">{task.task_name}</Typography>}
+									// color={task.completion_status ? "success" : "error"}
+									color={"primary"}
+									onClick={
+										user?.id == (task.user_id ? task.user_id : null) || isAdmin
+											? () =>
+													handleCompletionStatusClick(
+														task.id,
+														task.completion_status
+													)
+											: undefined
+									}
+									sx={{ zIndex: 3 }}
+								/>
+								<Box
+									sx={{
+										position: "absolute",
+										alignItems: "center",
+										justifyContent: "center",
+										backgroundColor: task.user_id
+											? statusMap[
+													task.completion_status.toString() as "true" | "false"
+											  ].backgroundColor
+											: "#686868",
+										marginTop: 0,
+										top: "17px",
+										width: "90%",
+										left: "5%",
+										textAlign: "center",
+										borderRadius: "0 0 100% 100%",
+										zIndex: 2,
+										paddingTop: "11px",
+										display: "flex",
+									}}
+								>
+									<Typography
+										sx={{
+											fontSize: "0.8rem",
+											marginTop: "2px",
+											textAlign: "center",
+											fontWeight: "600",
+											color: task.user_id
+												? statusMap[
+														task.completion_status.toString() as
+															| "true"
+															| "false"
+												  ].color
+												: "#e7e7e7",
+										}}
+									>
+										{task.user_id
+											? statusMap[
+													task.completion_status.toString() as "true" | "false"
+											  ].statusText
+											: "Nieprzypisane"}
+									</Typography>
+								</Box>
+							</Box>
 
 							<Box>
 								<Typography
@@ -142,6 +211,21 @@ export default function DisplayTasks(props: Props) {
 										Termin:
 									</Typography>{" "}
 									{task.due_date}
+									<Typography
+										sx={{
+											fontStyle: "italic",
+											fontSize: "0.8rem",
+											marginLeft: "5px",
+										}}
+										component="span"
+									>
+										za{" "}
+										{differenceInCalendarDays(
+											new Date(task.due_date),
+											new Date()
+										)}{" "}
+										dni
+									</Typography>{" "}
 								</Typography>
 							)}
 

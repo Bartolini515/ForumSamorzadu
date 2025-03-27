@@ -1,6 +1,7 @@
 import { Box, Chip, Typography } from "@mui/material";
 import MyButton from "../forms/MyButton";
 import { useNavigate } from "react-router-dom";
+import { differenceInCalendarDays } from "date-fns";
 
 interface Task {
 	id: number;
@@ -66,8 +67,26 @@ export default function DashboardTasks(props: Props) {
 					>
 						<Chip
 							label={<Typography>{task.task_name}</Typography>}
-							color={task.completion_status ? "success" : "error"}
+							// color={task.completion_status ? "success" : "error"}
+							color="primary"
 						/>
+						{task.due_date && (
+							<Typography
+								sx={{
+									fontStyle: "italic",
+									fontSize: "0.8rem",
+								}}
+								component="div"
+							>
+								{" "}
+								Termin za{" "}
+								{differenceInCalendarDays(
+									new Date(task.due_date),
+									new Date()
+								)}{" "}
+								dni
+							</Typography>
+						)}
 
 						{/* <Box>
 							<Typography

@@ -18,7 +18,7 @@ class LoginSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Profile
-        fields = ('id', 'first_name', 'last_name', 'email', 'password')
+        fields = ('id', 'first_name', 'last_name', 'email', 'password', "profile_picture")
     
 class Password_changeSerializer(serializers.Serializer):
     password = serializers.CharField()

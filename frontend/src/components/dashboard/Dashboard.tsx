@@ -101,7 +101,7 @@ export default function Dashboard() {
 					sx={{
 						flex: { sm: 1, xs: "none" },
 						height: "100%",
-						boxShadow: 3,
+						boxShadow: 0, // TODO: 3
 						padding: "20px",
 					}}
 				></Box>

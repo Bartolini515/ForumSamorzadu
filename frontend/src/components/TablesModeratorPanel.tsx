@@ -10,25 +10,19 @@ export default function ModeratorPanel() {
 	const [refresh, setRefresh] = useState(false);
 
 	const option = useMemo(() => {
-		switch (selectedOption) {
-			case "Użytkownicy":
-				return "user";
-			case "Typy wydarzeń":
-				return "event_types";
-			default:
-				return "";
-		}
+		const optionsMap: Record<string, string> = {
+			Użytkownicy: "user",
+			"Typy wydarzeń": "event_types",
+		};
+		return optionsMap[selectedOption] || "";
 	}, [selectedOption]);
 
 	const headers = useMemo(() => {
-		switch (option) {
-			case "user":
-				return ["ID", "Imię", "Nazwisko", "Email", "Ostatnie logowanie"];
-			case "event_types":
-				return ["ID", "Nazwa"];
-			default:
-				return [];
-		}
+		const headersMap: Record<string, string[]> = {
+			user: ["ID", "Imię", "Nazwisko", "Email", "Ostatnie logowanie"],
+			event_types: ["ID", "Nazwa"],
+		};
+		return headersMap[option] || [];
 	}, [option]);
 
 	const handleClick = () => {

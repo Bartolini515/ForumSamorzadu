@@ -4,6 +4,8 @@ import AxiosInstance from "../AxiosInstance";
 import { useAlert } from "../../contexts/AlertContext";
 import MyButton from "../forms/MyButton";
 import { differenceInCalendarDays } from "date-fns";
+import AlertDialog from "../modalsAndDialogs/AlertDialog";
+import { useState } from "react";
 
 interface Task {
 	id: number;
@@ -36,6 +38,10 @@ const statusMap = {
 };
 
 export default function DisplayTasks(props: Props) {
+	const [openDialog, setOpenDialog] = useState<boolean>(false);
+	const [takeTaskId, setTakeTaskId] = useState<number>(0);
+	const [takeTaskUserId, setTakeTaskUserId] = useState<number | null>(null);
+
 	const { user, isAdmin } = useAuth();
 	const { setAlert } = useAlert();
 
@@ -70,11 +76,13 @@ export default function DisplayTasks(props: Props) {
 		id: number,
 		completion_status: boolean
 	) => {
-		ChangeStatus(id, completion_status);
+		ChangeStatus(id, completion_status); // TODO to samo co w ChangeAssigned
 	};
 
 	const handleTakeTask = (id: number, user_id: number | null) => {
-		ChangeAssigned(id, user_id ? user_id : null);
+		setTakeTaskId(id);
+		setTakeTaskUserId(user_id ? user_id : null);
+		setOpenDialog(true);
 	};
 
 	return (
@@ -117,15 +125,6 @@ export default function DisplayTasks(props: Props) {
 									label={<Typography variant="h6">{task.task_name}</Typography>}
 									// color={task.completion_status ? "success" : "error"}
 									color={"primary"}
-									onClick={
-										user?.id == (task.user_id ? task.user_id : null) || isAdmin
-											? () =>
-													handleCompletionStatusClick(
-														task.id,
-														task.completion_status
-													)
-											: undefined
-									}
 									sx={{ zIndex: 3 }}
 								/>
 								<Box
@@ -224,16 +223,42 @@ export default function DisplayTasks(props: Props) {
 											new Date(task.due_date),
 											new Date()
 										)}{" "}
-										dni
+										{differenceInCalendarDays(
+											new Date(task.due_date),
+											new Date()
+										) === 1
+											? "dzień"
+											: "dni"}
 									</Typography>{" "}
 								</Typography>
 							)}
 
+							{((task.completion_status === false &&
+								task.user_id &&
+								task.user_id === user?.id) ||
+								(task.user_id && isAdmin)) && (
+								<MyButton
+									label={
+										task.completion_status
+											? "Oznacz jako nieukończone"
+											: "Oznacz jako ukończone"
+									}
+									color={task.completion_status ? "error" : "success"}
+									type={"button"}
+									style={{ marginTop: "auto" }}
+									onClick={() => {
+										handleTakeTask(task.id, task.user_id);
+									}}
+								/>
+							)}
+
 							{(task.user === null ||
-								(task.user_id && task.user_id === user?.id)) && (
+								(task.user_id &&
+									task.user_id === user?.id &&
+									task.completion_status === false)) && (
 								<MyButton
 									label={task.user ? "Oddaj zadanie" : "Przypisz do siebie"}
-									color="primary"
+									color="secondary"
 									type={"button"}
 									style={{ marginTop: "auto" }}
 									onClick={() => {
@@ -244,6 +269,18 @@ export default function DisplayTasks(props: Props) {
 						</Box>
 					))}
 				</Box>
+			)}
+			{openDialog && (
+				<AlertDialog
+					open={openDialog}
+					onClose={() => setOpenDialog(false)}
+					label="Czy na pewno chcesz ukończyć zadanie?"
+					content="Nie będziesz mógł cofnąć tej akcji, bez skontaktowania się z przewodniczącym."
+					onCloseOption2={() => {
+						ChangeAssigned(takeTaskId, takeTaskUserId);
+						setOpenDialog(false);
+					}}
+				/>
 			)}
 		</>
 	);

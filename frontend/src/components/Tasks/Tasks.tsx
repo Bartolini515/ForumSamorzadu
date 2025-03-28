@@ -7,7 +7,7 @@ import SingleSelect from "../forms/SingleSelect";
 import MultiSelectCheckbox from "../forms/MultiSelectCheckbox";
 import { useAuth } from "../../contexts/AuthContext";
 import FAB from "../forms/FAB";
-import CreateTaskModal from "../modals/CreateTaskModal";
+import CreateTaskModal from "../modalsAndDialogs/CreateTaskModal";
 
 interface Task {
 	id: string;

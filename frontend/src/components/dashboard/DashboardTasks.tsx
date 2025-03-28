@@ -84,7 +84,12 @@ export default function DashboardTasks(props: Props) {
 									new Date(task.due_date),
 									new Date()
 								)}{" "}
-								dni
+								{differenceInCalendarDays(
+									new Date(task.due_date),
+									new Date()
+								) === 1
+									? "dzień"
+									: "dni"}
 							</Typography>
 						)}
 

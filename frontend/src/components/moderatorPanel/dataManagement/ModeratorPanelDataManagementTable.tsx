@@ -8,14 +8,15 @@ import {
 	Paper,
 	IconButton,
 } from "@mui/material";
-import AxiosInstance from "../AxiosInstance";
+import AxiosInstance from "../../AxiosInstance";
 import { useEffect, useState } from "react";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import EditIcon from "@mui/icons-material/Edit";
 import { blue, red } from "@mui/material/colors";
-import { useAlert } from "../../contexts/AlertContext";
-import ModifyUserOrEvent from "../modals/ModifyUserOrEventModal";
+import { useAlert } from "../../../contexts/AlertContext";
+import ModifyUserOrEvent from "../../modalsAndDialogs/ModifyUserOrEventModal";
 import { toDate } from "date-fns";
+import AlertDialog from "../../modalsAndDialogs/AlertDialog";
 
 interface Props {
 	headers: string[];
@@ -24,10 +25,11 @@ interface Props {
 	setRefresh: any;
 }
 
-export default function ModeratorPanelTable(props: Props) {
+export default function ModeratorPanelDataManagementTable(props: Props) {
 	const [data, setData] = useState<{ id: number; [key: string]: any }[]>([]);
-	const [clickedId, setClickedId] = useState<string>("");
+	const [clickedId, setClickedId] = useState<number>(0);
 	const [open, setOpen] = useState<boolean>(false);
+	const [openDialog, setOpenDialog] = useState<boolean>(false);
 
 	const [loading, setLoading] = useState(true);
 	const { setAlert } = useAlert();
@@ -73,7 +75,8 @@ export default function ModeratorPanelTable(props: Props) {
 	};
 
 	const handleClickDelete = (id: number) => {
-		DeleteData(id);
+		setClickedId(id);
+		setOpenDialog(true);
 	};
 
 	const handleClickModify = (id: any) => {
@@ -137,6 +140,18 @@ export default function ModeratorPanelTable(props: Props) {
 					setRefresh={props.setRefresh}
 					id={clickedId}
 					setClickedId={setClickedId}
+				/>
+			)}
+			{openDialog && (
+				<AlertDialog
+					open={openDialog}
+					onClose={() => setOpenDialog(false)}
+					label="Czy na pewno chcesz usunąć dane?"
+					content="Nie będziesz mógł odwrócić tej akcji."
+					onCloseOption2={() => {
+						DeleteData(clickedId);
+						setOpenDialog(false);
+					}}
 				/>
 			)}
 		</>

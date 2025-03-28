@@ -5,8 +5,8 @@ import AxiosInstance from "../AxiosInstance";
 // import MultipleSelectChip from "./forms/MultiSelectChip";
 import { Box } from "@mui/material";
 import MultiSelectCheckbox from "../forms/MultiSelectCheckbox";
-import EventDetails from "../modals/EventDetailsModal";
-import CreateEventModal from "../modals/CreateEventModal";
+import EventDetails from "../modalsAndDialogs/EventDetailsModal";
+import CreateEventModal from "../modalsAndDialogs/CreateEventModal";
 import { useAlert } from "../../contexts/AlertContext";
 
 export default function Timetable() {

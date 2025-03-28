@@ -3,7 +3,7 @@ import { useAuth } from "../contexts/AuthContext";
 import MyButton from "./forms/MyButton";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import ChangeAvatarModal from "./modals/ChangeAvatarModal";
+import ChangeAvatarModal from "./modalsAndDialogs/ChangeAvatarModal";
 
 export default function Account() {
 	const [openChangeAvatarModal, setOpenChangeAvatarModal] = useState(false);

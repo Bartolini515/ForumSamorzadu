@@ -13,6 +13,7 @@ import { useAlert } from "../../contexts/AlertContext";
 import ModifyEventModal from "./ModifyEventModal";
 import AddCircleOutlineOutlinedIcon from "@mui/icons-material/AddCircleOutlineOutlined";
 import CreateTaskModal from "./CreateTaskModal";
+import AlertDialog from "./AlertDialog";
 
 const style = {
 	position: "absolute",
@@ -57,10 +58,11 @@ interface EventData {
 }
 
 export default function EventDetails(props: Props) {
-	const [open, setOpen] = useState(false);
-	const [openModify, setOpenModify] = useState(false);
-	const [openCreateTask, setOpenCreateTask] = useState(false);
-	const [refresh, setRefresh] = useState(false);
+	const [open, setOpen] = useState<boolean>(false);
+	const [openModify, setOpenModify] = useState<boolean>(false);
+	const [openCreateTask, setOpenCreateTask] = useState<boolean>(false);
+	const [openDialog, setOpenDialog] = useState<boolean>(false);
+	const [refresh, setRefresh] = useState<boolean>(false);
 	const [event, setEvent] = useState<EventData>({
 		id: 0,
 		title: "",
@@ -84,7 +86,7 @@ export default function EventDetails(props: Props) {
 		props.onClose();
 	};
 	const handleDeleteClick = () => {
-		DeleteData();
+		setOpenDialog(true);
 	};
 	const handleModifyClick = () => {
 		setOpenModify(true);
@@ -337,6 +339,18 @@ export default function EventDetails(props: Props) {
 									onClick={handleModifyClick}
 								/>
 							</Box>
+						)}
+						{openDialog && (
+							<AlertDialog
+								open={openDialog}
+								onClose={() => setOpenDialog(false)}
+								label="Czy na pewno chcesz usunąć wydarzenie?"
+								content="Nie będziesz mógł odwrócić tej akcji."
+								onCloseOption2={() => {
+									DeleteData();
+									setOpenDialog(false);
+								}}
+							/>
 						)}
 
 						{openModify && (

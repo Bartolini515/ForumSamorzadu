@@ -33,12 +33,12 @@ interface Props {
 	open: boolean;
 	setOpen: any;
 	setRefresh: any;
-	id: string;
+	id: number;
 	setClickedId: any;
 }
 
 interface ResponseData {
-	id: string;
+	id: number;
 	first_name?: string;
 	last_name?: string;
 	email?: string;
@@ -56,7 +56,7 @@ interface FormData {
 
 export default function ModifyUserOrEvent(props: Props) {
 	const [responseData, setResponseData] = useState<ResponseData>({
-		id: "",
+		id: 0,
 		first_name: "",
 		last_name: "",
 		email: "",

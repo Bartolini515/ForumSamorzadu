@@ -39,8 +39,9 @@ const statusMap = {
 
 export default function DisplayTasks(props: Props) {
 	const [openDialog, setOpenDialog] = useState<boolean>(false);
-	const [takeTaskId, setTakeTaskId] = useState<number>(0);
-	const [takeTaskUserId, setTakeTaskUserId] = useState<number | null>(null);
+	const [changeStatusId, setChangeStatusId] = useState<number>(0);
+	const [changeStatusCompletionStatus, setChangeStatusCompletionStatus] =
+		useState<boolean>(false);
 
 	const { user, isAdmin } = useAuth();
 	const { setAlert } = useAlert();
@@ -72,17 +73,14 @@ export default function DisplayTasks(props: Props) {
 			});
 	};
 
-	const handleCompletionStatusClick = (
-		id: number,
-		completion_status: boolean
-	) => {
-		ChangeStatus(id, completion_status); // TODO to samo co w ChangeAssigned
+	const handleCompletionStatus = (id: number, completion_status: boolean) => {
+		setChangeStatusId(id);
+		setChangeStatusCompletionStatus(completion_status);
+		setOpenDialog(true);
 	};
 
 	const handleTakeTask = (id: number, user_id: number | null) => {
-		setTakeTaskId(id);
-		setTakeTaskUserId(user_id ? user_id : null);
-		setOpenDialog(true);
+		ChangeAssigned(id, user_id ? user_id : null);
 	};
 
 	return (
@@ -247,7 +245,7 @@ export default function DisplayTasks(props: Props) {
 									type={"button"}
 									style={{ marginTop: "auto" }}
 									onClick={() => {
-										handleTakeTask(task.id, task.user_id);
+										handleCompletionStatus(task.id, task.completion_status);
 									}}
 								/>
 							)}
@@ -257,7 +255,9 @@ export default function DisplayTasks(props: Props) {
 									task.user_id === user?.id &&
 									task.completion_status === false)) && (
 								<MyButton
-									label={task.user ? "Oddaj zadanie" : "Przypisz do siebie"}
+									label={
+										task.user ? "Zrezygnuj z zadania" : "Przypisz do siebie"
+									}
 									color="secondary"
 									type={"button"}
 									style={{ marginTop: "auto" }}
@@ -277,7 +277,7 @@ export default function DisplayTasks(props: Props) {
 					label="Czy na pewno chcesz ukończyć zadanie?"
 					content="Nie będziesz mógł cofnąć tej akcji, bez skontaktowania się z przewodniczącym."
 					onCloseOption2={() => {
-						ChangeAssigned(takeTaskId, takeTaskUserId);
+						ChangeStatus(changeStatusId, changeStatusCompletionStatus);
 						setOpenDialog(false);
 					}}
 				/>

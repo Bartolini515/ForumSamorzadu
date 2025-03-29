@@ -69,6 +69,15 @@ export default function Tasks() {
 					),
 					"Bez wydarzenia",
 				]);
+				// Wybrane wydarzenia podstawowo
+				setSelectedOptionEvent([
+					...new Set(
+						tempTasks
+							.filter((task: any) => task.event != null)
+							.map((task: any) => task.event)
+					),
+					"Bez wydarzenia",
+				]);
 				setRefresh(false);
 			})
 			.catch((error: any) => {

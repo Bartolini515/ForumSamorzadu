@@ -172,20 +172,21 @@ export default function DisplayTasks(props: Props) {
 
 							<Box>
 								<Typography
+									sx={{ fontWeight: "bold", padding: "0px", margin: "0px" }}
+									component="div"
+								>
+									Opis:
+								</Typography>{" "}
+								<Typography
 									sx={{
 										overflow: "auto",
 										maxWidth: "300px",
 										maxHeight: "100px",
+										overflowY: "auto",
+										overflowWrap: "break-word",
 									}}
 									component="div"
 								>
-									{" "}
-									<Typography
-										sx={{ fontWeight: "bold", padding: "0px", margin: "0px" }}
-										component="div"
-									>
-										Opis:
-									</Typography>{" "}
 									{task.description ? task.description : "Brak"}
 								</Typography>
 							</Box>

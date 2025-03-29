@@ -1,25 +1,25 @@
 /* Navbar header */
 .css-1kh1mwg div {
-    font-weight: 600 !important;
+	font-weight: 600 !important;
 }
 
 /* Menu */
 .css-1i3kmky-MuiList-root a {
-    text-decoration: none !important;
-    color: black !important;
+	text-decoration: none !important;
+	color: black !important;
 }
 
 .Mui-selected {
-    background-color: rgba(189, 189, 189, 0.596) !important;
+	background-color: rgba(189, 189, 189, 0.596) !important;
 }
 
 /* Timetable Event types */
 a.Akcja {
-    background-color: red;
-    border-color: red;
+	background-color: red;
+	border-color: red;
 }
 
 a.Komunikat {
-    background-color: orange;
-    border-color: orange;
+	background-color: orange;
+	border-color: orange;
 }

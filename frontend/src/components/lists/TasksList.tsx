@@ -44,7 +44,15 @@ export default function TasksList(props: Props) {
 
 	return (
 		<>
-			<Stack direction="row" spacing={1} sx={{ marginBottom: "5px" }}>
+			<Stack
+				direction={{ sx: "column", sm: "row" }}
+				// spacing={0}
+				sx={{
+					marginBottom: "5px",
+					flexWrap: "wrap",
+					gap: "5px",
+				}}
+			>
 				{props.tasks.map((task) => (
 					<Chip
 						key={task.id}

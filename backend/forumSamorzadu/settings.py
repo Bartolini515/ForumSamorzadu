@@ -31,11 +31,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env('DEBUG')
 
 ALLOWED_HOSTS = [
     '127.0.0.1', # IP localhosta
-    '88.99.97.188' # IP Serwera
+    '127.0.0.254' # IP Serwera
 ]
 
 
@@ -107,8 +107,8 @@ DATABASES = {
         'NAME': env('DATABASE_NAME'),           # Nazwa bazy danych brana z pliku .env
         'USER': env('DATABASE_USER'),           # Nazwa użytkownika brana z pliku .env
         'PASSWORD': env('DATABASE_PASSWORD'),   # Hasło brane z pliku .env
-        'HOST': 'localhost',                    # Adres serwera
-        'PORT': '3306',                         # Port bazy danych
+        'HOST': env('DATABASE_HOST'),           # Adres serwera
+        'PORT': env('DATABASE_PORT'),           # Port bazy danych
         'CHARSET': 'utf8_general_ci',           # Kodowanie tekstu
 
     }
@@ -167,7 +167,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # CORS Headers
-CORS_ALLOW_ALL_ORIGINS = True # SECURITY WARNING: Don't run in production!
+# CORS_ALLOW_ALL_ORIGINS = True # SECURITY WARNING: Don't run in production!
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:5173',  # React server
 ]

@@ -58,6 +58,7 @@ export default function Dashboard() {
 					}
 					return 0;
 				});
+				tempTasks = tempTasks.slice(0, 5);
 				setTasks(tempTasks);
 				setLoading(false);
 			})

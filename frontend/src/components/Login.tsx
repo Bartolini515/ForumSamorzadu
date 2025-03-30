@@ -41,7 +41,7 @@ export default function Login() {
 					response.data.user.profile_picture = `${AxiosInstance.defaults.baseURL}${response.data.user.profile_picture}`;
 				}
 				setUser(response.data.user);
-				console.log(response.data.user);
+
 				if (response.data.isAdmin) {
 					setIsAdmin(response.data.isAdmin);
 				}

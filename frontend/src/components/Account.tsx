@@ -45,7 +45,7 @@ export default function Account() {
 					alt="Profile picture"
 					src={
 						typeof user?.profile_picture === "string"
-							? user.profile_picture
+							? `${user.profile_picture}?t=${new Date().getTime()}`
 							: undefined
 					}
 					onClick={() => {

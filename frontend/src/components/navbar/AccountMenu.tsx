@@ -51,7 +51,7 @@ export default function AccountMenu() {
 							sx={{ width: 32, height: 32 }}
 							src={
 								typeof user?.profile_picture === "string"
-									? user.profile_picture
+									? `${user.profile_picture}?t=${new Date().getTime()}`
 									: undefined
 							}
 						></Avatar>
@@ -104,7 +104,7 @@ export default function AccountMenu() {
 					<Avatar
 						src={
 							typeof user?.profile_picture === "string"
-								? user.profile_picture
+								? `${user.profile_picture}?t=${new Date().getTime()}`
 								: undefined
 						}
 					/>{" "}

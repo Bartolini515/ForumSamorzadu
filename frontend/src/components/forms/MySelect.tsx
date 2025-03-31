@@ -4,11 +4,12 @@ import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import { Controller } from "react-hook-form";
+import { FormHelperText } from "@mui/material";
 
 interface Props {
 	label: string;
 	name: string;
-	options: { id: number; option: string }[];
+	options: { id: number; option: string; label?: JSX.Element }[];
 	control: any;
 	selectedOption: any;
 	setSelectedOption: (value: any) => void;
@@ -42,13 +43,19 @@ export default function MySelect(props: Props) {
 							className={"myForm"}
 							sx={props.style || { width: "100%" }}
 							disabled={props.disabled}
+							error={!!error}
 						>
 							{props.options.map((option) => (
 								<MenuItem key={option.id} value={option.id}>
-									{option.option}
+									{option.label || option.option}
 								</MenuItem>
 							))}
 						</Select>
+						{error && (
+							<FormHelperText sx={{ color: "red" }}>
+								{error.message}
+							</FormHelperText>
+						)}
 					</FormControl>
 				</Box>
 			)}

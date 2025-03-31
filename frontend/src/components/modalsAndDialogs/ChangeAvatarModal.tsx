@@ -52,7 +52,13 @@ export default function ChangeAvatarModal(props: Props) {
 		})
 			.then((response) => {
 				props.onClose();
-				setAlert(response.data.message, "success");
+				setAlert(
+					response.data.message + ". Za chwile nastąpi odświeżenie strony",
+					"success"
+				);
+				setTimeout(() => {
+					window.location.reload();
+				}, 2000);
 			})
 			.catch((error: any) => {
 				if (
@@ -135,7 +141,6 @@ export default function ChangeAvatarModal(props: Props) {
 										submission(data);
 									})();
 									props.onClose();
-									window.location.reload();
 								}}
 								accept={["image/*"]}
 								style={{

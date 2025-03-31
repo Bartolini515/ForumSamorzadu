@@ -42,7 +42,8 @@ interface EventData {
 	title: string;
 	start: string;
 	end: string | null;
-	className: string;
+	event_type: string;
+	event_color: string;
 	description: string;
 	creator: string;
 	creator_id: string;
@@ -68,7 +69,8 @@ export default function EventDetails(props: Props) {
 		title: "",
 		start: "",
 		end: null,
-		className: "",
+		event_type: "",
+		event_color: "",
 		description: "",
 		creator: "",
 		creator_id: "",
@@ -196,7 +198,7 @@ export default function EventDetails(props: Props) {
 							<Box sx={{ fontWeight: "bold", alignContent: "center" }}>
 								Typ:{" "}
 							</Box>
-							<Box sx={{ marginLeft: "10px" }}>{event.className}</Box>
+							<Box sx={{ marginLeft: "10px" }}>{event.event_type}</Box>
 						</Box>
 						{event.end ? (
 							<>

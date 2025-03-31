@@ -21,7 +21,7 @@ export default function Timetable() {
 
 	// Filtracja wyświetlanych wydarzeń na bazie wybranych opcji
 	const filteredEvents: any = events.filter((event: any) =>
-		selectedOptions.includes(event.className)
+		selectedOptions.includes(event.event_type)
 	);
 
 	const GetData = () => {
@@ -30,11 +30,11 @@ export default function Timetable() {
 				setEvents(response.data);
 				// Stworzenie listy dostępnych typów wydarzeń
 				setOptions([
-					...new Set(response.data.map((event: any) => event.className)),
+					...new Set(response.data.map((event: any) => event.event_type)),
 				]);
 				// Ustawienie domyślnych typów wydarzeń (wszystkich)
 				setSelectedOptions([
-					...new Set(response.data.map((event: any) => event.className)),
+					...new Set(response.data.map((event: any) => event.event_type)),
 				]);
 
 				setLoading(false);

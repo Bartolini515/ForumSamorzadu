@@ -39,6 +39,7 @@ interface FormData {
 	start_date: Date;
 	end_date?: Date | null;
 	description?: string;
+	event_color: string;
 	event_type: string;
 	created_by: string;
 }
@@ -46,12 +47,15 @@ interface FormData {
 export default function CreateEventModal(props: Props) {
 	const [options, setOptions] = useState<any>([]);
 	const [selectedOption, setSelectedOption] = useState<any>(null);
+	const [optionsColor, setOptionsColor] = useState<any>([]);
+	const [selectedOptionColor, setSelectedOptionColor] = useState<any>(null);
 	const { handleSubmit, control, setError, clearErrors } = useForm<FormData>({
 		defaultValues: {
 			event_name: "",
 			start_date: new Date(),
 			end_date: null,
 			description: "",
+			event_color: "",
 			event_type: "",
 		},
 	});
@@ -76,6 +80,7 @@ export default function CreateEventModal(props: Props) {
 				? data.end_date.toISOString().split("T")[0]
 				: null,
 			event_type: data.event_type,
+			event_color: data.event_color,
 			description: data.description,
 		};
 
@@ -120,8 +125,43 @@ export default function CreateEventModal(props: Props) {
 			});
 	};
 
+	const getEventColors = () => {
+		AxiosInstance.get("timetable/event_colors/")
+			.then((response) => {
+				let tempOptions: { id: number; option: string; label: JSX.Element }[] =
+					[];
+				response.data.forEach((element: any) => {
+					tempOptions.push({
+						id: element.id,
+						option: element.event_color,
+						label: (
+							<div style={{ display: "flex", alignItems: "center" }}>
+								<div
+									style={{
+										width: "20px",
+										height: "20px",
+										backgroundColor: `#${element.event_color}`,
+										borderRadius: "50%",
+										marginRight: "10px",
+										border: "1px solid #ccc",
+									}}
+								></div>
+								#{element.event_color}
+							</div>
+						),
+					});
+				});
+				setOptionsColor(tempOptions);
+			})
+			.catch((error: any) => {
+				console.log(error);
+				setAlert(error.message, "error");
+			});
+	};
+
 	useEffect(() => {
 		getEventTypes();
+		getEventColors();
 	}, []);
 
 	const handleClick = () => {
@@ -293,6 +333,30 @@ export default function CreateEventModal(props: Props) {
 											control={control}
 											selectedOption={selectedOption}
 											setSelectedOption={setSelectedOption}
+										/>
+									</Box>
+								</Box>
+
+								<Box
+									sx={{
+										boxShadow: 3,
+										padding: "20px",
+										display: "flex",
+										flexDirection: "row",
+										marginBottom: "20px",
+									}}
+								>
+									<Box sx={{ fontWeight: "bold", alignContent: "center" }}>
+										Kolor wydarzenia:{" "}
+									</Box>
+									<Box sx={{ marginLeft: "10px", width: "40%" }}>
+										<MySelect
+											label="Kolor wydarzenia"
+											name="event_color"
+											options={optionsColor}
+											control={control}
+											selectedOption={selectedOptionColor}
+											setSelectedOption={setSelectedOptionColor}
 										/>
 									</Box>
 								</Box>

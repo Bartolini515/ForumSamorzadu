@@ -16,6 +16,7 @@ interface Task {
 	due_date: string | null;
 	event: string | null;
 	user_id: number | null;
+	color: string;
 }
 
 interface Props {
@@ -35,6 +36,22 @@ const statusMap = {
 		color: "#242424",
 		statusText: "Nieukończone",
 	},
+};
+
+const getContrastingColor = (hex: string) => {
+	// Remove the hash if it exists
+	const cleanHex = hex.replace("#", "");
+
+	// Convert hex to RGB
+	const r = parseInt(cleanHex.substring(0, 2), 16);
+	const g = parseInt(cleanHex.substring(2, 4), 16);
+	const b = parseInt(cleanHex.substring(4, 6), 16);
+
+	// Calculate luminance
+	const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+
+	// Return black or white based on luminance
+	return luminance > 0.5 ? "#000000" : "#FFFFFF";
 };
 
 export default function DisplayTasks(props: Props) {
@@ -121,9 +138,11 @@ export default function DisplayTasks(props: Props) {
 							>
 								<Chip
 									label={<Typography variant="h6">{task.task_name}</Typography>}
-									// color={task.completion_status ? "success" : "error"}
-									color={"primary"}
-									sx={{ zIndex: 3 }}
+									sx={{
+										zIndex: 3,
+										backgroundColor: `#${task.color}`,
+										color: getContrastingColor(task.color),
+									}}
 								/>
 								<Box
 									sx={{

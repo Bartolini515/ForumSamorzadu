@@ -116,6 +116,12 @@ class TimetableViewset(viewsets.ViewSet):
         serializer = Event_typesSerializer(queryset, many=True)
         return Response(serializer.data)
     
+    @action(detail=False, methods=["get"], url_path="event_colors")
+    def listEvent_colors(self, request):
+        queryset = Event_colors.objects.all()
+        serializer = Event_colorsSerializer(queryset, many=True)
+        return Response(serializer.data)
+    
     @action(detail=False, methods=["put"], url_path="(?P<pk>[^/.]+)/update")
     def updateEvent(self, request, pk=None):
         try:

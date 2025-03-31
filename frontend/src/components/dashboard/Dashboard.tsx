@@ -15,6 +15,7 @@ interface Task {
 	due_date: string | null;
 	event: string | null;
 	user_id: number | null;
+	color: string;
 }
 
 export default function Dashboard() {

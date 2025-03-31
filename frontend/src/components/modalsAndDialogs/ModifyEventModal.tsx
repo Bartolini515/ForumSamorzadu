@@ -35,7 +35,8 @@ interface Props {
 		title: string;
 		start: string;
 		end: string | null;
-		className: string;
+		event_type: string;
+		event_color: string;
 		description: string;
 		creator: string;
 		creator_id: string;
@@ -58,6 +59,7 @@ interface FormData {
 	start_date: Date;
 	end_date?: Date | null;
 	description?: string;
+	event_color: string;
 	event_type: string;
 	created_by: string;
 }
@@ -130,7 +132,7 @@ export default function ModifyEventModal(props: Props) {
 					start_date: new Date(event.start),
 					end_date: event.end ? new Date(event.end) : null,
 					description: event.description,
-					event_type: event.className,
+					event_type: event.event_type,
 				});
 				setLoading(false);
 			})

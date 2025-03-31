@@ -66,10 +66,11 @@ class TasksSerializer(serializers.ModelSerializer):
 class Tasks_for_displaySerializer(serializers.ModelSerializer):
     user = serializers.StringRelatedField()
     event = serializers.StringRelatedField()
+    color = serializers.StringRelatedField(source='event.event_color')
     
     class Meta:
         model = Tasks
-        fields = ('id', 'task_name', 'description', 'user', 'completion_status', 'due_date', 'event', 'user_id', 'event_id')
+        fields = ('id', 'task_name', 'description', 'user', 'completion_status', 'due_date', 'event', 'user_id', 'event_id', "color")
 
 class Tasks_for_eventSerializer(serializers.ModelSerializer):
     task_description = serializers.CharField(source='description')
@@ -82,11 +83,12 @@ class Timetable_eventsSerializer(serializers.ModelSerializer):
     title = serializers.CharField(source='event_name')
     start = serializers.DateField(source='start_date')
     end = serializers.DateField(source='end_date')
-    className = serializers.StringRelatedField(source='event_type')
+    event_type = serializers.StringRelatedField()
+    event_color = serializers.StringRelatedField()
     
     class Meta:
         model = Timetable_events
-        fields = ('id', 'title', 'start', 'end', 'className')
+        fields = ('id', 'title', 'start', 'end', 'event_color', 'event_type')
         
         
 class Timetable_eventsCreateSerializer(serializers.ModelSerializer):
@@ -100,20 +102,21 @@ class Timetable_eventsCreateSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Timetable_events
-        fields = ('id', 'event_name', 'start_date', 'end_date', 'event_type', 'description', 'created_by')
+        fields = ('id', 'event_name', 'start_date', 'end_date', 'event_type', 'event_color', 'description', 'created_by')
 
 class Timetable_eventsDetailsSerializer(serializers.ModelSerializer):
     title = serializers.CharField(source='event_name')
     start = serializers.DateField(source='start_date')
     end = serializers.DateField(source='end_date')
-    className = serializers.StringRelatedField(source='event_type')
+    event_type = serializers.StringRelatedField()
     creator = serializers.StringRelatedField(source='created_by')
     creator_id = serializers.IntegerField(source='created_by_id')
     tasks = Tasks_for_eventSerializer(many=True)
+    event_color = serializers.StringRelatedField()
     
     class Meta:
         model = Timetable_events
-        fields = ("id", "title", "start", "end", "className", "description", "creator", "creator_id", "tasks")
+        fields = ("id", "title", "start", "end", "event_type", "description", "creator", "creator_id", "tasks", "event_color")
 
 
 class Profiles_moderatorPanelSerializer(serializers.ModelSerializer):
@@ -170,3 +173,10 @@ class Event_typesSerializer(serializers.ModelSerializer):
     class Meta:
             model = Event_types
             fields = ("id", "event_type")
+            
+class Event_colorsSerializer(serializers.ModelSerializer):
+    event_color = serializers.CharField()
+    
+    class Meta:
+            model = Event_colors
+            fields = ("id", "event_color")

@@ -67,9 +67,16 @@ class Event_types(models.Model):
     def __str__(self):
         return self.event_type
     
+class Event_colorsManager(models.Manager):
+    def create_event_color(self, event_color):
+        event_color = self.model(event_color=event_color)
+        event_color.save(using=self._db)
+        return event_color
+    
 class Event_colors(models.Model):
     event_color = models.CharField(max_length=6, unique=True, null=False, blank=False)
     
+    objects = Event_colorsManager()
     def __str__(self):
         return self.event_color
         

@@ -29,7 +29,22 @@ const style = {
 };
 
 interface Props {
-	option: string;
+	option: {
+		name: string;
+		label: string;
+		labelSingle: string;
+		headers: string[];
+		buttonAdd: string;
+		forms: {
+			first_field: {
+				title: string;
+				label: string;
+				name: string;
+				helperText?: string;
+			};
+		};
+		payload: (data: any) => any;
+	};
 	open: boolean;
 	setOpen: any;
 	setRefresh: any;
@@ -44,6 +59,7 @@ interface ResponseData {
 	email?: string;
 	last_login?: string;
 	event_type?: string;
+	event_color?: string;
 }
 
 interface FormData {
@@ -52,6 +68,7 @@ interface FormData {
 	first_name?: string;
 	last_name?: string;
 	event_type?: string;
+	event_color?: string;
 }
 
 export default function ModifyUserOrEvent(props: Props) {
@@ -62,6 +79,7 @@ export default function ModifyUserOrEvent(props: Props) {
 		email: "",
 		last_login: "",
 		event_type: "",
+		event_color: "",
 	});
 	const handleClose = () => {
 		props.setOpen(false);
@@ -72,27 +90,15 @@ export default function ModifyUserOrEvent(props: Props) {
 	const [loading, setLoading] = useState(true);
 
 	const GetData = () => {
-		if (props.option === "user") {
-			AxiosInstance.get(`moderator_panel/user/${props.id}/`)
-				.then((response) => {
-					setResponseData(response.data);
-					setLoading(false);
-				})
-				.catch((error: any) => {
-					console.log(error);
-					setAlert(error.message, "error");
-				});
-		} else if (props.option === "event_types") {
-			AxiosInstance.get(`moderator_panel/event_types/${props.id}/`)
-				.then((response) => {
-					setResponseData(response.data);
-					setLoading(false);
-				})
-				.catch((error: any) => {
-					console.log(error);
-					setAlert(error.message, "error");
-				});
-		}
+		AxiosInstance.get(`moderator_panel/${props.option.name}/${props.id}/`)
+			.then((response) => {
+				setResponseData(response.data);
+				setLoading(false);
+			})
+			.catch((error: any) => {
+				console.log(error);
+				setAlert(error.message, "error");
+			});
 	};
 	useEffect(() => {
 		GetData();
@@ -116,68 +122,44 @@ export default function ModifyUserOrEvent(props: Props) {
 			first_name: responseData.first_name,
 			last_name: responseData.last_name,
 			event_type: responseData.event_type,
+			event_color: responseData.event_color,
 		});
 	}, [responseData, reset]);
 
 	const submission = (data: FormData) => {
-		const payload: any = {
-			email: data.email,
-			first_name: data.first_name,
-			last_name: data.last_name,
-		};
+		const payload = props.option.payload(data);
 
 		if (data.password) {
 			payload.password = data.password;
 		}
 
-		if (props.option === "user") {
-			AxiosInstance.put(`moderator_panel/user/${props.id}/update/`, payload)
-				.then((response) => {
-					handleClose();
-					setAlert(response.data.message, "success");
-				})
-				.catch((error: any) => {
-					if (
-						error.response &&
-						error.response.data &&
-						error.response.status === 400
-					) {
-						console.log(error);
-						const serverErrors = error.response.data;
-						Object.keys(serverErrors).forEach((field) => {
-							setError(field as keyof FormData, {
-								type: "server",
-								message: serverErrors[field][0],
-							});
-						});
-					} else {
-						console.log(error);
-						setAlert(error.message, "error");
-					}
-				});
-		} else if (props.option === "event_types") {
-			AxiosInstance.put(`moderator_panel/event_types/${props.id}/update/`, {
-				event_type: data.event_type,
+		AxiosInstance.put(
+			`moderator_panel/${props.option.name}/${props.id}/update/`,
+			payload
+		)
+			.then((response) => {
+				handleClose();
+				setAlert(response.data.message, "success");
 			})
-				.then((response) => {
-					handleClose();
-					setAlert(response.data.message, "success");
-				})
-				.catch((error: any) => {
-					if (error.response && error.response.data) {
-						const serverErrors = error.response.data;
-						Object.keys(serverErrors).forEach((field) => {
-							setError(field as keyof FormData, {
-								type: "server",
-								message: serverErrors[field][0],
-							});
+			.catch((error: any) => {
+				if (
+					error.response &&
+					error.response.data &&
+					error.response.status === 400
+				) {
+					console.log(error);
+					const serverErrors = error.response.data;
+					Object.keys(serverErrors).forEach((field) => {
+						setError(field as keyof FormData, {
+							type: "server",
+							message: serverErrors[field][0],
 						});
-					} else {
-						console.log(error);
-						setAlert(error.message, "error");
-					}
-				});
-		}
+					});
+				} else {
+					console.log(error);
+					setAlert(error.message, "error");
+				}
+			});
 	};
 
 	return (
@@ -214,9 +196,7 @@ export default function ModifyUserOrEvent(props: Props) {
 										variant="h5"
 										component="h2"
 									>
-										{props.option === "user"
-											? "Modyfikuj użytkownika"
-											: "Modyfikuj typ wydarzenia"}
+										Zmień {props.option.labelSingle}
 									</Typography>
 								</Box>
 								<Button
@@ -243,22 +223,18 @@ export default function ModifyUserOrEvent(props: Props) {
 										}}
 									>
 										<Box sx={{ fontWeight: "bold", alignContent: "center" }}>
-											{props.option === "user"
-												? "Email"
-												: "Nazwa typu wydarzeń:"}
+											{props.option.forms.first_field.title}:
 										</Box>
 										<Box sx={{ marginLeft: "10px" }}>
 											<MyTextField
-												label={
-													props.option === "user" ? "Email" : "Typ wydarzeń"
-												}
-												name={props.option === "user" ? "email" : "event_type"}
+												label={props.option.forms.first_field.label}
+												name={props.option.forms.first_field.name}
 												control={control}
 											/>
 										</Box>
 									</Box>
 
-									{props.option === "user" && (
+									{props.option.name === "user" && (
 										<>
 											<Box
 												sx={{

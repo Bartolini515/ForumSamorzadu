@@ -6,6 +6,19 @@ from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 User = get_user_model()
 
+# ProfilesSerializers
+class ProfileSerializer(serializers.ModelSerializer):
+    profile_picture = serializers.ImageField(allow_null=True)
+    
+    def update(self, instance, validated_data):
+        instance.profile_picture = validated_data.get('profile_picture', instance.profile_picture)
+        instance.save()
+        return instance
+    
+    class Meta:
+        model = Profile
+        fields = ('id', 'first_name', 'last_name', 'email', 'last_login', 'profile_picture')
+
 class LoginSerializer(serializers.ModelSerializer):
     email = serializers.EmailField()
     password = serializers.CharField()
@@ -34,19 +47,9 @@ class Password_changeSerializer(serializers.Serializer):
         ret = super().to_representation(instance)
         ret.pop('password', None)
         return ret
-    
-class ProfileSerializer(serializers.ModelSerializer):
-    profile_picture = serializers.ImageField(allow_null=True)
-    
-    def update(self, instance, validated_data):
-        instance.profile_picture = validated_data.get('profile_picture', instance.profile_picture)
-        instance.save()
-        return instance
-    
-    class Meta:
-        model = Profile
-        fields = ('id', 'first_name', 'last_name', 'email', 'last_login', 'profile_picture')
         
+        
+# TasksSerializers
 class TasksSerializer(serializers.ModelSerializer):
     user_id = serializers.IntegerField(allow_null=True)
     
@@ -79,6 +82,8 @@ class Tasks_for_eventSerializer(serializers.ModelSerializer):
         model = Tasks
         fields = ('id', 'task_name', 'task_description', 'assigned', 'completion_status', 'due_date')
 
+
+# Timetable_eventsSerializers
 class Timetable_eventsSerializer(serializers.ModelSerializer):
     title = serializers.CharField(source='event_name')
     start = serializers.DateField(source='start_date')
@@ -119,6 +124,7 @@ class Timetable_eventsDetailsSerializer(serializers.ModelSerializer):
         fields = ("id", "title", "start", "end", "event_type", "description", "creator", "creator_id", "tasks", "event_color")
 
 
+# moderatorPanelSerializers
 class Profiles_moderatorPanelSerializer(serializers.ModelSerializer):
     first_name = serializers.CharField()
     last_name = serializers.CharField()
@@ -152,8 +158,10 @@ class Profiles_moderatorPanelSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Profile
-        fields = ("id", "first_name", "last_name", "email", "last_login", "password")
+        fields = ("id" , "first_name", "last_name", "email", "last_login", "password")
         
+        
+# Event_typesSerializers
 class Event_typesSerializer(serializers.ModelSerializer):
     event_type = serializers.CharField()
     
@@ -174,8 +182,27 @@ class Event_typesSerializer(serializers.ModelSerializer):
             model = Event_types
             fields = ("id", "event_type")
             
+
+# Event_colorsSerializers
 class Event_colorsSerializer(serializers.ModelSerializer):
     event_color = serializers.CharField()
+    
+    def validate_event_color(self, value):
+        if Event_colors.objects.filter(event_color=value).exists():
+            raise serializers.ValidationError("Hex koloru nie może się powtarzać")
+        if value > 'FFFFFF' or value < '000000':
+            raise serializers.ValidationError("Hex koloru musi być w formacie RRGGBB")
+        if len(value) != 6:
+            raise serializers.ValidationError("Hex koloru musi mieć długość 6 znaków")
+        return value
+    
+    def create(self, validated_data):
+        return Event_colors.objects.create_event_color(**validated_data)
+    
+    def update(self, instance, validated_data):
+        instance.event_color = validated_data.get('event_color', instance.event_color)
+        instance.save()
+        return instance
     
     class Meta:
             model = Event_colors

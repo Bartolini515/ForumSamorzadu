@@ -10,6 +10,7 @@ interface Props {
 	style?: import("@mui/system").SxProps<import("@mui/material").Theme>;
 	multiline?: boolean;
 	maxRows?: number;
+	helperText?: string;
 }
 
 export default function MyTextField(props: Props) {
@@ -29,7 +30,7 @@ export default function MyTextField(props: Props) {
 					maxRows={props.maxRows || 1}
 					className={"myForm"}
 					error={!!error}
-					helperText={error ? error.message : ""}
+					helperText={error ? error.message : props?.helperText}
 				/>
 			)}
 		/>

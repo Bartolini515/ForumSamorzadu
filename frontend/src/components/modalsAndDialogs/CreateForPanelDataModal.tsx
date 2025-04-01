@@ -28,7 +28,22 @@ const style = {
 };
 
 interface Props {
-	option: string;
+	option: {
+		name: string;
+		label: string;
+		labelSingle: string;
+		headers: string[];
+		buttonAdd: string;
+		forms: {
+			first_field: {
+				title: string;
+				label: string;
+				name: string;
+				helperText?: string;
+			};
+		};
+		payload: (data: any) => any;
+	};
 	open: boolean;
 	setOpen: any;
 	setRefresh: any;
@@ -40,6 +55,7 @@ interface FormData {
 	first_name?: string;
 	last_name?: string;
 	event_type?: string;
+	event_color?: string;
 }
 
 export default function CreateUserOrEvent(props: Props) {
@@ -50,6 +66,7 @@ export default function CreateUserOrEvent(props: Props) {
 			first_name: "",
 			last_name: "",
 			event_type: "",
+			event_color: "",
 		},
 	});
 
@@ -61,58 +78,32 @@ export default function CreateUserOrEvent(props: Props) {
 	const { setAlert } = useAlert();
 
 	const submission = (data: FormData) => {
-		if (props.option === "user") {
-			AxiosInstance.post(`moderator_panel/user/create/`, {
-				email: data.email,
-				first_name: data.first_name,
-				last_name: data.last_name,
-				password: data.password,
+		AxiosInstance.post(
+			`moderator_panel/${props.option.name}/create/`,
+			props.option.payload(data)
+		)
+			.then((response) => {
+				handleClose();
+				setAlert(response.data.message, "success");
 			})
-				.then((response) => {
-					handleClose();
-					setAlert(response.data.message, "success");
-				})
-				.catch((error: any) => {
-					if (
-						error.response &&
-						error.response.data &&
-						error.response.status === 400
-					) {
-						const serverErrors = error.response.data;
-						Object.keys(serverErrors).forEach((field) => {
-							setError(field as keyof FormData, {
-								type: "server",
-								message: serverErrors[field][0],
-							});
+			.catch((error: any) => {
+				if (
+					error.response &&
+					error.response.data &&
+					error.response.status === 400
+				) {
+					const serverErrors = error.response.data;
+					Object.keys(serverErrors).forEach((field) => {
+						setError(field as keyof FormData, {
+							type: "server",
+							message: serverErrors[field][0],
 						});
-					} else {
-						console.log(error);
-						setAlert(error.message, "error");
-					}
-				});
-		} else if (props.option === "event_types") {
-			AxiosInstance.post(`moderator_panel/event_types/create/`, {
-				event_type: data.event_type,
-			})
-				.then((response) => {
-					handleClose();
-					setAlert(response.data.message, "success");
-				})
-				.catch((error: any) => {
-					if (error.response && error.response.data) {
-						const serverErrors = error.response.data;
-						Object.keys(serverErrors).forEach((field) => {
-							setError(field as keyof FormData, {
-								type: "server",
-								message: serverErrors[field][0],
-							});
-						});
-					} else {
-						console.log(error);
-						setAlert(error.message, "error");
-					}
-				});
-		}
+					});
+				} else {
+					console.log(error);
+					setAlert(error.message, "error");
+				}
+			});
 	};
 
 	return (
@@ -145,9 +136,7 @@ export default function CreateUserOrEvent(props: Props) {
 								variant="h5"
 								component="h2"
 							>
-								{props.option === "user"
-									? "Stwórz użytkownika"
-									: "Stwórz typ wydarzenia"}
+								Stwórz {props.option.labelSingle}
 							</Typography>
 						</Box>
 						<Button
@@ -174,18 +163,19 @@ export default function CreateUserOrEvent(props: Props) {
 								}}
 							>
 								<Box sx={{ fontWeight: "bold", alignContent: "center" }}>
-									{props.option === "user" ? "Email" : "Nazwa typu wydarzeń:"}
+									{props.option.forms.first_field.title}:{" "}
 								</Box>
 								<Box sx={{ marginLeft: "10px" }}>
 									<MyTextField
-										label={props.option === "user" ? "Email" : "Typ wydarzeń"}
-										name={props.option === "user" ? "email" : "event_type"}
+										label={props.option.forms.first_field.label}
+										name={props.option.forms.first_field.name}
 										control={control}
+										helperText={props.option.forms.first_field.helperText}
 									/>
 								</Box>
 							</Box>
 
-							{props.option === "user" && (
+							{props.option.name === "user" && (
 								<>
 									<Box
 										sx={{

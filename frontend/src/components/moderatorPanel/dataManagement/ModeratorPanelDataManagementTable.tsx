@@ -14,15 +14,28 @@ import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import EditIcon from "@mui/icons-material/Edit";
 import { blue, red } from "@mui/material/colors";
 import { useAlert } from "../../../contexts/AlertContext";
-import ModifyUserOrEvent from "../../modalsAndDialogs/ModifyUserOrEventModal";
+import ModifyForPanelDataModal from "../../modalsAndDialogs/ModifyForPanelDataModal";
 import { toDate } from "date-fns";
 import AlertDialog from "../../modalsAndDialogs/AlertDialog";
 
 interface Props {
-	headers: string[];
-	option: any;
+	option: {
+		name: string;
+		label: string;
+		labelSingle: string;
+		headers: string[];
+		buttonAdd: string;
+		forms: {
+			first_field: {
+				title: string;
+				label: string;
+				name: string;
+			};
+		};
+		payload: (data: any) => any;
+	};
 	refresh: boolean;
-	setRefresh: any;
+	setRefresh: (value: boolean) => void;
 }
 
 export default function ModeratorPanelDataManagementTable(props: Props) {
@@ -35,10 +48,10 @@ export default function ModeratorPanelDataManagementTable(props: Props) {
 	const { setAlert } = useAlert();
 
 	const GetData = () => {
-		AxiosInstance.get(`moderator_panel/${props.option}/`)
+		AxiosInstance.get(`moderator_panel/${props.option.name}/`)
 			.then((response) => {
 				const sortedData = response.data.sort((a: any, b: any) => a.id - b.id);
-				if (props.option === "user") {
+				if (props.option.name === "user") {
 					sortedData.forEach((element: any) => {
 						element["last_login"]
 							? (element["last_login"] = toDate(
@@ -63,7 +76,7 @@ export default function ModeratorPanelDataManagementTable(props: Props) {
 	}, [props.option, props.refresh]);
 
 	const DeleteData = (id: number) => {
-		AxiosInstance.delete(`moderator_panel/${props.option}/delete/${id}/`)
+		AxiosInstance.delete(`moderator_panel/${props.option.name}/delete/${id}/`)
 			.then((response) => {
 				props.setRefresh(true);
 				setAlert(response.data.message, "success");
@@ -103,7 +116,7 @@ export default function ModeratorPanelDataManagementTable(props: Props) {
 					<Table>
 						<TableHead>
 							<TableRow>
-								{props.headers.map((header, index) => (
+								{props.option.headers.map((header, index) => (
 									<TableCell key={index}>{header}</TableCell>
 								))}
 								<TableCell>Zmodyfikuj</TableCell>
@@ -133,7 +146,7 @@ export default function ModeratorPanelDataManagementTable(props: Props) {
 				</TableContainer>
 			)}
 			{open && (
-				<ModifyUserOrEvent
+				<ModifyForPanelDataModal
 					option={props.option}
 					open={open}
 					setOpen={setOpen}
@@ -147,7 +160,7 @@ export default function ModeratorPanelDataManagementTable(props: Props) {
 					open={openDialog}
 					onClose={() => setOpenDialog(false)}
 					label="Czy na pewno chcesz usunąć dane?"
-					content="Nie będziesz mógł odwrócić tej akcji."
+					content=" Wszystkie powiązane dane również zostaną usunięte. Nie będziesz mógł odwrócić tej akcji."
 					onCloseOption2={() => {
 						DeleteData(clickedId);
 						setOpenDialog(false);

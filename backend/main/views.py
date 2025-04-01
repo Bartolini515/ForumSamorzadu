@@ -147,6 +147,8 @@ class ModeratorPanelViewset(viewsets.ViewSet):
     queryset = Profile.objects.all()
     serializer_class = Profiles_moderatorPanelSerializer
     
+    
+    # Sekcja profili
     @action(detail=False, methods=["get"], url_path="user")
     def listProfiles(self, request):
         queryset = Profile.objects.all()
@@ -168,7 +170,24 @@ class ModeratorPanelViewset(viewsets.ViewSet):
             return message_response(serializer.data, "Profil zaktualizowany")
         else:
             return Response(serializer.errors, status=400)
+        
+    @action(detail=False, methods=["post"], url_path="user/create")
+    def createProfile(self, request):
+        serializer = Profiles_moderatorPanelSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return message_response(serializer.data, "Dodano użytkownika")
+        else:
+            return Response(serializer.errors, status=400)
+
+    @action(detail=False, methods=["delete"], url_path="user/delete/(?P<pk>[^/.]+)")
+    def deleteProfile(self, request, pk=None):
+        user = Profile.objects.get(pk=pk)
+        user.delete()
+        return Response({"message": "Użytkownik usunięty"})
     
+    
+    # Sekcja typów wydarzeń
     @action(detail=False, methods=["get"], url_path="event_types")
     def listEvent_types(self, request):
         queryset = Event_types.objects.all()
@@ -199,27 +218,51 @@ class ModeratorPanelViewset(viewsets.ViewSet):
             return message_response(serializer.data, "Dodano typ wydarzenia")
         else:
             return Response(serializer.errors, status=400)
-        
-    @action(detail=False, methods=["post"], url_path="user/create")
-    def createProfile(self, request):
-        serializer = Profiles_moderatorPanelSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return message_response(serializer.data, "Dodano użytkownika")
-        else:
-            return Response(serializer.errors, status=400)
-
-    @action(detail=False, methods=["delete"], url_path="user/delete/(?P<pk>[^/.]+)")
-    def deleteUser(self, request, pk=None):
-        user = Profile.objects.get(pk=pk)
-        user.delete()
-        return Response({"message": "Użytkownik usunięty"})
     
     @action(detail=False, methods=["delete"], url_path="event_types/delete/(?P<pk>[^/.]+)")
     def deleteEvent_type(self, request, pk=None):
         event_type = Event_types.objects.get(pk=pk)
         event_type.delete()
         return Response({"message": "Typ wydarzenia usunięty"})
+    
+    
+    #Sekcja kolorów wydarzeń
+    @action(detail=False, methods=["get"], url_path="event_colors")
+    def listEvent_colors(self, request):
+        queryset = Event_colors.objects.all()
+        serializer = Event_colorsSerializer(queryset, many=True)
+        return Response(serializer.data)
+    
+    @action(detail=False, methods=["get"], url_path="event_colors/(?P<pk>[^/.]+)")
+    def requestEvent_color(self, request, pk=None):
+        queryset = Event_colors.objects.get(pk=pk)
+        serializer = Event_colorsSerializer(queryset)
+        return Response(serializer.data)
+    
+    @action(detail=False, methods=["put"], url_path="event_colors/(?P<pk>[^/.]+)/update")
+    def updateEvent_colors(self, request, pk=None):
+        queryset = Event_colors.objects.get(pk=pk)
+        serializer = Event_colorsSerializer(queryset, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return message_response(serializer.data, "Kolor zaktualizowany")
+        else:
+            return Response(serializer.errors, status=400)
+    
+    @action(detail=False, methods=["post"], url_path="event_colors/create")
+    def createEvent_color(self, request):
+        serializer = Event_colorsSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return message_response(serializer.data, "Dodano kolor wydarzenia")
+        else:
+            return Response(serializer.errors, status=400)
+    
+    @action(detail=False, methods=["delete"], url_path="event_colors/delete/(?P<pk>[^/.]+)")
+    def deleteEvent_color(self, request, pk=None):
+        event_color = Event_colors.objects.get(pk=pk)
+        event_color.delete()
+        return Response({"message": "Kolor wydarzenia usunięty"})
     
     
 class AccountViewset(viewsets.ViewSet):

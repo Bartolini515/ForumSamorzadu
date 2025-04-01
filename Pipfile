@@ -13,6 +13,7 @@ django-environ = "*"
 django-cors-headers = "*"
 django-rest-knox = "*"
 pillow = "*"
+gunicorn = "*"
 
 [dev-packages]
 

@@ -103,13 +103,14 @@ WSGI_APPLICATION = 'forumSamorzadu.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',   # Silnik bazy danych django
-        'NAME': env('DATABASE_NAME'),           # Nazwa bazy danych brana z pliku .env
-        'USER': env('DATABASE_USER'),           # Nazwa użytkownika brana z pliku .env
-        'PASSWORD': env('DATABASE_PASSWORD'),   # Hasło brane z pliku .env
-        'HOST': env('DATABASE_HOST'),           # Adres serwera
-        'PORT': env('DATABASE_PORT'),           # Port bazy danych
-        'CHARSET': 'utf8_general_ci',           # Kodowanie tekstu
+        'ENGINE': 'django.db.backends.mysql',       # Silnik bazy danych django
+        'NAME': env('DATABASE_NAME'),               # Nazwa bazy danych brana z pliku .env
+        'USER': env('DATABASE_USER'),               # Nazwa użytkownika brana z pliku .env
+        'PASSWORD': env('DATABASE_PASSWORD'),       # Hasło brane z pliku .env
+        'HOST': env('DATABASE_HOST'),               # Adres serwera
+        'PORT': env('DATABASE_PORT'),               # Port bazy danych
+        'CHARSET': 'utf8_general_ci',               # Kodowanie tekstu
+        'OPTIONS': env('DATABASE_OPTIONS'),         # Opcje połączenia z bazą danych
 
     }
 }

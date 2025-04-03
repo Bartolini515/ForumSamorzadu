@@ -110,7 +110,6 @@ DATABASES = {
         'HOST': env('DATABASE_HOST'),               # Adres serwera
         'PORT': env('DATABASE_PORT'),               # Port bazy danych
         'CHARSET': 'utf8_general_ci',               # Kodowanie tekstu
-        'OPTIONS': env('DATABASE_OPTIONS'),         # Opcje połączenia z bazą danych
 
     }
 }

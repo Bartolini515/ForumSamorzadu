@@ -5,7 +5,7 @@ import Login from "./components/Login";
 import Register from "./components/Register";
 import Schedule from "./components/Schedule";
 import Timetable from "./components/timetable/Timetable";
-import Tasks from "./components/tasks/Tasks";
+import Tasks from "./components/Tasks/Tasks";
 import Navbar from "./components/navbar/Navbar";
 import TablesModeratorPanel from "./components/moderatorPanel/dataManagement/ModeratorPanelDataManagement";
 import ProtectedRoutes from "./components/ProtectedRoutes";

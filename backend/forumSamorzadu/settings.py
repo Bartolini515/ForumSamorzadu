@@ -15,6 +15,10 @@ from pathlib import Path
 import environ
 
 
+# Alternatywa dla mysqlclient
+import pymysql
+pymysql.install_as_MySQLdb()
+
 # Inicjalizacja pliku .env
 env = environ.Env()
 environ.Env.read_env()

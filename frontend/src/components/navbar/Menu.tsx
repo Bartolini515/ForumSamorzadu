@@ -10,7 +10,7 @@ import StarBorder from "@mui/icons-material/StarBorder";
 import GridViewIcon from "@mui/icons-material/GridView";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import ScheduleIcon from "@mui/icons-material/Schedule";
-import SchoolIcon from "@mui/icons-material/School";
+// import SchoolIcon from "@mui/icons-material/School";
 import EditNoteIcon from "@mui/icons-material/EditNote";
 import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
 import DatasetOutlinedIcon from "@mui/icons-material/DatasetOutlined";

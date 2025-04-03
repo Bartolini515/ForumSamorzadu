@@ -173,7 +173,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # CORS Headers
 # CORS_ALLOW_ALL_ORIGINS = True # SECURITY WARNING: Don't run in production!
 CORS_ALLOWED_ORIGINS = [
-    'http://localhost:5173',  # React server
+    'http://localhost:5173',  # React dev server
+    'https://samorzad.w.zset.leszno.pl',  # Production server
 ]
 
 # User model and auth

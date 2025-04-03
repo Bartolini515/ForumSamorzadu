@@ -39,7 +39,7 @@ DEBUG = env('DEBUG')
 
 ALLOWED_HOSTS = [
     '127.0.0.1', # IP localhosta
-    '127.0.0.254' # IP Serwera
+    'samorzad.w.zset.leszno.pl' # IP Serwera
 ]
 
 
@@ -177,6 +177,14 @@ CORS_ALLOWED_ORIGINS = [
     'https://samorzad.w.zset.leszno.pl',  # Production server (HTTPS)
     'http://samorzad.w.zset.leszno.pl',  # Production server (HTTP)
 ]
+
+# SSL configuration and other security settings
+SECURE_SSL_REDIRECT = not DEBUG
+SECURE_HSTS_SECONDS = 0 if DEBUG else 3600  # 1 hour
+SECURE_HSTS_INCLUDE_SUBDOMAINS = not DEBUG
+SECURE_HSTS_PRELOAD = not DEBUG
+CSRF_COOKIE_SECURE = not DEBUG
+SESSION_COOKIE_SECURE = not DEBUG
 
 # User model and auth
 AUTH_USER_MODEL = "main.Profile"

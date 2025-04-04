@@ -35,7 +35,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = env('DEBUG')
+DEBUG = env.bool('DEBUG', default=False)
 
 ALLOWED_HOSTS = [
     '127.0.0.1', # IP localhosta
@@ -176,6 +176,7 @@ CORS_ALLOWED_ORIGINS = [
     'http://localhost:5173',  # React dev server
     'https://samorzad.w.zset.leszno.pl',  # Production server (HTTPS)
 ]
+CORS_ALLOW_CREDENTIALS = not DEBUG
 
 # SSL configuration and other security settings
 SECURE_SSL_REDIRECT = not DEBUG

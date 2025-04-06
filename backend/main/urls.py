@@ -4,7 +4,7 @@ from .views import *
 from django.conf import settings
 from django.conf.urls.static import static
 
-router = DefaultRouter()
+router = DefaultRouter(trailing_slash=True)
 router.register('timetable', TimetableViewset, basename='timetable')
 router.register('login', LoginViewset, basename='login')
 router.register('moderator_panel', ModeratorPanelViewset, basename='moderator_panel')

@@ -23,7 +23,7 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('__debug__/', include(debug_toolbar.urls)),
-    path('admin/', admin.site.urls),
+    path('api/admin/', admin.site.urls),
     path('api/', include('main.urls')),
     # path('api/auth/', include('knox.urls'))
     

@@ -25,7 +25,6 @@ export default function ProtectedRoutes() {
 				localStorage.removeItem("Token");
 				return <Navigate to="/" />;
 			});
-		return <Navigate to="/dashboard" />;
 	}
 
 	return <Outlet />;

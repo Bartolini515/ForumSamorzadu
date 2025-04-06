@@ -14,7 +14,8 @@ export default function ProtectedRoutes() {
 		AxiosInstance.get("account/getuser/")
 			.then((response) => {
 				if (response.data.user.profile_picture) {
-					response.data.user.profile_picture = `${AxiosInstance.defaults.baseURL}${response.data.user.profile_picture}`;
+					const baseURL = AxiosInstance.defaults.baseURL?.replace("/api", "");
+					response.data.user.profile_picture = `${baseURL}${response.data.user.profile_picture}`;
 				}
 				setUser(response.data.user);
 				setIsAdmin(response.data.isAdmin);
@@ -24,6 +25,7 @@ export default function ProtectedRoutes() {
 				localStorage.removeItem("Token");
 				return <Navigate to="/" />;
 			});
+		return <Navigate to="/dashboard" />;
 	}
 
 	return <Outlet />;

@@ -66,9 +66,10 @@ export default function Timetable() {
 							display: "flex",
 							justifyContent: "space-evenly",
 							marginBottom: "20px",
+							flexDirection: { xs: "column", sm: "row" },
 						}}
 					>
-						<Box sx={{ width: "30%" }}>
+						<Box sx={{ width: { xs: "100%", sm: "30%" } }}>
 							<MultiSelectCheckbox
 								label="Typ"
 								options={options}
@@ -76,7 +77,7 @@ export default function Timetable() {
 								selectedValue={selectedOptions}
 							/>
 						</Box>
-						<Box sx={{ width: "30%" }}>
+						<Box sx={{ width: { xs: "100%", sm: "30%" } }}>
 							{/* <MultipleSelectChip
 								label="Osoby"
 								options={[]}
@@ -84,7 +85,7 @@ export default function Timetable() {
 								selectedValue={[]}
 							/> */}
 						</Box>
-						<Box sx={{ width: "30%" }}></Box>
+						<Box sx={{ width: { xs: "100%", sm: "30%" } }}></Box>
 					</Box>
 					<Box
 						sx={{

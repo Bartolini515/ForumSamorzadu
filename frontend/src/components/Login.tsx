@@ -38,7 +38,8 @@ export default function Login() {
 			.then((response) => {
 				localStorage.setItem("Token", response.data.token);
 				if (response.data.user.profile_picture) {
-					response.data.user.profile_picture = `${AxiosInstance.defaults.baseURL}${response.data.user.profile_picture}`;
+					const baseURL = AxiosInstance.defaults.baseURL?.replace("/api", "");
+					response.data.user.profile_picture = `${baseURL}${response.data.user.profile_picture}`;
 				}
 				setUser(response.data.user);
 

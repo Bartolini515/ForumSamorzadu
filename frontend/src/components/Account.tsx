@@ -7,12 +7,19 @@ import ChangeAvatarModal from "./modalsAndDialogs/ChangeAvatarModal";
 
 export default function Account() {
 	const [openChangeAvatarModal, setOpenChangeAvatarModal] = useState(false);
+	const [profilePicture, setProfilePicture] = useState<string | undefined>(
+		undefined
+	);
 
 	const navigate = useNavigate();
 	const { user } = useAuth();
 
 	const handleClickAvatar = () => {
 		setOpenChangeAvatarModal(true);
+	};
+
+	const handleAvatarChange = () => {
+		setProfilePicture(`${user?.profile_picture}?t=${new Date().getTime()}`);
 	};
 
 	return (
@@ -44,9 +51,10 @@ export default function Account() {
 					}}
 					alt="Profile picture"
 					src={
-						typeof user?.profile_picture === "string"
+						profilePicture ||
+						(typeof user?.profile_picture === "string"
 							? `${user.profile_picture}?t=${new Date().getTime()}`
-							: undefined
+							: undefined)
 					}
 					onClick={() => {
 						handleClickAvatar();
@@ -61,9 +69,6 @@ export default function Account() {
 			<Box display="flex" alignItems="center" mb={1}>
 				<Typography variant="h6">{user?.email}</Typography>
 			</Box>
-			{/* <Box display="flex" alignItems="center">
-				<Typography variant="h6">Role</Typography>
-			</Box> */}
 
 			<MyButton
 				label="Zmień hasło"
@@ -79,6 +84,7 @@ export default function Account() {
 				<ChangeAvatarModal
 					open={openChangeAvatarModal}
 					onClose={() => setOpenChangeAvatarModal(false)}
+					onAvatarChange={handleAvatarChange}
 				/>
 			)}
 		</Box>

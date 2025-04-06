@@ -28,6 +28,7 @@ const style = {
 interface Props {
 	open: boolean;
 	onClose: () => void;
+	onAvatarChange?: () => void; // Add this prop
 }
 
 interface FormData {
@@ -52,13 +53,10 @@ export default function ChangeAvatarModal(props: Props) {
 		})
 			.then((response) => {
 				props.onClose();
-				setAlert(
-					response.data.message + ". Za chwile nastąpi odświeżenie strony",
-					"success"
-				);
-				setTimeout(() => {
-					window.location.reload();
-				}, 2000);
+				setAlert(response.data.message, "success");
+				if (props.onAvatarChange) {
+					props.onAvatarChange();
+				}
 			})
 			.catch((error: any) => {
 				if (

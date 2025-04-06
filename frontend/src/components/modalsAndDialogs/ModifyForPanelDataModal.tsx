@@ -131,6 +131,8 @@ export default function ModifyUserOrEvent(props: Props) {
 
 		if (data.password) {
 			payload.password = data.password;
+		} else {
+			delete payload.password;
 		}
 
 		AxiosInstance.put(
@@ -309,7 +311,7 @@ export default function ModifyUserOrEvent(props: Props) {
 									<MyButton
 										label="Zatwierdź"
 										type="submit"
-										onClick={clearErrors}
+										onClick={() => clearErrors()}
 										style={{ width: "100%" }}
 									/>
 								</form>

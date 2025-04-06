@@ -294,8 +294,16 @@ export default function DisplayTasks(props: Props) {
 				<AlertDialog
 					open={openDialog}
 					onClose={() => setOpenDialog(false)}
-					label="Czy na pewno chcesz ukończyć zadanie?"
-					content="Nie będziesz mógł cofnąć tej akcji, bez skontaktowania się z przewodniczącym."
+					label={
+						changeStatusCompletionStatus
+							? "Czy na pewno chcesz oznaczyć zadanie jako nieukończone?"
+							: "Czy na pewno chcesz ukończyć zadanie?"
+					}
+					content={
+						changeStatusCompletionStatus
+							? " "
+							: "Nie będziesz mógł cofnąć tej akcji, bez skontaktowania się z przewodniczącym."
+					}
 					onCloseOption2={() => {
 						ChangeStatus(changeStatusId, changeStatusCompletionStatus);
 						setOpenDialog(false);

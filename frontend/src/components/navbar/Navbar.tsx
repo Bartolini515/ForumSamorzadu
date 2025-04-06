@@ -109,11 +109,12 @@ export default function Navbar({ content }: NavbarProps) {
 	return (
 		<Box sx={{ display: "flex" }}>
 			<CssBaseline />
-			<AppBar position="fixed" open={open}>
+			<AppBar position="fixed" open={open} sx={{ pr: "24px !important" }}>
 				<Toolbar
 					sx={{
 						flex: { right: 0, left: 0 },
 						justifyContent: "space-between",
+						pr: "0px !important",
 					}}
 				>
 					<IconButton

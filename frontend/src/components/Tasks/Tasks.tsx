@@ -141,9 +141,10 @@ export default function Tasks() {
 							display: "flex",
 							justifyContent: "space-evenly",
 							marginBottom: "20px",
+							flexDirection: { xs: "column", sm: "row" },
 						}}
 					>
-						<Box sx={{ width: "30%" }}>
+						<Box sx={{ width: { xs: "100%", sm: "30%" } }}>
 							<SingleSelect
 								options={optionsUsers}
 								label="Osoba"
@@ -151,7 +152,7 @@ export default function Tasks() {
 								setSelectedOption={setSelectedOptionUser}
 							/>
 						</Box>
-						<Box sx={{ width: "30%" }}>
+						<Box sx={{ width: { xs: "100%", sm: "30%" } }}>
 							<MultiSelectCheckbox
 								label={"Wydarzenia"}
 								options={optionsEvents}
@@ -159,7 +160,7 @@ export default function Tasks() {
 								selectedValue={selectedOptionEvent}
 							/>
 						</Box>
-						<Box sx={{ width: "30%" }}>
+						<Box sx={{ width: { xs: "100%", sm: "30%" } }}>
 							{/* <MultiSelectCheckbox
 								label={"Dodatkowe opcje"}
 								options={[

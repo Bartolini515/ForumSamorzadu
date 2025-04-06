@@ -2,7 +2,6 @@ import "../../App.css";
 import { Controller } from "react-hook-form";
 import { useDropzone } from "react-dropzone";
 import { FC, ChangeEventHandler, useMemo, useState } from "react";
-import { FormControl, FormHelperText } from "@mui/material";
 
 interface Props {
 	label: string;
@@ -21,27 +20,20 @@ export default function MyDropzone(props: Props) {
 		<Controller
 			name={props.name}
 			control={props.control}
-			render={({ field: { onChange }, fieldState: { error } }) => (
-				<FormControl>
-					<Dropzone
-						multiple={props.multiple}
-						maxFiles={props.multiple}
-						onChange={(e) =>
-							onChange(
-								props.multiple ? e.target.files : e.target.files?.[0] ?? null
-							)
-						}
-						onSubmit={props.onSubmit}
-						accept={props.accept}
-						style={props.style}
-						{...props.rest}
-					/>
-					{error && (
-						<FormHelperText sx={{ color: "red" }}>
-							{error.message}
-						</FormHelperText>
-					)}
-				</FormControl>
+			render={({ field: { onChange } }) => (
+				<Dropzone
+					multiple={props.multiple}
+					maxFiles={props.multiple}
+					onChange={(e) =>
+						onChange(
+							props.multiple ? e.target.files : e.target.files?.[0] ?? null
+						)
+					}
+					onSubmit={props.onSubmit}
+					accept={props.accept}
+					style={props.style}
+					{...props.rest}
+				/>
 			)}
 		/>
 	);

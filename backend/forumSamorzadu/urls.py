@@ -18,6 +18,8 @@ from django.contrib import admin
 import debug_toolbar
 from django.urls import path, include
 from knox import views as knox_views
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('__debug__/', include(debug_toolbar.urls)),
@@ -25,5 +27,8 @@ urlpatterns = [
     path('api/', include('main.urls')),
     # path('api/auth/', include('knox.urls'))
     
-    path('logout/', knox_views.LogoutView.as_view(), name='knox_logout'), 
+    path('api/logout/', knox_views.LogoutView.as_view(), name='knox_logout'), 
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

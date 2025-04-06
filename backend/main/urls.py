@@ -11,5 +11,3 @@ router.register('moderator_panel', ModeratorPanelViewset, basename='moderator_pa
 router.register('account', AccountViewset, basename='account')
 router.register('tasks', TasksViewset, basename='tasks')
 urlpatterns = router.urls
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

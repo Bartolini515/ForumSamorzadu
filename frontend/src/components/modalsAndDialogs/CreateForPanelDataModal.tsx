@@ -244,7 +244,7 @@ export default function CreateUserOrEvent(props: Props) {
 							<MyButton
 								label="Stwórz"
 								type="submit"
-								onClick={clearErrors}
+								onClick={() => clearErrors()}
 								style={{ width: "100%" }}
 							/>
 						</form>

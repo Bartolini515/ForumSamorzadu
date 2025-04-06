@@ -132,10 +132,11 @@ class Profiles_moderatorPanelSerializer(serializers.ModelSerializer):
     password = serializers.CharField()
     
     def validate_password(self, value):
-        try:
-            validate_password(value)
-        except ValidationError as e:
-            raise serializers.ValidationError(e.messages)
+        if value:
+            try:
+                validate_password(value)
+            except ValidationError as e:
+                raise serializers.ValidationError(e.messages)
         return value
     
     def create(self, validated_data):

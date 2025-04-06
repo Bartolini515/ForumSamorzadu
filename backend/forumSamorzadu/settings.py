@@ -184,6 +184,9 @@ SECURE_HSTS_INCLUDE_SUBDOMAINS = not DEBUG
 SECURE_HSTS_PRELOAD = not DEBUG
 CSRF_COOKIE_SECURE = not DEBUG
 SESSION_COOKIE_SECURE = not DEBUG
+CSRF_TRUSTED_ORIGINS = [
+    'https://samorzad.w.zset.leszno.pl',
+]
 
 # User model and auth
 AUTH_USER_MODEL = "main.Profile"

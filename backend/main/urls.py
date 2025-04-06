@@ -11,3 +11,4 @@ router.register('moderator_panel', ModeratorPanelViewset, basename='moderator_pa
 router.register('account', AccountViewset, basename='account')
 router.register('tasks', TasksViewset, basename='tasks')
 urlpatterns = router.urls
+urlpatterns = [url for url in urlpatterns if url.name != 'api-root']

@@ -91,19 +91,17 @@ class TimetableViewset(viewsets.ViewSet):
         else:
             return Response({"message": "Użytkownik nie zgodny"}, status=403)
     
-    @action(detail=False, methods=["post"], url_path="create/(?P<token>[^/.]+)")
+    @action(detail=False, methods=["post"], url_path="create")
     def createEvent(self, request, token=None):
         try:
+            token = request.headers['Authorization'][6:21]
             auth_token = AuthToken.objects.get(token_key=token[:15])
             user = auth_token.user
-            data = request.data
-            # data['start_date'] = request.data['start_date'][:10]
-            # if 'end_date' in request.data and request.data['end_date'] not in [None, "", "null"]:
-            #     data['end_date'] = request.data['end_date'][:10]
-            data['created_by'] = user.id
         except AuthToken.DoesNotExist:
             return Response({"message": "Invalid token"}, status=400)
         
+        data = request.data
+        data['created_by'] = user.id
         serializer = Timetable_eventsCreateSerializer(data=data)
         if serializer.is_valid():
             return message_response(Timetable_eventsDetailsSerializer(serializer.save()).data, "Wydarzenie utworzone")
@@ -275,18 +273,18 @@ class AccountViewset(viewsets.ViewSet):
         serializer = ProfileSerializer(queryset, many=True)
         return Response(serializer.data)
     
-    @action(detail=False, methods=["post"], url_path="change_password/(?P<token>[^/.]+)")
+    @action(detail=False, methods=["post"], url_path="change_password")
     def change_password(self, request, token=None):
+        try:
+            token = request.headers['Authorization'][6:21]
+            auth_token = AuthToken.objects.get(token_key=token[:15])
+            user = auth_token.user
+        except AuthToken.DoesNotExist:
+            return Response({"message": "Invalid token"}, status=400)
+        
         serializer = Password_changeSerializer(data=request.data)
         if serializer.is_valid():
-            password = serializer.validated_data['password']
-            
-            try:
-                auth_token = AuthToken.objects.get(token_key=token[:15])
-                user = auth_token.user
-            except AuthToken.DoesNotExist:
-                return Response({"message": "Invalid token"}, status=400)
-            
+            password = serializer.validated_data['password']   
             user.set_password(password)
             user.last_login = timezone.now()
             user.save()
@@ -321,6 +319,7 @@ class AccountViewset(viewsets.ViewSet):
         
         if serializer.is_valid():
             profile_picture = request.data.get('profile_picture')
+            # Modyfikacja zdjęcia profilowego do preferowanych wymiarów
             if profile_picture:
                 image = Image.open(profile_picture)
                 image = image.resize((256, 256))

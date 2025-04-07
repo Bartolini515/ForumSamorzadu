@@ -32,9 +32,8 @@ export default function ChangePasswordLogin() {
 			});
 			return;
 		}
-		const token = localStorage.getItem("Token");
 
-		AxiosInstance.post(`account/change_password/${token}/`, {
+		AxiosInstance.post(`account/change_password/`, {
 			password: data.password,
 		})
 			.then((response: any) => {

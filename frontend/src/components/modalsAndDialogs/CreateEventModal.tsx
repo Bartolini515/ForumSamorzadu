@@ -62,8 +62,6 @@ export default function CreateEventModal(props: Props) {
 
 	const [loading, setLoading] = useState(true);
 
-	const token = localStorage.getItem("Token");
-
 	const { setAlert } = useAlert();
 
 	const submission = (data: FormData) => {
@@ -84,7 +82,7 @@ export default function CreateEventModal(props: Props) {
 			description: data.description,
 		};
 
-		AxiosInstance.post(`timetable/create/${token}/`, payload)
+		AxiosInstance.post(`timetable/create/`, payload)
 			.then((response) => {
 				props.onClose();
 				setAlert(response.data.message, "success");

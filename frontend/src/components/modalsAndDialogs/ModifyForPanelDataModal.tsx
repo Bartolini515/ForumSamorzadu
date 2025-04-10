@@ -3,7 +3,7 @@ import Box from "@mui/material/Box";
 import Modal from "@mui/material/Modal";
 import Fade from "@mui/material/Fade";
 import AxiosInstance from "../AxiosInstance";
-import { Button, Typography } from "@mui/material";
+import { Button, Typography, Skeleton } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import MyTextField from "../forms/MyTextField";
 import { useForm } from "react-hook-form";
@@ -182,7 +182,7 @@ export default function ModifyUserOrEvent(props: Props) {
 				<Fade in={props.open}>
 					<Box sx={style}>
 						{loading ? (
-							<p>Pobieranie danych</p>
+							<Skeleton variant="rectangular" height={400} />
 						) : (
 							<>
 								<Box

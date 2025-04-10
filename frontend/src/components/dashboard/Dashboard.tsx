@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { useAlert } from "../../contexts/AlertContext";
 import { useAuth } from "../../contexts/AuthContext";
 import DashboardTasks from "./DashboardTasks";
+import { Skeleton } from "@mui/material";
 
 interface Task {
 	id: number;
@@ -99,7 +100,7 @@ export default function Dashboard() {
 					}}
 				>
 					{loading ? (
-						<p>Pobieranie danych</p>
+						<Skeleton variant="rectangular" height={200} />
 					) : (
 						<DashboardTasks tasks={tasks}></DashboardTasks>
 					)}
@@ -122,7 +123,7 @@ export default function Dashboard() {
 				}}
 			>
 				{loading ? (
-					<p>Pobieranie danych</p>
+					<Skeleton variant="rectangular" height={300} />
 				) : (
 					<DashboardCalendar events={events}></DashboardCalendar>
 				)}

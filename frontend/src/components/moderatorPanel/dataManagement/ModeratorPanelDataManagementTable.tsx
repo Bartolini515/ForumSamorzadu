@@ -7,6 +7,7 @@ import {
 	TableRow,
 	Paper,
 	IconButton,
+	Skeleton,
 } from "@mui/material";
 import AxiosInstance from "../../AxiosInstance";
 import { useEffect, useState } from "react";
@@ -100,7 +101,7 @@ export default function ModeratorPanelDataManagementTable(props: Props) {
 	return (
 		<>
 			{loading ? (
-				<p>Pobieranie danych</p>
+				<Skeleton variant="rectangular" height={400} />
 			) : (
 				<TableContainer
 					component={Paper}

@@ -3,7 +3,7 @@ import TimetableCalendar from "./TimetableCalendar";
 import FAB from "../forms/FAB";
 import AxiosInstance from "../AxiosInstance";
 // import MultipleSelectChip from "./forms/MultiSelectChip";
-import { Box } from "@mui/material";
+import { Box, Skeleton } from "@mui/material";
 import MultiSelectCheckbox from "../forms/MultiSelectCheckbox";
 import EventDetails from "../modalsAndDialogs/EventDetailsModal";
 import CreateEventModal from "../modalsAndDialogs/CreateEventModal";
@@ -56,7 +56,7 @@ export default function Timetable() {
 	return (
 		<>
 			{loading ? (
-				<p>Pobieranie danych</p>
+				<Skeleton variant="rectangular" height={400} />
 			) : (
 				<>
 					<Box

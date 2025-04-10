@@ -77,6 +77,17 @@ export default function Calendar(props: Props) {
 			}}
 			locale={plLocale}
 			contentHeight={800}
+			datesSet={() => {
+				const calendarApi = reference.current?.getApi();
+				if (calendarApi) {
+					const currentView = calendarApi.view.type;
+					calendarApi.setOption(
+						"contentHeight",
+						currentView === "dayGridWeek" ? 300 : 800
+					);
+					calendarApi.updateSize();
+				}
+			}}
 		/>
 	);
 }

@@ -84,10 +84,9 @@ export default function DashboardTasks(props: Props) {
 					>
 						<Chip
 							label={<Typography>{task.task_name}</Typography>}
-							// color={task.completion_status ? "success" : "error"}
 							sx={{
-								backgroundColor: `#${task.color}`,
-								color: getContrastingColor(task.color),
+								backgroundColor: `#${task.color || "1976d2"}`,
+								color: getContrastingColor(task.color || "1976d2"),
 							}}
 						/>
 						{task.due_date && (

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Box } from "@mui/material";
+import { Box, Skeleton } from "@mui/material";
 import AxiosInstance from "../AxiosInstance";
 import { useAlert } from "../../contexts/AlertContext";
 import DisplayTasks from "./DisplayTasks";
@@ -131,7 +131,7 @@ export default function Tasks() {
 	return (
 		<>
 			{loading ? (
-				<p>Pobieranie danych</p>
+				<Skeleton variant="rectangular" height={400} />
 			) : (
 				<>
 					<Box
@@ -160,16 +160,7 @@ export default function Tasks() {
 								selectedValue={selectedOptionEvent}
 							/>
 						</Box>
-						<Box sx={{ width: { xs: "100%", sm: "30%" } }}>
-							{/* <MultiSelectCheckbox
-								label={"Dodatkowe opcje"}
-								options={[
-									"Pokaż nieprzypisane"
-								]}
-								setSelectedValue={setSelectedOptionAdditional}
-								selectedValue={selectedOptionAdditional}
-							/> */}
-						</Box>
+						<Box sx={{ width: { xs: "100%", sm: "30%" } }}></Box>
 					</Box>
 					<DisplayTasks
 						tasks={filteredTasks}

@@ -140,8 +140,8 @@ export default function DisplayTasks(props: Props) {
 									label={<Typography variant="h6">{task.task_name}</Typography>}
 									sx={{
 										zIndex: 3,
-										backgroundColor: `#${task.color}`,
-										color: getContrastingColor(task.color),
+										backgroundColor: `#${task.color || "1976d2"}`,
+										color: getContrastingColor(task.color || "1976d2"),
 									}}
 								/>
 								<Box
@@ -251,41 +251,48 @@ export default function DisplayTasks(props: Props) {
 								</Typography>
 							)}
 
-							{((task.completion_status === false &&
-								task.user_id &&
-								task.user_id === user?.id) ||
-								(task.user_id && isAdmin)) && (
-								<MyButton
-									label={
-										task.completion_status
-											? "Oznacz jako nieukończone"
-											: "Oznacz jako ukończone"
-									}
-									color={task.completion_status ? "error" : "success"}
-									type={"button"}
-									style={{ marginTop: "auto" }}
-									onClick={() => {
-										handleCompletionStatus(task.id, task.completion_status);
-									}}
-								/>
-							)}
-
-							{(task.user === null ||
-								(task.user_id &&
-									task.user_id === user?.id &&
-									task.completion_status === false)) && (
-								<MyButton
-									label={
-										task.user ? "Zrezygnuj z zadania" : "Przypisz do siebie"
-									}
-									color="secondary"
-									type={"button"}
-									style={{ marginTop: "auto" }}
-									onClick={() => {
-										handleTakeTask(task.id, task.user_id);
-									}}
-								/>
-							)}
+							<Box
+								sx={{
+									display: "flex",
+									flexDirection: "column",
+									marginTop: "auto",
+								}}
+							>
+								{((task.completion_status === false &&
+									task.user_id &&
+									task.user_id === user?.id) ||
+									(task.user_id && isAdmin)) && (
+									<MyButton
+										label={
+											task.completion_status
+												? "Oznacz jako nieukończone"
+												: "Oznacz jako ukończone"
+										}
+										color={task.completion_status ? "error" : "success"}
+										type={"button"}
+										style={{ marginBottom: "10px", marginTop: "0px" }}
+										onClick={() => {
+											handleCompletionStatus(task.id, task.completion_status);
+										}}
+									/>
+								)}
+								{(task.user === null ||
+									(task.user_id &&
+										task.user_id === user?.id &&
+										task.completion_status === false)) && (
+									<MyButton
+										label={
+											task.user ? "Zrezygnuj z zadania" : "Przypisz do siebie"
+										}
+										color="secondary"
+										type={"button"}
+										style={{ marginBottom: "10px", marginTop: "0px" }}
+										onClick={() => {
+											handleTakeTask(task.id, task.user_id);
+										}}
+									/>
+								)}
+							</Box>
 						</Box>
 					))}
 				</Box>

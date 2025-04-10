@@ -70,7 +70,7 @@ export default function Tasks() {
 					),
 					"Bez wydarzenia",
 				]);
-				// Wybrane wydarzenia podstawowo
+				// Domyślne wybranie wszystkich wydarzeń
 				setSelectedOptionEvent([
 					...new Set(
 						tempTasks
@@ -162,11 +162,17 @@ export default function Tasks() {
 						</Box>
 						<Box sx={{ width: { xs: "100%", sm: "30%" } }}></Box>
 					</Box>
-					<DisplayTasks
-						tasks={filteredTasks}
-						refresh={refresh}
-						setRefresh={setRefresh}
-					></DisplayTasks>
+					{filteredTasks.length > 0 ? (
+						<DisplayTasks
+							tasks={filteredTasks}
+							refresh={refresh}
+							setRefresh={setRefresh}
+						/>
+					) : (
+						<Box sx={{ textAlign: "center", marginTop: "20px" }}>
+							Brak zadań
+						</Box>
+					)}
 					<FAB handleClick={handleClickFAB} color="secondary"></FAB>
 					{createTaskModal && (
 						<CreateTaskModal

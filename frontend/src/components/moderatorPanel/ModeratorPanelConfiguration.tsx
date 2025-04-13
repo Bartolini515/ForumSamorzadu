@@ -11,7 +11,7 @@ export default function ModeratorPanelConfiguration() {
 		schedule: {
 			name: "schedule",
 			axiosUrl: "schedule/create/",
-			labelModal: "Ustaw plan lekcji",
+			labelModal: "Stwórz plan lekcji",
 			buttonSend: "Stwórz plan lekcji",
 			forms: {
 				first_field: {
@@ -70,7 +70,7 @@ export default function ModeratorPanelConfiguration() {
 				}}
 			>
 				<MyButton
-					label={"Ustaw plan lekcji"}
+					label={"Stwórz plan lekcji"}
 					type={"button"}
 					variant="outlined"
 					color="primary"

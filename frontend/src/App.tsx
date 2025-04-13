@@ -2,7 +2,6 @@ import { Routes, Route, useLocation } from "react-router";
 import "./App.css";
 import Dashboard from "./components/dashboard/Dashboard";
 import Login from "./components/Login";
-import Register from "./components/Register";
 import Schedule from "./components/schedule/Schedule";
 import Timetable from "./components/timetable/Timetable";
 import Tasks from "./components/Tasks/Tasks";
@@ -35,7 +34,6 @@ export default function App() {
 			{noNavbar ? (
 				<Routes>
 					<Route path="/" element={<Login />} />
-					<Route path="/register" element={<Register />} />
 					<Route path="/change_password" element={<ChangePassword />} />
 				</Routes>
 			) : (

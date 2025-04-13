@@ -19,8 +19,7 @@ export default function Schedule() {
 				setLoading(false);
 			})
 			.catch((error: any) => {
-				// when response code is 418
-				if (error.response && error.response.status === 418) {
+				if (error.response && error.response.status === 404) {
 					setLoading(false);
 					setAlert(
 						"Brak planu do wyświetlenia. Skontaktuj się z administratorem",

@@ -182,7 +182,7 @@ class Event_typesSerializer(serializers.ModelSerializer):
     class Meta:
             model = Event_types
             fields = ("id", "event_type")
-            
+
 
 # Event_colorsSerializers
 class Event_colorsSerializer(serializers.ModelSerializer):
@@ -208,3 +208,13 @@ class Event_colorsSerializer(serializers.ModelSerializer):
     class Meta:
             model = Event_colors
             fields = ("id", "event_color")
+
+
+# ScheduleSerializers
+class ScheduleURLSerializer(serializers.Serializer):
+    url = serializers.URLField(required=True)
+    
+    def validate_url(self, value):
+        if not value.startswith("http://") and not value.startswith("https://"):
+            raise serializers.ValidationError("URL must start with http:// or https://")
+        return value

@@ -1,3 +1,5 @@
+import json
+import os
 from rest_framework import viewsets, permissions
 from rest_framework.decorators import action
 from .serializers import *
@@ -7,8 +9,8 @@ from django.contrib.auth import get_user_model, authenticate
 from django.utils import timezone
 from knox.models import AuthToken
 from PIL import Image
-import os
 from django.core.files.base import ContentFile
+from .schedule_scrapper import schedule_scrapper_main
 User = get_user_model()
 
 def message_response(data, message="Operacja się powiodła"):
@@ -262,6 +264,21 @@ class ModeratorPanelViewset(viewsets.ViewSet):
         event_color.delete()
         return Response({"message": "Kolor wydarzenia usunięty"})
     
+    # Sekcja planu lekcji
+    @action(detail=False, methods=["post"], url_path="schedule/create", permission_classes=[permissions.IsAdminUser])
+    def create_schedule(self, request):
+        serializer = ScheduleURLSerializer(data=request.data)
+        if serializer.is_valid():
+            url = serializer.validated_data['url']
+            success, message = schedule_scrapper_main(url)
+            if success:
+                return Response({"message": message})
+            else:
+                # If validation failed in the scrapper, return the error
+                return Response({"error": message}, status=400)
+        else:
+            return Response(serializer.errors, status=400)
+    
     
 class AccountViewset(viewsets.ViewSet):
     permission_classes = [permissions.IsAuthenticated]
@@ -376,3 +393,22 @@ class TasksViewset(viewsets.ViewSet):
             return message_response(serializer.data, "Przypisanie zmienione")
         else:
             return Response(serializer.errors, status=400)
+        
+class ScheduleViewset(viewsets.ViewSet):
+    permission_classes = [permissions.IsAuthenticated]
+    
+    def list(self, request):
+        try:
+            script_dir = os.path.dirname(__file__)
+            data_dir = os.path.join(script_dir, "..", "data")
+            file_path = os.path.join(data_dir, "schedule.json")
+            print(file_path)
+            if not os.path.exists(file_path):
+                return Response({"message": "Schedule file not found"}, status=404)
+            with open(file_path, 'r', encoding='utf-8') as file:
+                schedule_data = json.load(file)
+            return Response(schedule_data)
+        except FileNotFoundError:
+            return Response({"message": "Schedule file not found"}, status=404)
+        except json.JSONDecodeError:
+            return Response({"message": "Error decoding JSON"}, status=400)  

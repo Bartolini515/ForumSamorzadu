@@ -3,11 +3,11 @@ import "./App.css";
 import Dashboard from "./components/dashboard/Dashboard";
 import Login from "./components/Login";
 import Register from "./components/Register";
-import Schedule from "./components/Schedule";
+import Schedule from "./components/schedule/Schedule";
 import Timetable from "./components/timetable/Timetable";
 import Tasks from "./components/Tasks/Tasks";
 import Navbar from "./components/navbar/Navbar";
-import TablesModeratorPanel from "./components/moderatorPanel/dataManagement/ModeratorPanelDataManagement";
+import ModeratorPanelDataManagement from "./components/moderatorPanel/dataManagement/ModeratorPanelDataManagement";
 import ProtectedRoutes from "./components/ProtectedRoutes";
 import ChangePassword from "./components/ChangePassword";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFnsV3";
@@ -15,6 +15,7 @@ import { LocalizationProvider } from "@mui/x-date-pickers";
 import { de } from "date-fns/locale";
 import { plPL } from "@mui/x-date-pickers/locales";
 import Account from "./components/Account";
+import ModeratorPanelConfiguration from "./components/moderatorPanel/ModeratorPanelConfiguration";
 
 export default function App() {
 	const location = useLocation();
@@ -47,8 +48,12 @@ export default function App() {
 								<Route path="/timetable" element={<Timetable />} />
 								<Route path="/tasks" element={<Tasks />} />
 								<Route
-									path="/moderator_panel_tables"
-									element={<TablesModeratorPanel />}
+									path="/moderator_panel_data_management"
+									element={<ModeratorPanelDataManagement />}
+								/>
+								<Route
+									path="/moderator_panel_config"
+									element={<ModeratorPanelConfiguration />}
 								/>
 								<Route path="/account" element={<Account />} />
 							</Route>

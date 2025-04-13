@@ -1,3 +1,4 @@
+import os
 import requests
 from bs4 import BeautifulSoup
 import json
@@ -10,7 +11,7 @@ def get_urls(main_url):
     # Find the first list (ul or ol)
     classes_list = soup.find("ul") 
     if not classes_list:
-        return []
+        raise ValueError("Nie znaleziono listy na stronie.")
 
     urls = []
     class_names = []
@@ -28,10 +29,14 @@ def get_class_schedule(url, class_name):
     soup = BeautifulSoup(response.text, 'html.parser')
 
     table = soup.find("table", {"class": "tabela"})
+    if not table:
+        raise ValueError("Nie znaleziono tabeli z planem lekcji.")
     days = ["Poniedziałek", "Wtorek", "Środa", "Czwartek", "Piątek"]
     schedule = []
 
     rows = table.find_all("tr")[1:]  # Skip header row
+    if not rows:
+        raise ValueError("Nie znaleziono wierszy w tabeli z planem lekcji.")
     
 
     for day_index in range(5):  # 5 school days
@@ -81,11 +86,30 @@ def get_class_schedule(url, class_name):
         class_name: schedule
     }
 
-def main(main_url):
+def schedule_scrapper_main(main_url):
     data = {}
-    urls, class_names = get_urls(f"{main_url}/lista.html")
+    try:
+        urls, class_names = get_urls(f"{main_url}/lista.html")
+    except ValueError as e:
+        return False, str(e)
+    
     for url, class_name in zip(urls, class_names):
         full_url = f"{main_url}/{url}"
-        data.update(get_class_schedule(full_url, class_name))
-    with open(f"schedule.json", "w", encoding="utf-8") as f:
-        json.dump(data, f, indent=2, ensure_ascii=False)
+        try:
+            data.update(get_class_schedule(full_url, class_name))
+        except ValueError as e:
+            return False, str(e)
+        
+    script_dir = os.path.dirname(__file__)
+    if not os.path.exists(os.path.join(script_dir, "..", "data")):
+        os.makedirs(os.path.join(script_dir, "..", "data"))
+    json_path = os.path.join(script_dir, "..", "data", "schedule.json")
+    try:
+        with open(json_path, "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=2, ensure_ascii=False)
+    except IOError as e:
+        return False, f"Nie można zapisać pliku JSON: {e}"
+    except Exception as e:
+        return False, f"Wystąpił nieoczekiwany błąd: {e}"
+    
+    return True, 'Stworzono plan lekcji'

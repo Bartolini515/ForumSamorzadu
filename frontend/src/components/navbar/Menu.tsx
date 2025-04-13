@@ -1,4 +1,4 @@
-import { Link, useLocation } from "react-router"; // Ensure this is from react-router-dom
+import { Link, useLocation } from "react-router";
 import List from "@mui/material/List";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
@@ -10,10 +10,11 @@ import StarBorder from "@mui/icons-material/StarBorder";
 import GridViewIcon from "@mui/icons-material/GridView";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import ScheduleIcon from "@mui/icons-material/Schedule";
-// import SchoolIcon from "@mui/icons-material/School";
+import SchoolIcon from "@mui/icons-material/School";
 import EditNoteIcon from "@mui/icons-material/EditNote";
 import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
 import DatasetOutlinedIcon from "@mui/icons-material/DatasetOutlined";
+import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import { useState } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 
@@ -94,7 +95,7 @@ export default function Menu() {
 				</List>
 			</Collapse>
 
-			{/* <ListItemButton
+			<ListItemButton
 				component={Link}
 				to="/schedule"
 				selected={path === "/schedule"}
@@ -103,7 +104,7 @@ export default function Menu() {
 					<SchoolIcon />
 				</ListItemIcon>
 				<ListItemText primary="Plan lekcji" />
-			</ListItemButton> */}
+			</ListItemButton>
 
 			<ListItemButton
 				onClick={handleClickModerator}
@@ -124,13 +125,24 @@ export default function Menu() {
 					<ListItemButton
 						sx={{ pl: 3, display: isAdmin ? "flex" : "none" }}
 						component={Link}
-						to="/moderator_panel_tables"
-						selected={path === "/moderator_panel_tables"}
+						to="/moderator_panel_data_management"
+						selected={path === "/moderator_panel_data_management"}
 					>
 						<DatasetOutlinedIcon>
 							<StarBorder />
 						</DatasetOutlinedIcon>
 						<ListItemText primary="Zarządzanie danymi" />
+					</ListItemButton>
+					<ListItemButton
+						sx={{ pl: 3, display: isAdmin ? "flex" : "none" }}
+						component={Link}
+						to="/moderator_panel_config"
+						selected={path === "/moderator_panel_config"}
+					>
+						<SettingsOutlinedIcon>
+							<StarBorder />
+						</SettingsOutlinedIcon>
+						<ListItemText primary="Konfiguracja" />
 					</ListItemButton>
 				</List>
 			</Collapse>

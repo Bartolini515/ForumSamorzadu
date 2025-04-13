@@ -1,5 +1,5 @@
 import { Box, Divider, Button } from "@mui/material";
-import ModeratorPanelTable from "./ModeratorPanelDataManagementTable";
+import ModeratorPanelDataManagementTable from "./ModeratorPanelDataManagementTable";
 import SingleSelectAutoWidth from "../../forms/SingleSelectAutoWidth";
 import { useState } from "react";
 import CreateForPanelDataModal from "../../modalsAndDialogs/CreateForPanelDataModal";
@@ -92,7 +92,7 @@ export default function ModeratorPanelDataManagement() {
 				/>
 			</Box>
 
-			<ModeratorPanelTable
+			<ModeratorPanelDataManagementTable
 				option={optionsMap[selectedOption]}
 				refresh={refresh}
 				setRefresh={setRefresh}

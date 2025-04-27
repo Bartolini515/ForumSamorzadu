@@ -25,7 +25,7 @@ interface ScheduleData {
 
 export default function Schedule() {
 	const [schedule, setSchedule] = useState<ScheduleData>({});
-	const [selectedClass, setSelectedClass] = useState<string>("");
+	const [selectedClass, setSelectedClass] = useState<number>(0);
 	const [options, setOptions] = useState<{ id: number; option: string }[]>([
 		{ id: 0, option: "Brak opcji" },
 	]);
@@ -46,7 +46,6 @@ export default function Schedule() {
 					}
 				});
 				setOptions(tempOptions);
-				setSelectedClass(tempOptions[0].option);
 			})
 			.catch((error: any) => {
 				if (error.response && error.response.status === 404) {
@@ -102,7 +101,7 @@ export default function Schedule() {
 						{Object.keys(schedule).length > 0 ? (
 							<ScheduleTable
 								schedule={schedule}
-								selectedOption={selectedClass}
+								selectedOption={options[selectedClass].option}
 							/>
 						) : (
 							<p style={{ textAlign: "center", fontWeight: "bold" }}>

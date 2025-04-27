@@ -1,3 +1,12 @@
+import {
+	Table,
+	TableBody,
+	TableCell,
+	TableContainer,
+	TableHead,
+	TableRow,
+} from "@mui/material";
+
 interface Props {
 	schedule: {
 		[className: string]: {
@@ -17,44 +26,69 @@ interface Props {
 }
 
 export default function ScheduleTable(props: Props) {
-	console.log(props.schedule);
-
 	const selectedClass = props.schedule[props.selectedOption];
 
-	if (!selectedClass) {
-		return <div>No schedule available</div>;
-	}
-	console.log(selectedClass);
+	// TODO: Stylizacja
+	return (
+		<>
+			{selectedClass && (
+				<TableContainer>
+					<Table>
+						<TableHead>
+							<TableRow>
+								<TableCell>Numer lekcji</TableCell>
+								<TableCell>Poniedziałek</TableCell>
+								<TableCell>Wtorek</TableCell>
+								<TableCell>Środa</TableCell>
+								<TableCell>Czwartek</TableCell>
+								<TableCell>Piątek</TableCell>
+							</TableRow>
+						</TableHead>
+						<TableBody>
+							{Array.from(
+								{
+									length: Math.max(
+										...selectedClass.flatMap((d) =>
+											d.lessons.map((lesson) => lesson.lesson_number)
+										)
+									),
+								},
+								(_, lessonIndex) => (
+									<TableRow key={lessonIndex}>
+										<TableCell>{lessonIndex + 1}</TableCell>
+										{[
+											"Poniedziałek",
+											"Wtorek",
+											"Środa",
+											"Czwartek",
+											"Piątek",
+										].map((day) => {
+											const dayLessons = selectedClass
+												.find((d) => d.day === day)
+												?.lessons.find(
+													(lesson) => lesson.lesson_number === lessonIndex + 1
+												);
 
-	<table border={1} style={{ borderCollapse: "collapse", width: "100%" }}>
-		<thead>
-			<tr>
-				<th>Day</th>
-				<th>Lesson Number</th>
-				<th>Subject</th>
-				<th>Teacher</th>
-				<th>Room</th>
-				<th>Group</th>
-			</tr>
-		</thead>
-		<tbody>
-			{selectedClass.map((day: any) => {
-				return day.lessons.map((lesson: any) => {
-					console.log(lesson); // Generalnie to działa, tylko się nie wyświetla tabelka
-					return lesson.entries.map((entry: any) => {
-						return (
-							<tr key={`${day.day}-${lesson.lesson_number}-${entry.subject}`}>
-								<td>{day.day}</td>
-								<td>{lesson.lesson_number}</td>
-								<td>{entry.subject}</td>
-								<td>{entry.teacher}</td>
-								<td>{entry.room}</td>
-								<td>{entry.group || "N/A"}</td>
-							</tr>
-						);
-					});
-				});
-			})}
-		</tbody>
-	</table>;
+											return (
+												<TableCell key={day}>
+													{dayLessons?.entries.map((entry, index) => (
+														<div key={index}>
+															<strong>{entry.subject}</strong> <br />
+															Nauczyciel {entry.teacher} <br />
+															Sala: {entry.room} <br />
+															{entry.group && `Grupa: ${entry.group}`}
+														</div>
+													)) || <div>-</div>}
+												</TableCell>
+											);
+										})}
+									</TableRow>
+								)
+							)}
+						</TableBody>
+					</Table>
+				</TableContainer>
+			)}
+		</>
+	);
 }

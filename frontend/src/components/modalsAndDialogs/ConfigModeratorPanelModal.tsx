@@ -50,7 +50,7 @@ interface FormData {
 	url?: string;
 }
 
-export default function CreateUserOrEvent(props: Props) {
+export default function ConfigModeratorPanel(props: Props) {
 	const { handleSubmit, control, setError, clearErrors } = useForm<FormData>({
 		defaultValues: {
 			url: "",

@@ -58,7 +58,7 @@ interface FormData {
 	event_color?: string;
 }
 
-export default function CreateUserOrEvent(props: Props) {
+export default function CreateDataModerator(props: Props) {
 	const { handleSubmit, control, setError, clearErrors } = useForm<FormData>({
 		defaultValues: {
 			email: "",

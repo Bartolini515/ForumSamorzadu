@@ -71,7 +71,7 @@ interface FormData {
 	event_color?: string;
 }
 
-export default function ModifyUserOrEvent(props: Props) {
+export default function ModifyDataModerator(props: Props) {
 	const [responseData, setResponseData] = useState<ResponseData>({
 		id: 0,
 		first_name: "",

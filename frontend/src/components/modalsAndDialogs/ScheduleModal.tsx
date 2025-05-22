@@ -34,6 +34,12 @@ interface Props {
 				setSelectedOption: (value: any) => void;
 				label: string;
 			};
+			SingleSelect2?: {
+				options: { id: number; option: string }[];
+				selectedOption: any;
+				setSelectedOption: (value: any) => void;
+				label: string;
+			};
 		};
 		payload?: (data: any) => any;
 	};
@@ -113,6 +119,18 @@ export default function ScheduleModal(props: Props) {
 										props.option.forms.SingleSelect1.setSelectedOption
 									}
 									label={props.option.forms.SingleSelect1.label}
+								></SingleSelect>
+							) : null}
+							{props.option.forms.SingleSelect2 ? (
+								<SingleSelect
+									options={props.option.forms.SingleSelect2.options}
+									selectedOption={
+										props.option.forms.SingleSelect2.selectedOption
+									}
+									setSelectedOption={
+										props.option.forms.SingleSelect2.setSelectedOption
+									}
+									label={props.option.forms.SingleSelect2.label}
 								></SingleSelect>
 							) : null}
 						</Box>

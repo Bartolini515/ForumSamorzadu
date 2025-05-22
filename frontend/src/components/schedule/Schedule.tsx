@@ -27,6 +27,9 @@ interface ScheduleData {
 export default function Schedule() {
 	const [schedule, setSchedule] = useState<ScheduleData>({});
 	const [selectedClass, setSelectedClass] = useState<number>(0);
+	// const [selectedClass2, setSelectedClass2] = useState<number>(0);
+	const [selectedDay, setSelectedDay] = useState<number>(0);
+	const [allRooms, setAllRooms] = useState<string[]>(["Brak sal"]);
 	const [options, setOptions] = useState<{ id: number; option: string }[]>([
 		{ id: 0, option: "Brak opcji" },
 	]);
@@ -47,6 +50,42 @@ export default function Schedule() {
 				},
 			},
 		},
+		// compare: {
+		// 	name: "compare",
+		// 	labelModal: "Porównaj plany",
+		// 	forms: {
+		// 		SingleSelect1: {
+		// 			options: options,
+		// 			selectedOption: selectedClass,
+		// 			setSelectedOption: setSelectedClass,
+		// 			label: "Wybierz klasę do porównania",
+		// 		},
+		// 		SingleSelect2: {
+		// 			options: options,
+		// 			selectedOption: selectedClass2,
+		// 			setSelectedOption: setSelectedClass2,
+		// 			label: "Wybierz klasę do porównania",
+		// 		},
+		// 	},
+		// },
+		rooms: {
+			name: "rooms",
+			labelModal: "Sprawdź wolne sale",
+			forms: {
+				SingleSelect1: {
+					options: [
+						{ id: 0, option: "Poniedziałek" },
+						{ id: 1, option: "Wtorek" },
+						{ id: 2, option: "Środa" },
+						{ id: 3, option: "Czwartek" },
+						{ id: 4, option: "Piątek" },
+					],
+					selectedOption: selectedDay,
+					setSelectedOption: setSelectedDay,
+					label: "Wybierz dzień",
+				},
+			},
+		},
 	};
 
 	const { setAlert } = useAlert();
@@ -63,12 +102,28 @@ export default function Schedule() {
 			.then((response) => {
 				setSchedule(response.data);
 				setLoading(false);
+
 				let tempOptions = [] as { id: number; option: string }[];
 				Object.keys(response.data).forEach((key, index) => {
 					if (response.data[key].length > 0) {
 						tempOptions.push({ id: index, option: key });
 					}
 				});
+
+				let rooms = [] as string[];
+				Object.keys(response.data).forEach((key) => {
+					response.data[key].forEach((day: any) => {
+						day.lessons.forEach((lesson: any) => {
+							lesson.entries.forEach((entry: any) => {
+								if (!rooms.includes(entry.room)) {
+									rooms.push(entry.room);
+								}
+							});
+						});
+					});
+				});
+
+				setAllRooms(rooms);
 				setOptions(tempOptions);
 			})
 			.catch((error: any) => {
@@ -121,7 +176,7 @@ export default function Schedule() {
 								onClick={() => handleClick("show")}
 							/>
 						</Box>
-						<Box
+						{/* <Box
 							sx={{
 								width: { xs: "100%", sm: "30%" },
 							}}
@@ -131,24 +186,26 @@ export default function Schedule() {
 								type={"button"}
 								style={{ width: "100%" }}
 								variant={"outlined"}
+								onClick={() => handleClick("compare")}
 							/>
-						</Box>
+						</Box> */}
 						<Box sx={{ width: { xs: "100%", sm: "30%" } }}>
 							<MyButton
 								label={"Sprawdź wolne sale"}
 								type={"button"}
 								style={{ width: "100%" }}
 								variant={"outlined"}
+								onClick={() => handleClick("rooms")}
 							/>
 						</Box>
-						<Box sx={{ width: { xs: "100%", sm: "30%" } }}>
+						{/* <Box sx={{ width: { xs: "100%", sm: "30%" } }}>
 							<MyButton
-								label={"Sprawdź ilość klas w szkole"}
+								label={"Ilość klas w danej godzinie"}
 								type={"button"}
 								style={{ width: "100%" }}
 								variant={"outlined"}
 							/>
-						</Box>
+						</Box> */}
 						<Box sx={{ width: { xs: "100%", sm: "30%" } }}>
 							<MyButton
 								label={"Zaplanuj przejście po klasach"}

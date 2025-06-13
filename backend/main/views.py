@@ -363,7 +363,7 @@ class TasksViewset(viewsets.ViewSet):
         return Response(serializer.data)
     
     @action(detail=False, methods=["post"], url_path="create")
-    def createEvent_type(self, request):
+    def createTask(self, request):
         serializer = TasksSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -393,6 +393,12 @@ class TasksViewset(viewsets.ViewSet):
             return message_response(serializer.data, "Przypisanie zmienione")
         else:
             return Response(serializer.errors, status=400)
+        
+    @action(detail=False, methods=["delete"], url_path="delete/(?P<pk>[^/.]+)")
+    def deleteTask(self, request, pk=None):
+        task = Tasks.objects.get(pk=pk)
+        task.delete()
+        return Response({"message": "Zadanie usunięte"})
         
 class ScheduleViewset(viewsets.ViewSet):
     permission_classes = [permissions.IsAuthenticated]

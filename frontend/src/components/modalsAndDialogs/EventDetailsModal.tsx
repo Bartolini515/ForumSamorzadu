@@ -315,7 +315,14 @@ export default function EventDetails(props: Props) {
 								}}
 							>
 								{event.tasks && event.tasks.length > 0 ? (
-									<TasksList tasks={event.tasks} />
+									<TasksList
+										tasks={event.tasks}
+										is_creator={event.is_creator}
+										isAdmin={isAdmin}
+										onClose={() => {
+											setRefresh(!refresh);
+										}}
+									/>
 								) : (
 									"Brak zadań"
 								)}

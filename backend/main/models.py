@@ -90,7 +90,7 @@ class Timetable_events(models.Model):
     event_color = models.ForeignKey(Event_colors, on_delete=models.CASCADE, related_name='events_of_color', null=False, blank=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    created_by = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='created_events', null=False, blank=False)
+    created_by = models.ForeignKey(Profile, on_delete=models.SET_NULL, related_name='created_events', null=True, blank=False)
     
     def __str__(self):
         return self.event_name
@@ -105,7 +105,7 @@ class TasksManager(models.Manager):
 class Tasks(models.Model):
     task_name = models.CharField(max_length=255)
     description = models.TextField(null=True, blank=True)
-    user = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='tasks', null=True, blank=True)
+    user = models.ForeignKey(Profile, on_delete=models.SET_NULL, related_name='tasks', null=True, blank=True)
     completion_status = models.BooleanField(default=False)
     due_date = models.DateField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)

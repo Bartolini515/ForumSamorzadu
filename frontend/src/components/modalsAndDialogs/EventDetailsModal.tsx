@@ -260,7 +260,9 @@ export default function EventDetails(props: Props) {
 							<Box sx={{ fontWeight: "bold", alignContent: "center" }}>
 								Utworzył(a):{" "}
 							</Box>
-							<Box sx={{ marginLeft: "10px" }}>{event.creator}</Box>
+							<Box sx={{ marginLeft: "10px", fontStyle: "italic" }}>
+								{event.creator ? event.creator : "Usunięty użytkownik"}
+							</Box>
 						</Box>
 						{event.description ? (
 							<>

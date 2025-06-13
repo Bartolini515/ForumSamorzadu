@@ -90,6 +90,17 @@ export default function DisplayTasks(props: Props) {
 			});
 	};
 
+	const DeleteTask = (id: number) => {
+		AxiosInstance.delete(`tasks/delete/${id}/`)
+			.then((response) => {
+				setAlert(response.data.message, "success");
+			})
+			.catch((error: any) => {
+				console.log(error);
+				setAlert(error.message, "error");
+			});
+	};
+
 	const handleCompletionStatus = (id: number, completion_status: boolean) => {
 		setChangeStatusId(id);
 		setChangeStatusCompletionStatus(completion_status);
@@ -98,6 +109,11 @@ export default function DisplayTasks(props: Props) {
 
 	const handleTakeTask = (id: number, user_id: number | null) => {
 		ChangeAssigned(id, user_id ? user_id : null);
+	};
+
+	const handleDeleteTask = (id: number) => {
+		setOpenDialog(true);
+		// TODO
 	};
 
 	return (
@@ -292,12 +308,24 @@ export default function DisplayTasks(props: Props) {
 										}}
 									/>
 								)}
+								{isAdmin && (
+									<MyButton
+										label={"Usuń zadanie"}
+										color="error"
+										type={"button"}
+										style={{ marginBottom: "10px", marginTop: "0px" }}
+										onClick={() => {
+											handleDeleteTask(task.id);
+										}}
+									/>
+								)}
 							</Box>
 						</Box>
 					))}
 				</Box>
 			)}
 			{openDialog && (
+				// TODO Przekształcić aby obsługiwało usuwanie zadania
 				<AlertDialog
 					open={openDialog}
 					onClose={() => setOpenDialog(false)}

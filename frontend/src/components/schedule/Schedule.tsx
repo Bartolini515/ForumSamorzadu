@@ -5,6 +5,8 @@ import { useAlert } from "../../contexts/AlertContext";
 import ScheduleTable from "./ScheduleTable";
 import MyButton from "../forms/MyButton";
 import ScheduleModal from "../modalsAndDialogs/ScheduleModal";
+import RoomTable from "./RoomTable";
+import ClassesTable from "./ClassesTable";
 // import { useAuth } from "../../contexts/AuthContext";
 
 interface ScheduleData {
@@ -71,6 +73,24 @@ export default function Schedule() {
 		rooms: {
 			name: "rooms",
 			labelModal: "Sprawdź wolne sale",
+			forms: {
+				SingleSelect1: {
+					options: [
+						{ id: 0, option: "Poniedziałek" },
+						{ id: 1, option: "Wtorek" },
+						{ id: 2, option: "Środa" },
+						{ id: 3, option: "Czwartek" },
+						{ id: 4, option: "Piątek" },
+					],
+					selectedOption: selectedDay,
+					setSelectedOption: setSelectedDay,
+					label: "Wybierz dzień",
+				},
+			},
+		},
+		classes: {
+			name: "classes",
+			labelModal: "Sprawdź ilość klas w dniu",
 			forms: {
 				SingleSelect1: {
 					options: [
@@ -198,14 +218,15 @@ export default function Schedule() {
 								onClick={() => handleClick("rooms")}
 							/>
 						</Box>
-						{/* <Box sx={{ width: { xs: "100%", sm: "30%" } }}>
+						<Box sx={{ width: { xs: "100%", sm: "30%" } }}>
 							<MyButton
-								label={"Ilość klas w danej godzinie"}
+								label={"Sprawdź ilość klas w dniu"}
 								type={"button"}
 								style={{ width: "100%" }}
 								variant={"outlined"}
+								onClick={() => handleClick("classes")}
 							/>
-						</Box> */}
+						</Box>
 						<Box sx={{ width: { xs: "100%", sm: "30%" } }}>
 							<MyButton
 								label={"Zaplanuj przejście po klasach"}
@@ -228,6 +249,26 @@ export default function Schedule() {
 									schedule={schedule}
 									selectedOption={options[selectedClass].option}
 								/>
+							) : (
+								<p style={{ textAlign: "center", fontWeight: "bold" }}>
+									Brak planu do wyświetlenia
+								</p>
+							))}
+						{selectedType === "rooms" &&
+							(allRooms.length > 0 && Object.keys(schedule).length > 0 ? (
+								<RoomTable
+									schedule={schedule}
+									allRooms={allRooms}
+									selectedDay={selectedDay}
+								/>
+							) : (
+								<p style={{ textAlign: "center", fontWeight: "bold" }}>
+									Brak dostępnych sal
+								</p>
+							))}
+						{selectedType === "classes" &&
+							(Object.keys(schedule).length > 0 ? (
+								<ClassesTable schedule={schedule} selectedDay={selectedDay} />
 							) : (
 								<p style={{ textAlign: "center", fontWeight: "bold" }}>
 									Brak planu do wyświetlenia

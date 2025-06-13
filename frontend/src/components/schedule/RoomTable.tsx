@@ -6,7 +6,7 @@ import {
 	TableHead,
 	TableRow,
 } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface Props {
 	schedule: {
@@ -24,63 +24,69 @@ interface Props {
 		}[];
 	};
 	allRooms: string[];
+	selectedDay: number;
 }
 
 export default function RoomTable(props: Props) {
-	const [availableRooms, setAvailableRooms] = useState<string[]>([]);
+	const [availableRooms, setAvailableRooms] = useState<{
+		[lessonNumber: number]: string[];
+	}>({});
+
+	useEffect(() => {
+		const roomsOccupied: { [lessonNumber: number]: Set<string> } = {};
+
+		Object.values(props.schedule).forEach((classSchedule) => {
+			classSchedule.forEach((daySchedule) => {
+				if (
+					daySchedule.day ===
+					["Poniedziałek", "Wtorek", "Środa", "Czwartek", "Piątek"][
+						props.selectedDay
+					]
+				) {
+					daySchedule.lessons.forEach((lesson) => {
+						if (!roomsOccupied[lesson.lesson_number]) {
+							roomsOccupied[lesson.lesson_number] = new Set();
+						}
+						lesson.entries.forEach((entry) => {
+							roomsOccupied[lesson.lesson_number].add(entry.room);
+						});
+					});
+				}
+			});
+		});
+
+		const freeRooms: { [lessonNumber: number]: string[] } = {};
+		Object.keys(roomsOccupied).forEach((lessonNumber) => {
+			freeRooms[Number(lessonNumber)] = props.allRooms.filter(
+				(room) => !roomsOccupied[Number(lessonNumber)].has(room)
+			);
+		});
+
+		setAvailableRooms(freeRooms);
+	}, [props.schedule, props.allRooms, props.selectedDay]);
 
 	return (
 		<>
-			{availableRooms.length > 0 && (
+			{Object.keys(availableRooms).length > 0 && (
 				<TableContainer>
 					<Table>
 						<TableHead>
 							<TableRow>
 								<TableCell>Numer lekcji</TableCell>
-                                <TableCell>Wolne pokoje</TableCell>
+								<TableCell>Wolne pokoje</TableCell>
 							</TableRow>
 						</TableHead>
 						<TableBody>
-							{Array.from(
-								{
-									length: Math.max(
-										...selectedClass.flatMap((d) =>
-											d.lessons.map((lesson) => lesson.lesson_number)
-										)
-									),
-								},
-								(_, lessonIndex) => (
-									<TableRow key={lessonIndex}>
-										<TableCell>{lessonIndex + 1}</TableCell>
-										{[
-											"Poniedziałek",
-											"Wtorek",
-											"Środa",
-											"Czwartek",
-											"Piątek",
-										].map((day) => {
-											const dayLessons = selectedClass
-												.find((d) => d.day === day)
-												?.lessons.find(
-													(lesson) => lesson.lesson_number === lessonIndex + 1
-												);
-
-											return (
-												<TableCell key={day}>
-													{dayLessons?.entries.map((entry, index) => (
-														<div key={index}>
-															<strong>{entry.subject}</strong> <br />
-															Nauczyciel {entry.teacher} <br />
-															Sala: {entry.room} <br />
-															{entry.group && `Grupa: ${entry.group}`}
-														</div>
-													)) || <div>-</div>}
-												</TableCell>
-											);
-										})}
+							{Object.entries(availableRooms)
+								.sort(([a], [b]) => Number(a) - Number(b)) // Sort by lesson number
+								.map(([lessonNumber, rooms]) => (
+									<TableRow key={lessonNumber}>
+										<TableCell>{lessonNumber}</TableCell>
+										<TableCell>
+											{rooms.length > 0 ? rooms.join(", ") : "-"}
+										</TableCell>
 									</TableRow>
-								)
-							)}
+								))}
 						</TableBody>
 					</Table>
 				</TableContainer>

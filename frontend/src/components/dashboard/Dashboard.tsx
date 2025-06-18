@@ -109,7 +109,7 @@ export default function Dashboard() {
 					sx={{
 						flex: { sm: 1, xs: "none" },
 						height: "100%",
-						boxShadow: 0, // TODO: 3
+						boxShadow: 0, // TODO: 3, znaleźć użytek dla tego miejsca
 						padding: "20px",
 					}}
 				></Box>

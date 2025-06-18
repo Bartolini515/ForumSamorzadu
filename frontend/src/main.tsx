@@ -19,5 +19,3 @@ createRoot(document.getElementById("root")!).render(
 		</AlertProvider>
 	</AuthProvider>
 );
-
-// TODO : Delete StrictMode

@@ -59,6 +59,7 @@ export default function DisplayTasks(props: Props) {
 	const [changeStatusId, setChangeStatusId] = useState<number>(0);
 	const [changeStatusCompletionStatus, setChangeStatusCompletionStatus] =
 		useState<boolean>(false);
+	const [deleteTaskId, setDeleteTaskId] = useState<number>(0);
 
 	const { user, isAdmin } = useAuth();
 	const { setAlert } = useAlert();
@@ -94,6 +95,7 @@ export default function DisplayTasks(props: Props) {
 		AxiosInstance.delete(`tasks/delete/${id}/`)
 			.then((response) => {
 				setAlert(response.data.message, "success");
+				props.setRefresh(true);
 			})
 			.catch((error: any) => {
 				console.log(error);
@@ -112,8 +114,8 @@ export default function DisplayTasks(props: Props) {
 	};
 
 	const handleDeleteTask = (id: number) => {
+		setDeleteTaskId(id);
 		setOpenDialog(true);
-		// TODO
 	};
 
 	return (
@@ -325,22 +327,36 @@ export default function DisplayTasks(props: Props) {
 				</Box>
 			)}
 			{openDialog && (
-				// TODO Przekształcić aby obsługiwało usuwanie zadania
 				<AlertDialog
 					open={openDialog}
-					onClose={() => setOpenDialog(false)}
+					onClose={() => {
+						setOpenDialog(false);
+						setDeleteTaskId(0);
+						setChangeStatusId(0);
+						setChangeStatusCompletionStatus(false);
+					}}
 					label={
-						changeStatusCompletionStatus
+						deleteTaskId
+							? "Czy na pewno chcesz usunąć zadanie?"
+							: changeStatusCompletionStatus
 							? "Czy na pewno chcesz oznaczyć zadanie jako nieukończone?"
 							: "Czy na pewno chcesz ukończyć zadanie?"
 					}
 					content={
-						changeStatusCompletionStatus
+						deleteTaskId
+							? "Usunięcie zadania jest permanentne i nie można go cofnąć."
+							: changeStatusCompletionStatus
 							? " "
 							: "Nie będziesz mógł cofnąć tej akcji, bez skontaktowania się z przewodniczącym."
 					}
 					onCloseOption2={() => {
-						ChangeStatus(changeStatusId, changeStatusCompletionStatus);
+						if (deleteTaskId) {
+							DeleteTask(deleteTaskId);
+							setOpenDialog(false);
+							setDeleteTaskId(0);
+						} else {
+							ChangeStatus(changeStatusId, changeStatusCompletionStatus);
+						}
 						setOpenDialog(false);
 					}}
 				/>

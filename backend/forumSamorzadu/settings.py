@@ -192,10 +192,19 @@ CSRF_TRUSTED_ORIGINS = [
 AUTH_USER_MODEL = "main.Profile"
 
 AUTHENTICATION_BACKEND = [
-    'main.auth_backend.EmailAuthBackend'
+    'main.utils.auth_backend.EmailAuthBackend'
 ]
 
 # REST Framework
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': ('knox.auth.TokenAuthentication',)
 }
+
+# Email settings
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend' if not DEBUG else 'django.core.mail.backends.console.EmailBackend'
+EMAIL_HOST = "localhost"
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+DEFAULT_FROM_EMAIL = 'powiadomienia@samorzad.w.zset.pl'
+# EMAIL_HOST_USER = env('EMAIL_HOST_USER')
+# EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')

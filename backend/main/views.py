@@ -10,7 +10,8 @@ from django.utils import timezone
 from knox.models import AuthToken
 from PIL import Image
 from django.core.files.base import ContentFile
-from .schedule_scrapper import schedule_scrapper_main
+from .utils.schedule_scrapper import schedule_scrapper_main
+from main.utils.email_notifications import send_email_notification
 User = get_user_model()
 
 def message_response(data, message="Operacja się powiodła"):
@@ -47,6 +48,17 @@ class LoginViewset(viewsets.ViewSet):
                 return Response({"message": "Nieprawidłowe dane"}, status=401)
         else:
             return Response(serializer.errors, status=400)
+        
+    @action(detail=False, methods=["get"], url_path="test_mail")
+    def test_mail(self, request):
+        
+        subject = "Test Email"
+        message = "This is a test email sent from the Django application."
+        recipient_list = ["b.jedrzychowski@zset.leszno.pl"]
+        
+        send_email_notification(subject, message, recipient_list)
+        
+        return Response({"message": "Email sent successfully"})
 
 class TimetableViewset(viewsets.ViewSet):
     permission_classes = [permissions.IsAuthenticated]

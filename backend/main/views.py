@@ -49,17 +49,6 @@ class LoginViewset(viewsets.ViewSet):
         else:
             return Response(serializer.errors, status=400)
         
-    @action(detail=False, methods=["get"], url_path="test_mail")
-    def test_mail(self, request):
-        
-        subject = "Test Email"
-        message = "This is a test email sent from the Django application."
-        recipient_list = ["b.jedrzychowski@zset.leszno.pl"]
-        
-        send_email_notification(subject, message, recipient_list)
-        
-        return Response({"message": "Email sent successfully"})
-
 class TimetableViewset(viewsets.ViewSet):
     permission_classes = [permissions.IsAuthenticated]
     queryset = Timetable_events.objects.all()
@@ -118,6 +107,11 @@ class TimetableViewset(viewsets.ViewSet):
         data['created_by'] = user.id
         serializer = Timetable_eventsCreateSerializer(data=data)
         if serializer.is_valid():
+            send_email_notification.delay(
+                subject="Nowe wydarzenie w planie lekcji",
+                message=f"Użytkownik {user.first_name} {user.last_name} utworzył nowe wydarzenie: {data['event_name']} o dacie {data['start_date']}.",
+                recipient_list=["all"]
+            )
             return message_response(Timetable_eventsDetailsSerializer(serializer.save()).data, "Wydarzenie utworzone")
         else:
             return Response(serializer.errors, status=400)
@@ -379,6 +373,11 @@ class TasksViewset(viewsets.ViewSet):
         serializer = TasksSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
+            send_email_notification.delay(
+                subject="Nowe zadanie do wykonania",
+                message=f"Użytkownik {request.user.first_name} {request.user.last_name} dodał nowe zadanie: {serializer.validated_data['task_name']}.",
+                recipient_list=["all"]
+            )
             return message_response(serializer.data, "Dodano zadanie")
         else:
             return Response(serializer.errors, status=400)
@@ -390,6 +389,19 @@ class TasksViewset(viewsets.ViewSet):
         
         if serializer.is_valid():
             serializer.save()
+            if serializer.data.get('completion_status') and serializer.data.get('event'):
+                event_id = serializer.data.get('event')
+                if event_id:
+                    try:
+                        event = Timetable_events.objects.get(pk=event_id)
+                        send_email_notification.delay(
+                            subject="Zadanie zostało ukończone",
+                            message=f'Użytkownik {request.user.first_name} {request.user.last_name} oznaczył zadanie "{serializer.data["task_name"]}" jako ukończone.',
+                            recipient_list=[event.created_by.email]
+                        )
+                    except Timetable_events.DoesNotExist:
+                        pass
+                
             return message_response(serializer.data, "Status zmieniony")
         else:
             return Response(serializer.errors, status=400)
@@ -399,9 +411,28 @@ class TasksViewset(viewsets.ViewSet):
         queryset = Tasks.objects.get(pk=pk)
         serializer = TasksSerializer(queryset, data=request.data, partial=True)
 
-        
         if serializer.is_valid():
             serializer.save()
+            if serializer.data.get('user_id') is not None:
+                user = User.objects.get(pk=serializer.data.get('user_id'))
+                if user:
+                    send_email_notification.delay(
+                            subject="Zadanie zostało przypisane",
+                            message=f"Przypisano do Ciebie zadanie: {serializer.data['task_name']}.",
+                        recipient_list=[user.email]
+                        )
+                    if serializer.data.get('event'):
+                        event_id = serializer.data.get('event')
+                        if event_id:
+                            try:
+                                event = Timetable_events.objects.get(pk=event_id)
+                                send_email_notification.delay(
+                                    subject="Zadanie twojego wydarzenia zostało przypisane",
+                                    message=f'Użytkownikowi {user.first_name} {user.last_name} zostało przypisane zadanie "{serializer.data["task_name"]}" do wydarzenia: {event.event_name}.',
+                                    recipient_list=[event.created_by.email]
+                                )
+                            except Timetable_events.DoesNotExist:
+                                pass
             return message_response(serializer.data, "Przypisanie zmienione")
         else:
             return Response(serializer.errors, status=400)
@@ -429,4 +460,4 @@ class ScheduleViewset(viewsets.ViewSet):
         except FileNotFoundError:
             return Response({"message": "Schedule file not found"}, status=404)
         except json.JSONDecodeError:
-            return Response({"message": "Error decoding JSON"}, status=400)  
+            return Response({"message": "Error decoding JSON"}, status=400)

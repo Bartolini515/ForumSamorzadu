@@ -17,6 +17,8 @@ gunicorn = "*"
 pymysql = {extras = ["rsa"], version = "*"}
 requests = "*"
 beautifulsoup4 = "*"
+celery = "*"
+redis = "*"
 
 [dev-packages]
 

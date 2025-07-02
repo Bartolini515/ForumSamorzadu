@@ -7,6 +7,7 @@ import MyButton from "../forms/MyButton";
 import ScheduleModal from "../modalsAndDialogs/ScheduleModal";
 import RoomTable from "./RoomTable";
 import ClassesTable from "./ClassesTable";
+import ClassWalkTable from "./ClassWalkTable";
 // import { useAuth } from "../../contexts/AuthContext";
 
 interface ScheduleData {
@@ -30,6 +31,10 @@ export default function Schedule() {
 	const [schedule, setSchedule] = useState<ScheduleData>({});
 	const [selectedClass, setSelectedClass] = useState<number>(0);
 	// const [selectedClass2, setSelectedClass2] = useState<number>(0);
+	const [selectedLessonNumber, setSelectedLessonNumber] = useState<number>(0);
+	const [lessonNumberOptions, setLessonNumberOptions] = useState<
+		{ id: number; option: string }[]
+	>([{ id: 0, option: "Brak lekcji" }]);
 	const [selectedDay, setSelectedDay] = useState<number>(0);
 	const [allRooms, setAllRooms] = useState<string[]>(["Brak sal"]);
 	const [options, setOptions] = useState<{ id: number; option: string }[]>([
@@ -106,7 +111,60 @@ export default function Schedule() {
 				},
 			},
 		},
+		class_walk: {
+			name: "class_walk",
+			labelModal: "Zaplanuj przejście po klasach",
+			forms: {
+				SingleSelect1: {
+					options: [
+						{ id: 0, option: "Poniedziałek" },
+						{ id: 1, option: "Wtorek" },
+						{ id: 2, option: "Środa" },
+						{ id: 3, option: "Czwartek" },
+						{ id: 4, option: "Piątek" },
+					],
+					selectedOption: selectedDay,
+					setSelectedOption: setSelectedDay,
+					label: "Wybierz dzień",
+				},
+				SingleSelect2: {
+					options: lessonNumberOptions,
+					selectedOption: selectedLessonNumber,
+					setSelectedOption: setSelectedLessonNumber,
+					label: "Wybierz numer lekcji",
+				},
+			},
+		},
 	};
+
+	useEffect(() => {
+		if (selectedType === "class_walk") {
+			let maxLessonNumberToConsider = 0;
+			Object.values(schedule).forEach((classDays) => {
+				const daySchedule = classDays.find(
+					(day) =>
+						day.day ===
+						typeMap.class_walk.forms.SingleSelect1.options[selectedDay].option
+				);
+				if (daySchedule) {
+					daySchedule.lessons.forEach((lesson) => {
+						if (lesson.lesson_number > maxLessonNumberToConsider) {
+							maxLessonNumberToConsider = lesson.lesson_number;
+						}
+					});
+				}
+			});
+
+			const lessonOptions = Array.from(
+				{ length: maxLessonNumberToConsider },
+				(_, i) => ({
+					id: i,
+					option: (i + 1).toString(),
+				})
+			);
+			setLessonNumberOptions(lessonOptions);
+		}
+	}, [selectedDay, selectedType]);
 
 	const { setAlert } = useAlert();
 	const [loading, setLoading] = useState(true);
@@ -233,6 +291,7 @@ export default function Schedule() {
 								type={"button"}
 								style={{ width: "100%" }}
 								variant={"outlined"}
+								onClick={() => handleClick("class_walk")}
 							/>
 						</Box>
 					</Box>
@@ -269,6 +328,18 @@ export default function Schedule() {
 						{selectedType === "classes" &&
 							(Object.keys(schedule).length > 0 ? (
 								<ClassesTable schedule={schedule} selectedDay={selectedDay} />
+							) : (
+								<p style={{ textAlign: "center", fontWeight: "bold" }}>
+									Brak planu do wyświetlenia
+								</p>
+							))}
+						{selectedType === "class_walk" &&
+							(Object.keys(schedule).length > 0 ? (
+								<ClassWalkTable
+									schedule={schedule}
+									selectedDay={selectedDay}
+									selectedLessonNumber={selectedLessonNumber}
+								/>
 							) : (
 								<p style={{ textAlign: "center", fontWeight: "bold" }}>
 									Brak planu do wyświetlenia

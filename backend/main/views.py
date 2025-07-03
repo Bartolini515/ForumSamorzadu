@@ -39,7 +39,7 @@ class LoginViewset(viewsets.ViewSet):
                     user.save()
                 _, token=AuthToken.objects.create(user)
                 return Response({
-                    'user': self.serializer_class(user).data,
+                    'user': ProfileSerializer(user).data,
                     'token': token,
                     'isAdmin': user.is_staff,
                     'message': "Zalogowano pomyślnie"
@@ -451,7 +451,6 @@ class ScheduleViewset(viewsets.ViewSet):
             script_dir = os.path.dirname(__file__)
             data_dir = os.path.join(script_dir, "..", "data")
             file_path = os.path.join(data_dir, "schedule.json")
-            print(file_path)
             if not os.path.exists(file_path):
                 return Response({"message": "Schedule file not found"}, status=404)
             with open(file_path, 'r', encoding='utf-8') as file:

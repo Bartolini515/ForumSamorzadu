@@ -15,6 +15,7 @@ interface Task {
 	completion_status: boolean;
 	due_date: string | null;
 	event: string | null;
+	event_id: number | null;
 	user_id: number | null;
 	color: string;
 }
@@ -310,7 +311,10 @@ export default function DisplayTasks(props: Props) {
 										}}
 									/>
 								)}
-								{isAdmin && (
+								{(isAdmin ||
+									user?.created_events.find(
+										(event_id) => event_id === task.event_id
+									)) && (
 									<MyButton
 										label={"Usuń zadanie"}
 										color="error"

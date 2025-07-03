@@ -9,6 +9,9 @@ User = get_user_model()
 # ProfilesSerializers
 class ProfileSerializer(serializers.ModelSerializer):
     profile_picture = serializers.ImageField(allow_null=True)
+    created_events = serializers.SlugRelatedField(
+        many=True, read_only=True, allow_null=True, slug_field='id'
+    )
     
     def update(self, instance, validated_data):
         instance.profile_picture = validated_data.get('profile_picture', instance.profile_picture)
@@ -17,21 +20,15 @@ class ProfileSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Profile
-        fields = ('id', 'first_name', 'last_name', 'email', 'last_login', 'profile_picture')
+        fields = ('id', 'first_name', 'last_name', 'email', 'last_login', 'profile_picture', 'created_events')
 
 class LoginSerializer(serializers.ModelSerializer):
     email = serializers.EmailField()
     password = serializers.CharField()
     
-    def to_representation(self, instance):
-        ret = super().to_representation(instance)
-        ret.pop('password', None)
-        ret['last_login'] = instance.last_login
-        return ret
-    
     class Meta:
         model = Profile
-        fields = ('id', 'first_name', 'last_name', 'email', 'password', "profile_picture")
+        fields = ('email', 'password')
     
 class Password_changeSerializer(serializers.Serializer):
     password = serializers.CharField()

@@ -11,6 +11,7 @@ interface Task {
 	completion_status: boolean;
 	due_date: string | null;
 	event: string | null;
+	event_id: number | null;
 	user_id: number | null;
 	color: string;
 }

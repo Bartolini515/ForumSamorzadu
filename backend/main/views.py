@@ -11,7 +11,7 @@ from knox.models import AuthToken
 from PIL import Image
 from django.core.files.base import ContentFile
 from .utils.schedule_scrapper import schedule_scrapper_main
-from main.utils.email_notifications import send_email_notification
+from .utils.email_notifications import send_email_notification
 User = get_user_model()
 
 def message_response(data, message="Operacja się powiodła"):

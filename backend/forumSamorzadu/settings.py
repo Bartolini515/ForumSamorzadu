@@ -202,7 +202,7 @@ REST_FRAMEWORK = {
 
 # Email settings
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend' if not DEBUG else 'django.core.mail.backends.console.EmailBackend'
-EMAIL_HOST = "localhost"
+EMAIL_HOST = "127.0.0.1"
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 DEFAULT_FROM_EMAIL = 'powiadomienia@samorzad.w.zset.pl'
@@ -210,8 +210,8 @@ DEFAULT_FROM_EMAIL = 'powiadomienia@samorzad.w.zset.pl'
 # EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
 
 # Celery Configuration
-CELERY_BROKER_URL = 'redis://localhost:6379'
-CELERY_RESULT_BACKEND = 'redis://localhost:6379'
+CELERY_BROKER_URL = 'redis://127.0.0.1:6379'
+CELERY_RESULT_BACKEND = 'redis://127.0.0.1:6379'
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'

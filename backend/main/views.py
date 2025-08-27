@@ -49,24 +49,19 @@ class LoginViewset(viewsets.ViewSet):
         else:
             return Response(serializer.errors, status=400)
         
-class TimetableViewset(viewsets.ViewSet):
+class TimetableViewset(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     queryset = Timetable_events.objects.all()
     serializer_class = Timetable_eventsSerializer
     
     def list(self, request):
-        queryset = Timetable_events.objects.all()
+        queryset = self.queryset
         serializer = self.serializer_class(queryset, many=True)
         return Response(serializer.data)
     
     def retrieve(self, request, pk=None):
         serializer = Timetable_eventsDetailsSerializer(self.queryset.get(pk=pk))
-        try:
-            token = request.headers['Authorization'][6:21]
-            auth_token = AuthToken.objects.get(token_key=token[:15])
-            user = auth_token.user
-        except AuthToken.DoesNotExist:
-            return Response({"message": "Invalid token"}, status=400)
+        user = self.request.user
         data = serializer.data
         
         if data['creator_id'] == user.id:
@@ -78,15 +73,10 @@ class TimetableViewset(viewsets.ViewSet):
     
     @action(detail=False, methods=["delete"], url_path="delete/(?P<pk>[^/.]+)")
     def deleteEvent(self, request, pk=None):
-        try:
-            token = request.headers['Authorization'][6:21]
-            auth_token = AuthToken.objects.get(token_key=token[:15])
-            user = auth_token.user
-        except AuthToken.DoesNotExist:
-            return Response({"message": "Invalid token"}, status=400)
+        user = self.request.user
         
         serializer = Timetable_eventsDetailsSerializer(self.queryset.get(pk=pk))
-        event = Timetable_events.objects.get(pk=pk)
+        event = self.queryset.get(pk=pk)
         
         if serializer.data['creator_id'] == user.id or user.is_staff:
             event.delete()
@@ -96,12 +86,7 @@ class TimetableViewset(viewsets.ViewSet):
     
     @action(detail=False, methods=["post"], url_path="create")
     def createEvent(self, request, token=None):
-        try:
-            token = request.headers['Authorization'][6:21]
-            auth_token = AuthToken.objects.get(token_key=token[:15])
-            user = auth_token.user
-        except AuthToken.DoesNotExist:
-            return Response({"message": "Invalid token"}, status=400)
+        user = self.request.user
         
         data = request.data
         data['created_by'] = user.id
@@ -130,14 +115,9 @@ class TimetableViewset(viewsets.ViewSet):
     
     @action(detail=False, methods=["put"], url_path="(?P<pk>[^/.]+)/update")
     def updateEvent(self, request, pk=None):
-        try:
-            token = request.headers['Authorization'][6:21]
-            auth_token = AuthToken.objects.get(token_key=token[:15])
-            user = auth_token.user
-        except AuthToken.DoesNotExist:
-            return Response({"message": "Invalid token"}, status=400)
+        user = self.request.user
         
-        event = Timetable_events.objects.get(pk=pk)
+        event = self.queryset.get(pk=pk)
         if event.created_by != user and not user.is_staff:
             return Response({"message": "Użytkownik nie zgodny"}, status=403)
         
@@ -150,9 +130,6 @@ class TimetableViewset(viewsets.ViewSet):
     
 class ModeratorPanelViewset(viewsets.ViewSet):
     permission_classes = [permissions.IsAdminUser]
-    queryset = Profile.objects.all()
-    serializer_class = Profiles_moderatorPanelSerializer
-    
     
     # Sekcja profili
     @action(detail=False, methods=["get"], url_path="user")
@@ -286,7 +263,7 @@ class ModeratorPanelViewset(viewsets.ViewSet):
             return Response(serializer.errors, status=400)
     
     
-class AccountViewset(viewsets.ViewSet):
+class AccountViewset(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = ProfileSerializer
     queryset = Profile.objects.all()
@@ -298,12 +275,7 @@ class AccountViewset(viewsets.ViewSet):
     
     @action(detail=False, methods=["post"], url_path="change_password")
     def change_password(self, request, token=None):
-        try:
-            token = request.headers['Authorization'][6:21]
-            auth_token = AuthToken.objects.get(token_key=token[:15])
-            user = auth_token.user
-        except AuthToken.DoesNotExist:
-            return Response({"message": "Invalid token"}, status=400)
+        user = self.request.user
         
         serializer = Password_changeSerializer(data=request.data)
         if serializer.is_valid():
@@ -317,12 +289,7 @@ class AccountViewset(viewsets.ViewSet):
     
     @action(detail=False, methods=["get"], url_path="getuser")
     def getUser(self, request):
-        try:
-            token = request.headers['Authorization'][6:21]
-            auth_token = AuthToken.objects.get(token_key=token[:15])
-            user = auth_token.user
-        except AuthToken.DoesNotExist:
-            return Response({"message": "Invalid token"}, status=400)
+        user = self.request.user
         serializer = ProfileSerializer(self.queryset.get(pk=user.id))
         data = serializer.data
             
@@ -330,12 +297,7 @@ class AccountViewset(viewsets.ViewSet):
     
     @action(detail=False, methods=["post"], url_path="change_profile_picture")
     def change_profile_picture(self, request):
-        try:
-            token = request.headers['Authorization'][6:21]
-            auth_token = AuthToken.objects.get(token_key=token[:15])
-            user = auth_token.user
-        except AuthToken.DoesNotExist:
-            return Response({"message": "Invalid token"}, status=400)
+        user = self.request.user
         
         queryset = Profile.objects.get(pk=user.id)
         serializer = ProfileSerializer(queryset, data=request.data, partial=True)
@@ -358,19 +320,19 @@ class AccountViewset(viewsets.ViewSet):
         else:
             return Response(serializer.errors, status=400)
     
-class TasksViewset(viewsets.ViewSet):
+class TasksViewset(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = TasksSerializer
     queryset = Tasks.objects.all()
     
     def list(self, request):
-        queryset = Tasks.objects.all()
+        queryset = self.queryset
         serializer = Tasks_for_displaySerializer(queryset, many=True)
         return Response(serializer.data)
     
     @action(detail=False, methods=["post"], url_path="create")
     def createTask(self, request):
-        serializer = TasksSerializer(data=request.data)
+        serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
             serializer.save()
             send_email_notification.delay(
@@ -384,9 +346,9 @@ class TasksViewset(viewsets.ViewSet):
     
     @action(detail=False, methods=["put"], url_path="(?P<pk>[^/.]+)/update_status")
     def updateStatus(self, request, pk=None):
-        queryset = Tasks.objects.get(pk=pk)
-        serializer = TasksSerializer(queryset, data=request.data, partial=True)
-        
+        queryset = self.queryset.get(pk=pk)
+        serializer = self.serializer_class(queryset, data=request.data, partial=True)
+
         if serializer.is_valid():
             serializer.save()
             if serializer.data.get('completion_status') and serializer.data.get('event'):
@@ -408,8 +370,8 @@ class TasksViewset(viewsets.ViewSet):
         
     @action(detail=False, methods=["put"], url_path="(?P<pk>[^/.]+)/update_assigned")
     def updateAssigned(self, request, pk=None):
-        queryset = Tasks.objects.get(pk=pk)
-        serializer = TasksSerializer(queryset, data=request.data, partial=True)
+        queryset = self.queryset.get(pk=pk)
+        serializer = self.serializer_class(queryset, data=request.data, partial=True)
 
         if serializer.is_valid():
             serializer.save()
@@ -439,7 +401,7 @@ class TasksViewset(viewsets.ViewSet):
         
     @action(detail=False, methods=["delete"], url_path="delete/(?P<pk>[^/.]+)")
     def deleteTask(self, request, pk=None):
-        task = Tasks.objects.get(pk=pk)
+        task = self.queryset.get(pk=pk)
         task.delete()
         return Response({"message": "Zadanie usunięte"})
         

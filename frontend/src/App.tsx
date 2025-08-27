@@ -1,5 +1,6 @@
 import { Routes, Route, useLocation } from "react-router";
 import "./App.css";
+import "./index.css";
 import Dashboard from "./components/dashboard/Dashboard";
 import Login from "./components/Login";
 import Schedule from "./components/schedule/Schedule";

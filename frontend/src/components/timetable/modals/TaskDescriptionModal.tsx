@@ -4,9 +4,9 @@ import { Box, Button, Typography, Fade, Chip } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import { useState } from "react";
-import AlertDialog from "./AlertDialog";
-import AxiosInstance from "../AxiosInstance";
-import { useAlert } from "../../contexts/AlertContext";
+import AlertDialog from "../../../UI/dialogs/AlertDialog";
+import AxiosInstance from "../../AxiosInstance";
+import { useAlert } from "../../../contexts/AlertContext";
 
 interface Props {
 	task_id: string | null;

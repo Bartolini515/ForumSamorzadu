@@ -3,11 +3,11 @@ import { Box, Skeleton } from "@mui/material";
 import AxiosInstance from "../AxiosInstance";
 import { useAlert } from "../../contexts/AlertContext";
 import DisplayTasks from "./DisplayTasks";
-import SingleSelect from "../forms/SingleSelect";
-import MultiSelectCheckbox from "../forms/MultiSelectCheckbox";
+import SingleSelect from "../../UI/forms/SingleSelect";
+import MultiSelectCheckbox from "../../UI/forms/MultiSelectCheckbox";
 import { useAuth } from "../../contexts/AuthContext";
-import FAB from "../forms/FAB";
-import CreateTaskModal from "../modalsAndDialogs/CreateTaskModal";
+import FAB from "../../UI/forms/FAB";
+import CreateTaskModal from "./CreateTaskModal";
 
 interface Task {
 	id: string;

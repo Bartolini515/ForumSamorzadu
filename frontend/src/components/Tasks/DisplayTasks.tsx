@@ -2,9 +2,9 @@ import { Box, Chip, Typography } from "@mui/material";
 import { useAuth } from "../../contexts/AuthContext";
 import AxiosInstance from "../AxiosInstance";
 import { useAlert } from "../../contexts/AlertContext";
-import MyButton from "../forms/MyButton";
+import MyButton from "../../UI/forms/MyButton";
 import { differenceInCalendarDays } from "date-fns";
-import AlertDialog from "../modalsAndDialogs/AlertDialog";
+import AlertDialog from "../../UI/dialogs/AlertDialog";
 import { useState } from "react";
 
 interface Task {

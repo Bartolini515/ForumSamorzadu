@@ -3,17 +3,17 @@ import Box from "@mui/material/Box";
 import Modal from "@mui/material/Modal";
 import Fade from "@mui/material/Fade";
 import { useState, useEffect } from "react";
-import AxiosInstance from "../AxiosInstance";
+import AxiosInstance from "../../AxiosInstance";
 import { Button, IconButton, Typography } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import TasksList from "../lists/TasksList";
-import MyButton from "../forms/MyButton";
-import { useAuth } from "../../contexts/AuthContext";
-import { useAlert } from "../../contexts/AlertContext";
+import TasksList from "../../../UI/lists/TasksList";
+import MyButton from "../../../UI/forms/MyButton";
+import { useAuth } from "../../../contexts/AuthContext";
+import { useAlert } from "../../../contexts/AlertContext";
 import ModifyEventModal from "./ModifyEventModal";
 import AddCircleOutlineOutlinedIcon from "@mui/icons-material/AddCircleOutlineOutlined";
-import CreateTaskModal from "./CreateTaskModal";
-import AlertDialog from "./AlertDialog";
+import CreateTaskModal from "../../Tasks/CreateTaskModal";
+import AlertDialog from "../../../UI/dialogs/AlertDialog";
 
 const style = {
 	position: "absolute",

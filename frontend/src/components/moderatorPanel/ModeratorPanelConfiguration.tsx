@@ -1,7 +1,7 @@
 import { Box, Typography } from "@mui/material";
-import MyButton from "../forms/MyButton";
+import MyButton from "../../UI/forms/MyButton";
 import { useState } from "react";
-import ConfigModeratorPanelModal from "../modalsAndDialogs/ConfigModeratorPanelModal";
+import ConfigModeratorPanelModal from "./modals/ConfigModeratorPanelModal";
 
 export default function ModeratorPanelConfiguration() {
 	const [option, setOption] = useState<keyof typeof optionsMap>("schedule");

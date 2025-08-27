@@ -2,13 +2,14 @@ import Backdrop from "@mui/material/Backdrop";
 import Box from "@mui/material/Box";
 import Modal from "@mui/material/Modal";
 import Fade from "@mui/material/Fade";
-import AxiosInstance from "../AxiosInstance";
+import AxiosInstance from "../../AxiosInstance";
 import { Button, Typography } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import MyTextField from "../forms/MyTextField";
+import MyTextField from "../../../UI/forms/MyTextField";
 import { useForm } from "react-hook-form";
-import MyButton from "../forms/MyButton";
-import { useAlert } from "../../contexts/AlertContext";
+import MyButton from "../../../UI/forms/MyButton";
+import { useAlert } from "../../../contexts/AlertContext";
+import MyPassField from "../../../UI/forms/MyPassField";
 
 const style = {
 	position: "absolute",
@@ -29,9 +30,10 @@ const style = {
 interface Props {
 	option: {
 		name: string;
-		axiosUrl: string;
-		labelModal: string;
-		buttonSend: string;
+		label: string;
+		labelSingle: string;
+		headers: string[];
+		buttonAdd: string;
 		forms: {
 			first_field: {
 				title: string;
@@ -44,31 +46,40 @@ interface Props {
 	};
 	open: boolean;
 	setOpen: any;
+	setRefresh: any;
 }
 
 interface FormData {
-	url?: string;
+	email?: string;
+	password?: string;
+	first_name?: string;
+	last_name?: string;
+	event_type?: string;
+	event_color?: string;
 }
 
-export default function ConfigModeratorPanel(props: Props) {
+export default function CreateDataModerator(props: Props) {
 	const { handleSubmit, control, setError, clearErrors } = useForm<FormData>({
 		defaultValues: {
-			url: "",
+			email: "",
+			password: "",
+			first_name: "",
+			last_name: "",
+			event_type: "",
+			event_color: "",
 		},
 	});
 
 	const handleClose = () => {
 		props.setOpen(false);
+		props.setRefresh(true);
 	};
 
 	const { setAlert } = useAlert();
 
 	const submission = (data: FormData) => {
-		if (props.option.name === "schedule") {
-			setAlert("Trwa tworzenie planu lekcji, proszę czekać", "info");
-		}
 		AxiosInstance.post(
-			`moderator_panel/${props.option.axiosUrl}`,
+			`moderator_panel/${props.option.name}/create/`,
 			props.option.payload(data)
 		)
 			.then((response) => {
@@ -125,7 +136,7 @@ export default function ConfigModeratorPanel(props: Props) {
 								variant="h5"
 								component="h2"
 							>
-								{props.option.labelModal}
+								Stwórz {props.option.labelSingle}
 							</Typography>
 						</Box>
 						<Button
@@ -163,6 +174,73 @@ export default function ConfigModeratorPanel(props: Props) {
 									/>
 								</Box>
 							</Box>
+
+							{props.option.name === "user" && (
+								<>
+									<Box
+										sx={{
+											boxShadow: 3,
+											padding: "20px",
+											display: "flex",
+											flexDirection: "row",
+											marginBottom: "20px",
+										}}
+									>
+										<Box sx={{ fontWeight: "bold", alignContent: "center" }}>
+											Hasło:{" "}
+										</Box>
+										<Box sx={{ marginLeft: "10px" }}>
+											<MyPassField
+												label="Hasło"
+												name="password"
+												control={control}
+											/>
+										</Box>
+									</Box>
+
+									<Box
+										sx={{
+											boxShadow: 3,
+											padding: "20px",
+											display: "flex",
+											flexDirection: "row",
+											marginBottom: "20px",
+										}}
+									>
+										<Box sx={{ fontWeight: "bold", alignContent: "center" }}>
+											Imię:{" "}
+										</Box>
+										<Box sx={{ marginLeft: "10px" }}>
+											<MyTextField
+												label="Imię"
+												name="first_name"
+												control={control}
+											/>
+										</Box>
+									</Box>
+
+									<Box
+										sx={{
+											boxShadow: 3,
+											padding: "20px",
+											display: "flex",
+											flexDirection: "row",
+											marginBottom: "20px",
+										}}
+									>
+										<Box sx={{ fontWeight: "bold", alignContent: "center" }}>
+											Nazwisko:{" "}
+										</Box>
+										<Box sx={{ marginLeft: "10px" }}>
+											<MyTextField
+												label="Nazwisko"
+												name="last_name"
+												control={control}
+											/>
+										</Box>
+									</Box>
+								</>
+							)}
 							<MyButton
 								label="Stwórz"
 								type="submit"

@@ -2,15 +2,15 @@ import Backdrop from "@mui/material/Backdrop";
 import Box from "@mui/material/Box";
 import Modal from "@mui/material/Modal";
 import Fade from "@mui/material/Fade";
-import AxiosInstance from "../AxiosInstance";
+import AxiosInstance from "../../AxiosInstance";
 import { Button, Typography, Skeleton } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import MyTextField from "../forms/MyTextField";
+import MyTextField from "../../../UI/forms/MyTextField";
 import { useForm } from "react-hook-form";
-import MyButton from "../forms/MyButton";
-import { useAlert } from "../../contexts/AlertContext";
+import MyButton from "../../../UI/forms/MyButton";
+import { useAlert } from "../../../contexts/AlertContext";
 import { useEffect, useState } from "react";
-import MyPassField from "../forms/MyPassField";
+import MyPassField from "../../../UI/forms/MyPassField";
 
 const style = {
 	position: "absolute",

@@ -1,8 +1,8 @@
 import { Box, Divider, Button } from "@mui/material";
 import ModeratorPanelDataManagementTable from "./ModeratorPanelDataManagementTable";
-import SingleSelectAutoWidth from "../../forms/SingleSelectAutoWidth";
+import SingleSelectAutoWidth from "../../../UI/forms/SingleSelectAutoWidth";
 import { useState } from "react";
-import CreateForPanelDataModal from "../../modalsAndDialogs/CreateForPanelDataModal";
+import CreateForPanelDataModal from "../modals/CreateForPanelDataModal";
 
 export default function ModeratorPanelDataManagement() {
 	const [selectedOption, setSelectedOption] =

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import TaskDescriptionModal from "../modalsAndDialogs/TaskDescriptionModal"; // Import the new modal component
+import TaskDescriptionModal from "../../components/timetable/modals/TaskDescriptionModal"; // Import the new modal component
 import Chip from "@mui/material/Chip";
 import Stack from "@mui/material/Stack";
 

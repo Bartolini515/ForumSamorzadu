@@ -1,5 +1,5 @@
 import { Box, Chip, Typography } from "@mui/material";
-import MyButton from "../forms/MyButton";
+import MyButton from "../../UI/forms/MyButton";
 import { useNavigate } from "react-router-dom";
 import { differenceInCalendarDays } from "date-fns";
 

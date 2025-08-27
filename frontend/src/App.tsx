@@ -2,19 +2,19 @@ import { Routes, Route, useLocation } from "react-router";
 import "./App.css";
 import "./index.css";
 import Dashboard from "./components/dashboard/Dashboard";
-import Login from "./components/Login";
+import Login from "./components/auth/Login";
 import Schedule from "./components/schedule/Schedule";
 import Timetable from "./components/timetable/Timetable";
 import Tasks from "./components/Tasks/Tasks";
 import Navbar from "./components/navbar/Navbar";
 import ModeratorPanelDataManagement from "./components/moderatorPanel/dataManagement/ModeratorPanelDataManagement";
 import ProtectedRoutes from "./components/ProtectedRoutes";
-import ChangePassword from "./components/ChangePassword";
+import ChangePassword from "./components/auth/ChangePassword";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFnsV3";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { de } from "date-fns/locale";
 import { plPL } from "@mui/x-date-pickers/locales";
-import Account from "./components/Account";
+import Account from "./components/account/Account";
 import ModeratorPanelConfiguration from "./components/moderatorPanel/ModeratorPanelConfiguration";
 
 export default function App() {

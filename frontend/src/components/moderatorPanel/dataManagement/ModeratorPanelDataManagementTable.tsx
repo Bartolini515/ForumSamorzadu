@@ -15,9 +15,9 @@ import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import EditIcon from "@mui/icons-material/Edit";
 import { blue, red } from "@mui/material/colors";
 import { useAlert } from "../../../contexts/AlertContext";
-import ModifyForPanelDataModal from "../../modalsAndDialogs/ModifyForPanelDataModal";
+import ModifyForPanelDataModal from "../modals/ModifyForPanelDataModal";
 import { toDate } from "date-fns";
-import AlertDialog from "../../modalsAndDialogs/AlertDialog";
+import AlertDialog from "../../../UI/dialogs/AlertDialog";
 
 interface Props {
 	option: {

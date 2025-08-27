@@ -4,8 +4,8 @@ import Modal from "@mui/material/Modal";
 import Fade from "@mui/material/Fade";
 import { Button, Typography } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import MyButton from "../forms/MyButton";
-import SingleSelect from "../forms/SingleSelect";
+import MyButton from "../../../UI/forms/MyButton";
+import SingleSelect from "../../../UI/forms/SingleSelect";
 
 const style = {
 	position: "absolute",

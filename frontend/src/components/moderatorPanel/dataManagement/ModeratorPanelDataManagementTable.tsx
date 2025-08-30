@@ -74,9 +74,6 @@ export default function ModeratorPanelDataManagementTable(props: Props) {
 					});
 				}
 				setData(sortedData);
-
-				console.log(sortedData);
-
 				props.setRefresh(false);
 				setLoading(false);
 			})
@@ -92,8 +89,6 @@ export default function ModeratorPanelDataManagementTable(props: Props) {
 	};
 
 	const handleClickIsActive = (id: number, is_active: boolean) => {
-		console.log(id, is_active);
-
 		AxiosInstance.put(`moderator_panel/user/${id}/update/`, {
 			is_active: !is_active,
 		})

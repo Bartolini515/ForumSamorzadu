@@ -19,6 +19,8 @@ requests = "*"
 beautifulsoup4 = "*"
 celery = "*"
 redis = "*"
+django-celery-beat = "*"
+django-redis = "*"
 
 [dev-packages]
 

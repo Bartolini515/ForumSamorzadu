@@ -37,10 +37,7 @@ SECRET_KEY = env('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env.bool('DEBUG', default=False)
 
-ALLOWED_HOSTS = [
-    '127.0.0.1', # IP localhosta
-    'samorzad.w.zset.leszno.pl' # IP Serwera
-]
+ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['127.0.0.1'])
 
 
 # Application definition
@@ -57,6 +54,7 @@ INSTALLED_APPS = [
     'corsheaders', # Narzędzie do obsługi API za pomocą CORS
     'rest_framework', # Narzędzie do obsługi API za pomocą REST
     'knox', # Narzędzie oferujące dodatkową ochronę API
+    'django_celery_beat', # Narzędzie do obsługi zadań cyklicznych
     # MyApps
     'main', # Główna aplikacja
 ]
@@ -172,10 +170,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # CORS Headers
 # CORS_ALLOW_ALL_ORIGINS = True # SECURITY WARNING: Don't run in production!
-CORS_ALLOWED_ORIGINS = [
-    'http://localhost:5173',  # React dev server
-    'https://samorzad.w.zset.leszno.pl',  # Production server (HTTPS)
-]
+CORS_ALLOWED_ORIGINS = env.list('CORS_ALLOWED_ORIGINS', default=['http://localhost:5173'])
 CORS_ALLOW_CREDENTIALS = not DEBUG
 
 # SSL configuration and other security settings
@@ -184,9 +179,7 @@ SECURE_HSTS_INCLUDE_SUBDOMAINS = not DEBUG
 SECURE_HSTS_PRELOAD = not DEBUG
 CSRF_COOKIE_SECURE = not DEBUG
 SESSION_COOKIE_SECURE = not DEBUG
-CSRF_TRUSTED_ORIGINS = [
-    'https://samorzad.w.zset.leszno.pl',
-]
+CSRF_TRUSTED_ORIGINS = env.list('CSRF_TRUSTED_ORIGINS', default=[])
 
 # User model and auth
 AUTH_USER_MODEL = "main.Profile"
@@ -205,9 +198,10 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend' if not DEBUG else 
 EMAIL_HOST = "127.0.0.1"
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-DEFAULT_FROM_EMAIL = 'powiadomienia@samorzad.w.zset.pl'
+DEFAULT_FROM_EMAIL = 'noreply@samorzad.w.zset.pl'
 # EMAIL_HOST_USER = env('EMAIL_HOST_USER')
 # EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
+EMAIL_FOOTER = "\n\n--\nTa wiadomość została wysłana automatycznie. Prosimy na nią nie odpowiadać.\nForum Samorządu ZSET\nhttps://samorzad.w.zset.leszno.pl"
 
 # Celery Configuration
 CELERY_BROKER_URL = 'redis://127.0.0.1:6379'
@@ -215,3 +209,14 @@ CELERY_RESULT_BACKEND = 'redis://127.0.0.1:6379'
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
+
+# Caching
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/1", # Use a different DB number than Celery
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    }
+}

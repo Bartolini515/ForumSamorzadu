@@ -11,7 +11,7 @@ from knox.models import AuthToken
 from PIL import Image
 from django.core.files.base import ContentFile
 from .utils.schedule_scrapper import schedule_scrapper_main
-from .utils.email_notifications import send_email_notification
+from .tasks import send_email_notification
 User = get_user_model()
 
 def message_response(data, message="Operacja się powiodła"):
@@ -422,3 +422,15 @@ class ScheduleViewset(viewsets.ViewSet):
             return Response({"message": "Schedule file not found"}, status=404)
         except json.JSONDecodeError:
             return Response({"message": "Error decoding JSON"}, status=400)
+
+class UtilitiesViewset(viewsets.ViewSet):
+    permission_classes = [permissions.AllowAny]
+
+    @action(detail=False, methods=["get"], url_path="email/test")
+    def test_email(self, request):
+        send_email_notification.delay(
+            subject="Test Email",
+            message="This is a test email.",
+            recipient_list=["b.jedrzychowski@zset.leszno.pl"]
+        )
+        return Response({"message": "Test email sent"}, status=200)

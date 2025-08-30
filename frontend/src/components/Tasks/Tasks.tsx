@@ -39,9 +39,7 @@ export default function Tasks() {
 	const filteredTasks: any = tasks.filter((task: any) => {
 		const unassignedUser = task.user_id === null && selectedOptionUser === 0;
 		const matchesUser = task.user_id === selectedOptionUser;
-		const matchesEvent =
-			selectedOptionEvent.includes(task.event) ||
-			(task.event === null && selectedOptionEvent.includes("Bez wydarzenia"));
+		const matchesEvent = selectedOptionEvent.includes(task.event);
 
 		return (matchesUser && matchesEvent) || (unassignedUser && matchesEvent);
 	});
@@ -69,7 +67,6 @@ export default function Tasks() {
 							.filter((task: any) => task.event != null)
 							.map((task: any) => task.event)
 					),
-					"Bez wydarzenia",
 				]);
 				// Domyślne wybranie wszystkich wydarzeń
 				setSelectedOptionEvent([
@@ -78,7 +75,6 @@ export default function Tasks() {
 							.filter((task: any) => task.event != null)
 							.map((task: any) => task.event)
 					),
-					"Bez wydarzenia",
 				]);
 				setRefresh(false);
 			})

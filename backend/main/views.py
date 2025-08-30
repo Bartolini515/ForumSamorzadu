@@ -135,18 +135,6 @@ class TimetableViewset(viewsets.ModelViewSet):
         cache.set(cache_key, serializer.data, timeout=3600)
         return Response(serializer.data)
     
-    @action(detail=False, methods=["get"], url_path="event_colors")
-    def listEvent_colors(self, request):
-        cache_key = 'event_colors_list'
-        cached_data = cache.get(cache_key)
-        if cached_data:
-            return Response(cached_data)
-            
-        queryset = Event_colors.objects.all()
-        serializer = Event_colorsSerializer(queryset, many=True)
-        cache.set(cache_key, serializer.data, timeout=3600)
-        return Response(serializer.data)
-    
 class ModeratorPanelViewset(viewsets.ViewSet):
     permission_classes = [permissions.IsAdminUser]
     
@@ -249,57 +237,6 @@ class ModeratorPanelViewset(viewsets.ViewSet):
         return Response({"message": "Typ wydarzenia usunięty"})
     
     
-    #Sekcja kolorów wydarzeń
-    @action(detail=False, methods=["get"], url_path="event_colors")
-    def listEvent_colors(self, request):
-        cache_key = 'moderator_event_colors_list'
-        cached_data = cache.get(cache_key)
-        if cached_data:
-            return Response(cached_data)
-
-        queryset = Event_colors.objects.all()
-        serializer = Event_colorsSerializer(queryset, many=True)
-        cache.set(cache_key, serializer.data, timeout=3600)
-        return Response(serializer.data)
-    
-    @action(detail=False, methods=["get"], url_path="event_colors/(?P<pk>[^/.]+)")
-    def requestEvent_color(self, request, pk=None):
-        queryset = Event_colors.objects.get(pk=pk)
-        serializer = Event_colorsSerializer(queryset)
-        return Response(serializer.data)
-    
-    @action(detail=False, methods=["post"], url_path="event_colors/create")
-    def createEvent_color(self, request):
-        serializer = Event_colorsSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            cache.delete('moderator_event_colors_list')
-            cache.delete('event_colors_list')
-            return message_response(serializer.data, "Dodano kolor wydarzenia")
-        else:
-            return Response(serializer.errors, status=400)
-    
-    @action(detail=False, methods=["put"], url_path="event_colors/(?P<pk>[^/.]+)/update")
-    def updateEvent_colors(self, request, pk=None):
-        queryset = Event_colors.objects.get(pk=pk)
-        serializer = Event_colorsSerializer(queryset, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            cache.delete('moderator_event_colors_list')
-            cache.delete('event_colors_list')
-            return message_response(serializer.data, "Kolor zaktualizowany")
-        else:
-            return Response(serializer.errors, status=400)
-    
-    @action(detail=False, methods=["delete"], url_path="event_colors/delete/(?P<pk>[^/.]+)")
-    def deleteEvent_color(self, request, pk=None):
-        event_color = Event_colors.objects.get(pk=pk)
-        event_color.delete()
-        cache.delete('moderator_event_colors_list')
-        cache.delete('event_colors_list')
-        return Response({"message": "Kolor wydarzenia usunięty"})
-    
-    
     # Sekcja planu lekcji
     @action(detail=False, methods=["post"], url_path="schedule/create", permission_classes=[permissions.IsAdminUser])
     def create_schedule(self, request):
@@ -315,7 +252,6 @@ class ModeratorPanelViewset(viewsets.ViewSet):
                 return Response({"error": message}, status=400)
         else:
             return Response(serializer.errors, status=400)
-    
     
 class AccountViewset(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]

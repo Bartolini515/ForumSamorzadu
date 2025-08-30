@@ -10,7 +10,7 @@ import Navbar from "./components/navbar/Navbar";
 import ModeratorPanelDataManagement from "./components/moderatorPanel/dataManagement/ModeratorPanelDataManagement";
 import ProtectedRoutes from "./components/ProtectedRoutes";
 import ChangePassword from "./components/auth/ChangePassword";
-import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFnsV3";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { de } from "date-fns/locale";
 import { plPL } from "@mui/x-date-pickers/locales";

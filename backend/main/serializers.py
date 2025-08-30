@@ -72,7 +72,7 @@ class TasksSerializer(serializers.ModelSerializer):
 class Tasks_for_displaySerializer(serializers.ModelSerializer):
     user = serializers.StringRelatedField()
     event = serializers.StringRelatedField()
-    color = serializers.StringRelatedField(source='event.event_color')
+    color = serializers.CharField(source='event.event_color')
     
     class Meta:
         model = Tasks
@@ -92,7 +92,6 @@ class Timetable_eventsSerializer(serializers.ModelSerializer):
     start = serializers.DateField(source='start_date')
     end = serializers.DateField(source='end_date')
     event_type = serializers.StringRelatedField()
-    event_color = serializers.StringRelatedField()
     
     class Meta:
         model = Timetable_events
@@ -120,7 +119,6 @@ class Timetable_eventsDetailsSerializer(serializers.ModelSerializer):
     creator = serializers.StringRelatedField(source='created_by')
     creator_id = serializers.IntegerField(source='created_by_id')
     tasks = Tasks_for_eventSerializer(many=True)
-    event_color = serializers.StringRelatedField()
     
     class Meta:
         model = Timetable_events
@@ -186,32 +184,6 @@ class Event_typesSerializer(serializers.ModelSerializer):
     class Meta:
             model = Event_types
             fields = ("id", "event_type")
-
-
-# Event_colorsSerializers
-class Event_colorsSerializer(serializers.ModelSerializer):
-    event_color = serializers.CharField()
-    
-    def validate_event_color(self, value):
-        if Event_colors.objects.filter(event_color=value).exists():
-            raise serializers.ValidationError("Hex koloru nie może się powtarzać")
-        if value > 'FFFFFF' or value < '000000':
-            raise serializers.ValidationError("Hex koloru musi być w formacie RRGGBB")
-        if len(value) != 6:
-            raise serializers.ValidationError("Hex koloru musi mieć długość 6 znaków")
-        return value
-    
-    def create(self, validated_data):
-        return Event_colors.objects.create_event_color(**validated_data)
-    
-    def update(self, instance, validated_data):
-        instance.event_color = validated_data.get('event_color', instance.event_color)
-        instance.save()
-        return instance
-    
-    class Meta:
-            model = Event_colors
-            fields = ("id", "event_color")
 
 
 # ScheduleSerializers

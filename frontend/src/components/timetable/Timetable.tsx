@@ -36,7 +36,6 @@ export default function Timetable() {
 				setSelectedOptions([
 					...new Set(response.data.map((event: any) => event.event_type)),
 				]);
-				console.log(response.data);
 				setLoading(false);
 			})
 			.catch((error: any) => {

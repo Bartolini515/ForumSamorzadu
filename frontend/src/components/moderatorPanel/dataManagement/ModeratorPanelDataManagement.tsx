@@ -55,24 +55,6 @@ export default function ModeratorPanelDataManagement() {
 				event_type: data.event_type,
 			}),
 		},
-		event_colors: {
-			name: "event_colors",
-			label: "Kolory wydarzeń",
-			labelSingle: "Kolor wydarzenia",
-			headers: ["ID", "Hex koloru"],
-			buttonAdd: "Dodaj kolor wydarzenia",
-			forms: {
-				first_field: {
-					title: "Kolor",
-					label: "Hex koloru",
-					name: "event_color",
-					helperText: "Podaj hex koloru bez #, np. 00FF00",
-				},
-			},
-			payload: (data: any) => ({
-				event_color: data.event_color,
-			}),
-		},
 	};
 
 	const handleClick = () => {

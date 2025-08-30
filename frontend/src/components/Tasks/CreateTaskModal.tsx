@@ -40,6 +40,7 @@ interface FormData {
 	description: string;
 	event?: number | null;
 	due_date?: Date | null;
+	user?: number | null;
 }
 
 interface Event {
@@ -51,19 +52,26 @@ interface Event {
 }
 
 export default function CreateEventModal(props: Props) {
-	const [options, setOptions] = useState<any>([]);
-	const [selectedOption, setSelectedOption] = useState<number | null>(
+	const [optionsEvents, setOptionsEvents] = useState<any>([]);
+	const [selectedOptionEvent, setSelectedOptionEvent] = useState<number | null>(
 		props.event_id ? props.event_id : null
 	);
+	const [optionsUsers, setOptionsUsers] = useState<
+		{ id: number; option: string }[]
+	>([]);
+	const [selectedOptionUser, setSelectedOptionUser] = useState<number | null>(
+		null
+	);
 	const [events, setEvents] = useState<Event[]>([]);
-	const [maxDate, setMaxDate] = useState<Date | null>(null);
+	const [maxDate, setMaxDate] = useState<Date | undefined>(undefined);
 	const { handleSubmit, control, setError, clearErrors, resetField } =
 		useForm<FormData>({
 			defaultValues: {
 				task_name: "",
 				description: "",
-				event: props.event_id ? props.event_id : null,
+				event: props.event_id ? props.event_id : selectedOptionEvent,
 				due_date: null,
+				user: selectedOptionUser,
 			},
 		});
 
@@ -79,7 +87,7 @@ export default function CreateEventModal(props: Props) {
 				? data.due_date.toISOString().split("T")[0]
 				: null,
 			event: data.event,
-			user_id: null,
+			user_id: selectedOptionUser,
 		};
 		AxiosInstance.post(`tasks/`, payload)
 			.then((response) => {
@@ -111,7 +119,7 @@ export default function CreateEventModal(props: Props) {
 			});
 	};
 
-	const getEvents = () => {
+	const GetEventsAndUsers = () => {
 		AxiosInstance.get("timetable/")
 			.then((response) => {
 				setEvents(response.data);
@@ -124,7 +132,36 @@ export default function CreateEventModal(props: Props) {
 						tempOptions.push({ id: element.id, option: element.title });
 					}
 				});
-				setOptions(tempOptions);
+				setOptionsEvents(tempOptions);
+			})
+			.catch((error: any) => {
+				console.log(error);
+				setAlert(
+					error.response.data.message
+						? error.response.data.message
+						: error.message,
+					"error"
+				);
+			});
+
+		AxiosInstance.get("account/")
+			.then((response) => {
+				let tempUsers: { id: number; option: string }[] = [];
+				// Tworzenie listy dostępnych użytkowników
+				// W przypadku braku imienia i nazwiska wyświetlany jest email
+				response.data.map((user: any) => {
+					let tempOption;
+					if (user.first_name && user.last_name) {
+						tempOption = `${user.first_name} ${user.last_name}`;
+					} else {
+						tempOption = user.email;
+					}
+					tempUsers.push({
+						id: user.id,
+						option: tempOption,
+					});
+				});
+				setOptionsUsers(tempUsers);
 				setLoading(false);
 			})
 			.catch((error: any) => {
@@ -139,12 +176,12 @@ export default function CreateEventModal(props: Props) {
 	};
 
 	useEffect(() => {
-		getEvents();
+		GetEventsAndUsers();
 	}, []);
 
 	useEffect(() => {
 		let selectedEvent = events.find(
-			(event) => event.id === Number(selectedOption)
+			(event) => event.id === Number(selectedOptionEvent)
 		);
 
 		if (selectedEvent) {
@@ -154,7 +191,7 @@ export default function CreateEventModal(props: Props) {
 			resetField("due_date", { defaultValue: date });
 			setMaxDate(date);
 		}
-	}, [selectedOption, loading]);
+	}, [selectedOptionEvent, loading]);
 
 	const handleClick = () => {
 		clearErrors();
@@ -275,10 +312,10 @@ export default function CreateEventModal(props: Props) {
 										<MySelect
 											label="Wydarzenie"
 											name="event"
-											options={options}
+											options={optionsEvents}
 											control={control}
-											selectedOption={selectedOption}
-											setSelectedOption={setSelectedOption}
+											selectedOption={selectedOptionEvent}
+											setSelectedOption={setSelectedOptionEvent}
 											disabled={props.event_id ? true : false}
 										/>
 									</Box>
@@ -303,6 +340,33 @@ export default function CreateEventModal(props: Props) {
 											control={control}
 											disablePast={true}
 											maxDate={maxDate}
+										/>
+									</Box>
+								</Box>
+
+								<Box
+									sx={{
+										boxShadow: 3,
+										padding: "20px",
+										display: "flex",
+										flexDirection: "row",
+										marginBottom: "20px",
+									}}
+								>
+									<Box sx={{ fontWeight: "bold", alignContent: "center" }}>
+										Przypisanie:{" "}
+									</Box>
+									<Box sx={{ marginLeft: "10px" }}>
+										<MySelect
+											label="Przypisanie"
+											name="user"
+											options={optionsUsers}
+											control={control}
+											selectedOption={selectedOptionUser}
+											setSelectedOption={setSelectedOptionUser}
+											helperText={
+												"Pozostaw puste, aby nie przypisywać użytkownika do zadania"
+											}
 										/>
 									</Box>
 								</Box>

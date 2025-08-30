@@ -8,7 +8,7 @@ interface Props {
 	name: string;
 	helperText?: string;
 	disablePast?: boolean;
-	maxDate?: Date | null | undefined;
+	maxDate?: Date;
 	defaultValue?: Date | null | undefined;
 	control: any;
 	views?: ["year", "month", "day"];

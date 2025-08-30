@@ -12,6 +12,7 @@ import MyDatePicker from "../../../UI/forms/MyDatePicker";
 import MySelect from "../../../UI/forms/MySelect";
 import { useEffect, useState } from "react";
 import { useAlert } from "../../../contexts/AlertContext";
+import MyColorInput from "../../../UI/forms/MyColorInput";
 
 const style = {
 	position: "absolute",
@@ -47,16 +48,15 @@ interface FormData {
 export default function CreateEventModal(props: Props) {
 	const [options, setOptions] = useState<any>([]);
 	const [selectedOption, setSelectedOption] = useState<any>(null);
-	const [optionsColor, setOptionsColor] = useState<any>([]);
-	const [selectedOptionColor, setSelectedOptionColor] = useState<any>(null);
+	const [selectedColor, setSelectedColor] = useState<any>("#2196f3");
 	const { handleSubmit, control, setError, clearErrors } = useForm<FormData>({
 		defaultValues: {
 			event_name: "",
 			start_date: new Date(),
 			end_date: null,
 			description: "",
-			event_color: "",
-			event_type: "",
+			event_color: selectedColor,
+			event_type: selectedOption,
 		},
 	});
 
@@ -65,20 +65,22 @@ export default function CreateEventModal(props: Props) {
 	const { setAlert } = useAlert();
 
 	const submission = (data: FormData) => {
-		if (data.end_date) {
-			const date = new Date(data.end_date);
-			date.setDate(date.getDate() + 2);
-			data.end_date = new Date(date);
-		}
+		// Helper function to omit timezone conversion
+		const formatDate = (date: Date | null | undefined) => {
+			if (!date) return null;
+			const d = new Date(date);
+			const year = d.getFullYear();
+			const month = String(d.getMonth() + 1).padStart(2, "0");
+			const day = String(d.getDate()).padStart(2, "0");
+			return `${year}-${month}-${day}`;
+		};
 
 		const payload = {
 			event_name: data.event_name,
-			start_date: data.start_date.toISOString().split("T")[0],
-			end_date: data.end_date
-				? data.end_date.toISOString().split("T")[0]
-				: null,
+			start_date: formatDate(data.start_date),
+			end_date: formatDate(data.end_date),
 			event_type: data.event_type,
-			event_color: data.event_color,
+			event_color: data.event_color.substring(1),
 			description: data.description,
 		};
 
@@ -133,48 +135,8 @@ export default function CreateEventModal(props: Props) {
 			});
 	};
 
-	const getEventColors = () => {
-		AxiosInstance.get("timetable/event_colors/")
-			.then((response) => {
-				let tempOptions: { id: number; option: string; label: JSX.Element }[] =
-					[];
-				response.data.forEach((element: any) => {
-					tempOptions.push({
-						id: element.id,
-						option: element.event_color,
-						label: (
-							<div style={{ display: "flex", alignItems: "center" }}>
-								<div
-									style={{
-										width: "20px",
-										height: "20px",
-										backgroundColor: `#${element.event_color}`,
-										borderRadius: "50%",
-										marginRight: "10px",
-										border: "1px solid #ccc",
-									}}
-								></div>
-								#{element.event_color}
-							</div>
-						),
-					});
-				});
-				setOptionsColor(tempOptions);
-			})
-			.catch((error: any) => {
-				console.log(error);
-				setAlert(
-					error.response.data.message
-						? error.response.data.message
-						: error.message,
-					"error"
-				);
-			});
-	};
-
 	useEffect(() => {
 		getEventTypes();
-		getEventColors();
 	}, []);
 
 	const handleClick = () => {
@@ -363,13 +325,14 @@ export default function CreateEventModal(props: Props) {
 										Kolor wydarzenia:{" "}
 									</Box>
 									<Box sx={{ marginLeft: "10px", width: "40%" }}>
-										<MySelect
-											label="Kolor wydarzenia"
-											name="event_color"
-											options={optionsColor}
+										<MyColorInput
+											label={"Kolor wydarzenia"}
+											name={"event_color"}
 											control={control}
-											selectedOption={selectedOptionColor}
-											setSelectedOption={setSelectedOptionColor}
+											selectedColor={selectedColor}
+											setSelectedColor={setSelectedColor}
+											format="hex"
+											isAlphaHidden={true}
 										/>
 									</Box>
 								</Box>

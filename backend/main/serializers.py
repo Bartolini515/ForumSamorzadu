@@ -51,6 +51,12 @@ class TasksSerializer(serializers.ModelSerializer):
     user_id = serializers.IntegerField(allow_null=True)
     
     def create(self, validated_data):
+        due_date = validated_data.get('due_date', None)
+        event = validated_data.get('event', None)
+        if not (due_date and event):
+            raise serializers.ValidationError("Data terminu i wydarzenie muszą być podane")
+        if not (due_date and due_date > datetime.now().date()):
+            raise serializers.ValidationError("Data terminu musi być w przyszłości")
         return Tasks.objects.create_task(**validated_data)
     
     def update(self, instance, validated_data):

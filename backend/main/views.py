@@ -12,6 +12,7 @@ from PIL import Image
 from django.core.files.base import ContentFile
 from .utils.schedule_scrapper import schedule_scrapper_main
 from .tasks import send_email_notification
+from django.core.cache import cache
 User = get_user_model()
 
 def message_response(data, message="Operacja się powiodła"):
@@ -80,6 +81,7 @@ class TimetableViewset(viewsets.ModelViewSet):
         
         if serializer.data['creator_id'] == user.id or user.is_staff:
             event.delete()
+            cache.clear()
             return Response({"message": "Wydarzenie usunięte"})
         else:
             return Response({"message": "Użytkownik nie zgodny"}, status=403)
@@ -97,6 +99,7 @@ class TimetableViewset(viewsets.ModelViewSet):
                 message=f"Użytkownik {user.first_name} {user.last_name} utworzył nowe wydarzenie: {data['event_name']} o dacie {data['start_date']}.",
                 recipient_list=["all"]
             )
+            cache.clear()
             return message_response(Timetable_eventsDetailsSerializer(serializer.save()).data, "Wydarzenie utworzone")
         else:
             return Response(serializer.errors, status=400)
@@ -124,6 +127,7 @@ class TimetableViewset(viewsets.ModelViewSet):
         serializer = Timetable_eventsCreateSerializer(event, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
+            cache.clear()
             return message_response(Timetable_eventsDetailsSerializer(event).data, "Wydarzenie zaktualizowane")
         else:
             return Response(serializer.errors, status=400)
@@ -150,6 +154,7 @@ class ModeratorPanelViewset(viewsets.ViewSet):
         serializer = Profiles_moderatorPanelSerializer(queryset, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
+            cache.clear()
             return message_response(serializer.data, "Profil zaktualizowany")
         else:
             return Response(serializer.errors, status=400)
@@ -159,6 +164,7 @@ class ModeratorPanelViewset(viewsets.ViewSet):
         serializer = Profiles_moderatorPanelSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
+            cache.clear()
             return message_response(serializer.data, "Dodano użytkownika")
         else:
             return Response(serializer.errors, status=400)
@@ -167,6 +173,7 @@ class ModeratorPanelViewset(viewsets.ViewSet):
     def deleteProfile(self, request, pk=None):
         user = Profile.objects.get(pk=pk)
         user.delete()
+        cache.clear()
         return Response({"message": "Użytkownik usunięty"})
     
     
@@ -189,6 +196,7 @@ class ModeratorPanelViewset(viewsets.ViewSet):
         serializer = Event_typesSerializer(queryset, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
+            cache.clear()
             return message_response(serializer.data, "Typ wydarzenia zaktualizowany")
         else:
             return Response(serializer.errors, status=400)
@@ -198,6 +206,7 @@ class ModeratorPanelViewset(viewsets.ViewSet):
         serializer = Event_typesSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
+            cache.clear()
             return message_response(serializer.data, "Dodano typ wydarzenia")
         else:
             return Response(serializer.errors, status=400)
@@ -206,6 +215,7 @@ class ModeratorPanelViewset(viewsets.ViewSet):
     def deleteEvent_type(self, request, pk=None):
         event_type = Event_types.objects.get(pk=pk)
         event_type.delete()
+        cache.clear()
         return Response({"message": "Typ wydarzenia usunięty"})
     
     
@@ -228,6 +238,7 @@ class ModeratorPanelViewset(viewsets.ViewSet):
         serializer = Event_colorsSerializer(queryset, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
+            cache.clear()
             return message_response(serializer.data, "Kolor zaktualizowany")
         else:
             return Response(serializer.errors, status=400)
@@ -237,6 +248,7 @@ class ModeratorPanelViewset(viewsets.ViewSet):
         serializer = Event_colorsSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
+            cache.clear()
             return message_response(serializer.data, "Dodano kolor wydarzenia")
         else:
             return Response(serializer.errors, status=400)
@@ -245,6 +257,7 @@ class ModeratorPanelViewset(viewsets.ViewSet):
     def deleteEvent_color(self, request, pk=None):
         event_color = Event_colors.objects.get(pk=pk)
         event_color.delete()
+        cache.clear()
         return Response({"message": "Kolor wydarzenia usunięty"})
     
     # Sekcja planu lekcji
@@ -255,6 +268,7 @@ class ModeratorPanelViewset(viewsets.ViewSet):
             url = serializer.validated_data['url']
             success, message = schedule_scrapper_main(url)
             if success:
+                cache.clear()
                 return Response({"message": message})
             else:
                 # If validation failed in the scrapper, return the error
@@ -315,7 +329,7 @@ class AccountViewset(viewsets.ModelViewSet):
                 serializer.validated_data['profile_picture'] = temp_file  
                 
             serializer.save()
-            
+            cache.clear()
             return message_response(serializer.data, "Zmieniono zdjęcie profilowe")
         else:
             return Response(serializer.errors, status=400)
@@ -340,6 +354,7 @@ class TasksViewset(viewsets.ModelViewSet):
                 message=f"Użytkownik {request.user.first_name} {request.user.last_name} dodał nowe zadanie: {serializer.validated_data['task_name']}.",
                 recipient_list=["all"]
             )
+            cache.clear()
             return message_response(serializer.data, "Dodano zadanie")
         else:
             return Response(serializer.errors, status=400)
@@ -363,7 +378,7 @@ class TasksViewset(viewsets.ModelViewSet):
                         )
                     except Timetable_events.DoesNotExist:
                         pass
-                
+            cache.clear()
             return message_response(serializer.data, "Status zmieniony")
         else:
             return Response(serializer.errors, status=400)
@@ -395,6 +410,7 @@ class TasksViewset(viewsets.ModelViewSet):
                                 )
                             except Timetable_events.DoesNotExist:
                                 pass
+            cache.clear()
             return message_response(serializer.data, "Przypisanie zmienione")
         else:
             return Response(serializer.errors, status=400)
@@ -403,6 +419,7 @@ class TasksViewset(viewsets.ModelViewSet):
     def deleteTask(self, request, pk=None):
         task = self.queryset.get(pk=pk)
         task.delete()
+        cache.clear()
         return Response({"message": "Zadanie usunięte"})
         
 class ScheduleViewset(viewsets.ViewSet):

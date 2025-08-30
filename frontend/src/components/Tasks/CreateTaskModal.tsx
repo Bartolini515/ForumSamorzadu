@@ -81,7 +81,7 @@ export default function CreateEventModal(props: Props) {
 			event: data.event,
 			user_id: null,
 		};
-		AxiosInstance.post(`tasks/create/`, payload)
+		AxiosInstance.post(`tasks/`, payload)
 			.then((response) => {
 				props.onClose();
 				setAlert(response.data.message, "success");

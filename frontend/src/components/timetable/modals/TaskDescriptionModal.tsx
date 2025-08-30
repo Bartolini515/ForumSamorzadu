@@ -41,7 +41,7 @@ export default function TaskDescriptionModal(props: Props) {
 	const { setAlert } = useAlert();
 
 	const DeleteTask = (id: number) => {
-		AxiosInstance.delete(`tasks/delete/${id}/`)
+		AxiosInstance.delete(`tasks/${id}/`)
 			.then((response) => {
 				setAlert(response.data.message, "success");
 			})

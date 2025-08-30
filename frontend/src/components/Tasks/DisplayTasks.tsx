@@ -103,7 +103,7 @@ export default function DisplayTasks(props: Props) {
 	};
 
 	const DeleteTask = (id: number) => {
-		AxiosInstance.delete(`tasks/delete/${id}/`)
+		AxiosInstance.delete(`tasks/${id}/`)
 			.then((response) => {
 				setAlert(response.data.message, "success");
 				props.setRefresh(true);

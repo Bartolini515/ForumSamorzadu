@@ -96,7 +96,7 @@ export default function ModifyEventModal(props: Props) {
 			description: data.description,
 		};
 
-		AxiosInstance.put(`timetable/${props.id}/update/`, payload)
+		AxiosInstance.put(`timetable/${props.id}/`, payload)
 			.then((response) => {
 				props.onClose();
 				setAlert(response.data.message, "success");

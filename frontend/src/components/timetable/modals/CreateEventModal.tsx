@@ -82,7 +82,7 @@ export default function CreateEventModal(props: Props) {
 			description: data.description,
 		};
 
-		AxiosInstance.post(`timetable/create/`, payload)
+		AxiosInstance.post(`timetable/`, payload)
 			.then((response) => {
 				props.onClose();
 				setAlert(response.data.message, "success");

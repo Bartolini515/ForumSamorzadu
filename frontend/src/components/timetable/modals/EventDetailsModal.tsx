@@ -112,7 +112,7 @@ export default function EventDetails(props: Props) {
 	};
 
 	const DeleteData = () => {
-		AxiosInstance.delete(`timetable/delete/${props.id}/`)
+		AxiosInstance.delete(`timetable/${props.id}/`)
 			.then((response) => {
 				handleClose();
 				setAlert(response.data.message, "success");

@@ -56,8 +56,14 @@ class TimetableViewset(viewsets.ModelViewSet):
     serializer_class = Timetable_eventsSerializer
     
     def list(self, request):
-        queryset = self.queryset
+        cache_key = 'timetable_events_list'
+        cached_data = cache.get(cache_key)
+        if cached_data:
+            return Response(cached_data)
+            
+        queryset = Timetable_events.objects.all()
         serializer = self.serializer_class(queryset, many=True)
+        cache.set(cache_key, serializer.data, timeout=3600)
         return Response(serializer.data)
     
     def retrieve(self, request, pk=None):
@@ -72,22 +78,7 @@ class TimetableViewset(viewsets.ModelViewSet):
             
         return Response(data)
     
-    @action(detail=False, methods=["delete"], url_path="delete/(?P<pk>[^/.]+)")
-    def deleteEvent(self, request, pk=None):
-        user = self.request.user
-        
-        serializer = Timetable_eventsDetailsSerializer(self.queryset.get(pk=pk))
-        event = self.queryset.get(pk=pk)
-        
-        if serializer.data['creator_id'] == user.id or user.is_staff:
-            event.delete()
-            cache.clear()
-            return Response({"message": "Wydarzenie usunięte"})
-        else:
-            return Response({"message": "Użytkownik nie zgodny"}, status=403)
-    
-    @action(detail=False, methods=["post"], url_path="create")
-    def createEvent(self, request, token=None):
+    def create(self, request):
         user = self.request.user
         
         data = request.data
@@ -99,25 +90,12 @@ class TimetableViewset(viewsets.ModelViewSet):
                 message=f"Użytkownik {user.first_name} {user.last_name} utworzył nowe wydarzenie: {data['event_name']} o dacie {data['start_date']}.",
                 recipient_list=["all"]
             )
-            cache.clear()
+            cache.delete('timetable_events_list')
             return message_response(Timetable_eventsDetailsSerializer(serializer.save()).data, "Wydarzenie utworzone")
         else:
             return Response(serializer.errors, status=400)
-        
-    @action(detail=False, methods=["get"], url_path="event_types")
-    def listEvent_types(self, request):
-        queryset = Event_types.objects.all()
-        serializer = Event_typesSerializer(queryset, many=True)
-        return Response(serializer.data)
     
-    @action(detail=False, methods=["get"], url_path="event_colors")
-    def listEvent_colors(self, request):
-        queryset = Event_colors.objects.all()
-        serializer = Event_colorsSerializer(queryset, many=True)
-        return Response(serializer.data)
-    
-    @action(detail=False, methods=["put"], url_path="(?P<pk>[^/.]+)/update")
-    def updateEvent(self, request, pk=None):
+    def update(self, request, pk=None):
         user = self.request.user
         
         event = self.queryset.get(pk=pk)
@@ -127,10 +105,47 @@ class TimetableViewset(viewsets.ModelViewSet):
         serializer = Timetable_eventsCreateSerializer(event, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
-            cache.clear()
+            cache.delete('timetable_events_list')
             return message_response(Timetable_eventsDetailsSerializer(event).data, "Wydarzenie zaktualizowane")
         else:
             return Response(serializer.errors, status=400)
+        
+    def destroy(self, request, pk=None):
+        user = self.request.user
+        
+        serializer = Timetable_eventsDetailsSerializer(self.queryset.get(pk=pk))
+        event = self.queryset.get(pk=pk)
+        
+        if serializer.data['creator_id'] == user.id or user.is_staff:
+            event.delete()
+            cache.delete('timetable_events_list')
+            return Response({"message": "Wydarzenie usunięte"})
+        else:
+            return Response({"message": "Użytkownik nie zgodny"}, status=403)
+        
+    @action(detail=False, methods=["get"], url_path="event_types")
+    def listEvent_types(self, request):
+        cache_key = 'event_types_list'
+        cached_data = cache.get(cache_key)
+        if cached_data:
+            return Response(cached_data)
+
+        queryset = Event_types.objects.all()
+        serializer = Event_typesSerializer(queryset, many=True)
+        cache.set(cache_key, serializer.data, timeout=3600)
+        return Response(serializer.data)
+    
+    @action(detail=False, methods=["get"], url_path="event_colors")
+    def listEvent_colors(self, request):
+        cache_key = 'event_colors_list'
+        cached_data = cache.get(cache_key)
+        if cached_data:
+            return Response(cached_data)
+            
+        queryset = Event_colors.objects.all()
+        serializer = Event_colorsSerializer(queryset, many=True)
+        cache.set(cache_key, serializer.data, timeout=3600)
+        return Response(serializer.data)
     
 class ModeratorPanelViewset(viewsets.ViewSet):
     permission_classes = [permissions.IsAdminUser]
@@ -138,8 +153,14 @@ class ModeratorPanelViewset(viewsets.ViewSet):
     # Sekcja profili
     @action(detail=False, methods=["get"], url_path="user")
     def listProfiles(self, request):
+        cache_key = 'profiles_list'
+        cached_data = cache.get(cache_key)
+        if cached_data:
+            return Response(cached_data)
+
         queryset = Profile.objects.all()
         serializer = Profiles_moderatorPanelSerializer(queryset, many=True)
+        cache.set(cache_key, serializer.data, timeout=3600)
         return Response(serializer.data)
     
     @action(detail=False, methods=["get"], url_path="user/(?P<pk>[^/.]+)")
@@ -147,6 +168,16 @@ class ModeratorPanelViewset(viewsets.ViewSet):
         queryset = Profile.objects.get(pk=pk)
         serializer = Profiles_moderatorPanelSerializer(queryset)
         return Response(serializer.data)
+
+    @action(detail=False, methods=["post"], url_path="user/create")
+    def createProfile(self, request):
+        serializer = Profiles_moderatorPanelSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            cache.delete('profiles_list')
+            return message_response(serializer.data, "Dodano użytkownika")
+        else:
+            return Response(serializer.errors, status=400)
     
     @action(detail=False, methods=["put"], url_path="user/(?P<pk>[^/.]+)/update")
     def updateProfile(self, request, pk=None):
@@ -154,18 +185,8 @@ class ModeratorPanelViewset(viewsets.ViewSet):
         serializer = Profiles_moderatorPanelSerializer(queryset, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
-            cache.clear()
+            cache.delete('profiles_list')
             return message_response(serializer.data, "Profil zaktualizowany")
-        else:
-            return Response(serializer.errors, status=400)
-        
-    @action(detail=False, methods=["post"], url_path="user/create")
-    def createProfile(self, request):
-        serializer = Profiles_moderatorPanelSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            cache.clear()
-            return message_response(serializer.data, "Dodano użytkownika")
         else:
             return Response(serializer.errors, status=400)
 
@@ -173,15 +194,21 @@ class ModeratorPanelViewset(viewsets.ViewSet):
     def deleteProfile(self, request, pk=None):
         user = Profile.objects.get(pk=pk)
         user.delete()
-        cache.clear()
+        cache.delete('profiles_list')
         return Response({"message": "Użytkownik usunięty"})
     
     
     # Sekcja typów wydarzeń
     @action(detail=False, methods=["get"], url_path="event_types")
     def listEvent_types(self, request):
+        cache_key = 'moderator_event_types_list'
+        cached_data = cache.get(cache_key)
+        if cached_data:
+            return Response(cached_data)
+
         queryset = Event_types.objects.all()
         serializer = Event_typesSerializer(queryset, many=True)
+        cache.set(cache_key, serializer.data, timeout=3600)
         return Response(serializer.data)
     
     @action(detail=False, methods=["get"], url_path="event_types/(?P<pk>[^/.]+)")
@@ -190,24 +217,26 @@ class ModeratorPanelViewset(viewsets.ViewSet):
         serializer = Event_typesSerializer(queryset)
         return Response(serializer.data)
     
+    @action(detail=False, methods=["post"], url_path="event_types/create")
+    def createEvent_type(self, request):
+        serializer = Event_typesSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            cache.delete('moderator_event_types_list')
+            cache.delete('event_types_list')
+            return message_response(serializer.data, "Dodano typ wydarzenia")
+        else:
+            return Response(serializer.errors, status=400)
+    
     @action(detail=False, methods=["put"], url_path="event_types/(?P<pk>[^/.]+)/update")
     def updateEvent_types(self, request, pk=None):
         queryset = Event_types.objects.get(pk=pk)
         serializer = Event_typesSerializer(queryset, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
-            cache.clear()
+            cache.delete('moderator_event_types_list')
+            cache.delete('event_types_list')
             return message_response(serializer.data, "Typ wydarzenia zaktualizowany")
-        else:
-            return Response(serializer.errors, status=400)
-    
-    @action(detail=False, methods=["post"], url_path="event_types/create")
-    def createEvent_type(self, request):
-        serializer = Event_typesSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            cache.clear()
-            return message_response(serializer.data, "Dodano typ wydarzenia")
         else:
             return Response(serializer.errors, status=400)
     
@@ -215,15 +244,22 @@ class ModeratorPanelViewset(viewsets.ViewSet):
     def deleteEvent_type(self, request, pk=None):
         event_type = Event_types.objects.get(pk=pk)
         event_type.delete()
-        cache.clear()
+        cache.delete('moderator_event_types_list')
+        cache.delete('event_types_list')
         return Response({"message": "Typ wydarzenia usunięty"})
     
     
     #Sekcja kolorów wydarzeń
     @action(detail=False, methods=["get"], url_path="event_colors")
     def listEvent_colors(self, request):
+        cache_key = 'moderator_event_colors_list'
+        cached_data = cache.get(cache_key)
+        if cached_data:
+            return Response(cached_data)
+
         queryset = Event_colors.objects.all()
         serializer = Event_colorsSerializer(queryset, many=True)
+        cache.set(cache_key, serializer.data, timeout=3600)
         return Response(serializer.data)
     
     @action(detail=False, methods=["get"], url_path="event_colors/(?P<pk>[^/.]+)")
@@ -232,24 +268,26 @@ class ModeratorPanelViewset(viewsets.ViewSet):
         serializer = Event_colorsSerializer(queryset)
         return Response(serializer.data)
     
+    @action(detail=False, methods=["post"], url_path="event_colors/create")
+    def createEvent_color(self, request):
+        serializer = Event_colorsSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            cache.delete('moderator_event_colors_list')
+            cache.delete('event_colors_list')
+            return message_response(serializer.data, "Dodano kolor wydarzenia")
+        else:
+            return Response(serializer.errors, status=400)
+    
     @action(detail=False, methods=["put"], url_path="event_colors/(?P<pk>[^/.]+)/update")
     def updateEvent_colors(self, request, pk=None):
         queryset = Event_colors.objects.get(pk=pk)
         serializer = Event_colorsSerializer(queryset, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
-            cache.clear()
+            cache.delete('moderator_event_colors_list')
+            cache.delete('event_colors_list')
             return message_response(serializer.data, "Kolor zaktualizowany")
-        else:
-            return Response(serializer.errors, status=400)
-    
-    @action(detail=False, methods=["post"], url_path="event_colors/create")
-    def createEvent_color(self, request):
-        serializer = Event_colorsSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            cache.clear()
-            return message_response(serializer.data, "Dodano kolor wydarzenia")
         else:
             return Response(serializer.errors, status=400)
     
@@ -257,8 +295,10 @@ class ModeratorPanelViewset(viewsets.ViewSet):
     def deleteEvent_color(self, request, pk=None):
         event_color = Event_colors.objects.get(pk=pk)
         event_color.delete()
-        cache.clear()
+        cache.delete('moderator_event_colors_list')
+        cache.delete('event_colors_list')
         return Response({"message": "Kolor wydarzenia usunięty"})
+    
     
     # Sekcja planu lekcji
     @action(detail=False, methods=["post"], url_path="schedule/create", permission_classes=[permissions.IsAdminUser])
@@ -268,7 +308,7 @@ class ModeratorPanelViewset(viewsets.ViewSet):
             url = serializer.validated_data['url']
             success, message = schedule_scrapper_main(url)
             if success:
-                cache.clear()
+                cache.delete('schedule_data')
                 return Response({"message": message})
             else:
                 # If validation failed in the scrapper, return the error
@@ -288,7 +328,7 @@ class AccountViewset(viewsets.ModelViewSet):
         return Response(serializer.data)
     
     @action(detail=False, methods=["post"], url_path="change_password")
-    def change_password(self, request, token=None):
+    def change_password(self, request):
         user = self.request.user
         
         serializer = Password_changeSerializer(data=request.data)
@@ -329,7 +369,7 @@ class AccountViewset(viewsets.ModelViewSet):
                 serializer.validated_data['profile_picture'] = temp_file  
                 
             serializer.save()
-            cache.clear()
+            
             return message_response(serializer.data, "Zmieniono zdjęcie profilowe")
         else:
             return Response(serializer.errors, status=400)
@@ -340,12 +380,18 @@ class TasksViewset(viewsets.ModelViewSet):
     queryset = Tasks.objects.all()
     
     def list(self, request):
-        queryset = self.queryset
+        cache_key = 'tasks_list'
+        cached_data = cache.get(cache_key)
+        if cached_data:
+            return Response(cached_data)
+
+        queryset = Tasks.objects.all()
+        self.queryset = queryset
         serializer = Tasks_for_displaySerializer(queryset, many=True)
+        cache.set(cache_key, serializer.data, timeout=3600)
         return Response(serializer.data)
     
-    @action(detail=False, methods=["post"], url_path="create")
-    def createTask(self, request):
+    def create(self, request):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -354,12 +400,12 @@ class TasksViewset(viewsets.ModelViewSet):
                 message=f"Użytkownik {request.user.first_name} {request.user.last_name} dodał nowe zadanie: {serializer.validated_data['task_name']}.",
                 recipient_list=["all"]
             )
-            cache.clear()
+            cache.delete('tasks_list')
             return message_response(serializer.data, "Dodano zadanie")
         else:
             return Response(serializer.errors, status=400)
     
-    @action(detail=False, methods=["put"], url_path="(?P<pk>[^/.]+)/update_status")
+    @action(detail=True, methods=["put"], url_path=("update_status"))
     def updateStatus(self, request, pk=None):
         queryset = self.queryset.get(pk=pk)
         serializer = self.serializer_class(queryset, data=request.data, partial=True)
@@ -378,12 +424,12 @@ class TasksViewset(viewsets.ModelViewSet):
                         )
                     except Timetable_events.DoesNotExist:
                         pass
-            cache.clear()
+            cache.delete('tasks_list')
             return message_response(serializer.data, "Status zmieniony")
         else:
             return Response(serializer.errors, status=400)
         
-    @action(detail=False, methods=["put"], url_path="(?P<pk>[^/.]+)/update_assigned")
+    @action(detail=True, methods=["put"], url_path="update_assigned")
     def updateAssigned(self, request, pk=None):
         queryset = self.queryset.get(pk=pk)
         serializer = self.serializer_class(queryset, data=request.data, partial=True)
@@ -410,22 +456,26 @@ class TasksViewset(viewsets.ModelViewSet):
                                 )
                             except Timetable_events.DoesNotExist:
                                 pass
-            cache.clear()
+            cache.delete('tasks_list')
             return message_response(serializer.data, "Przypisanie zmienione")
         else:
             return Response(serializer.errors, status=400)
         
-    @action(detail=False, methods=["delete"], url_path="delete/(?P<pk>[^/.]+)")
-    def deleteTask(self, request, pk=None):
+    def destroy(self, request, pk=None):
         task = self.queryset.get(pk=pk)
         task.delete()
-        cache.clear()
+        cache.delete('tasks_list')
         return Response({"message": "Zadanie usunięte"})
         
 class ScheduleViewset(viewsets.ViewSet):
     permission_classes = [permissions.IsAuthenticated]
     
     def list(self, request):
+        cache_key = 'schedule_data'
+        cached_data = cache.get(cache_key)
+        if cached_data:
+            return Response(cached_data)
+
         try:
             script_dir = os.path.dirname(__file__)
             data_dir = os.path.join(script_dir, "..", "data")
@@ -434,6 +484,8 @@ class ScheduleViewset(viewsets.ViewSet):
                 return Response({"message": "Schedule file not found"}, status=404)
             with open(file_path, 'r', encoding='utf-8') as file:
                 schedule_data = json.load(file)
+            
+            cache.set(cache_key, schedule_data, timeout=3600)
             return Response(schedule_data)
         except FileNotFoundError:
             return Response({"message": "Schedule file not found"}, status=404)

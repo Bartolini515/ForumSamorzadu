@@ -101,9 +101,9 @@ def schedule_scrapper_main(main_url):
             return False, str(e)
         
     script_dir = os.path.dirname(__file__)
-    if not os.path.exists(os.path.join(script_dir, "..", "data")):
-        os.makedirs(os.path.join(script_dir, "..", "data"))
-    json_path = os.path.join(script_dir, "..", "data", "schedule.json")
+    if not os.path.exists(os.path.join(script_dir, "..", "..", "data")):
+        os.makedirs(os.path.join(script_dir, "..", "..", "data"))
+    json_path = os.path.join(script_dir, "..", "..", "data", "schedule.json")
     try:
         with open(json_path, "w", encoding="utf-8") as f:
             json.dump(data, f, indent=2, ensure_ascii=False)

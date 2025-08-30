@@ -8,6 +8,7 @@ import {
 	Paper,
 	IconButton,
 	Skeleton,
+	Checkbox,
 } from "@mui/material";
 import AxiosInstance from "../../AxiosInstance";
 import { useEffect, useState } from "react";
@@ -59,16 +60,55 @@ export default function ModeratorPanelDataManagementTable(props: Props) {
 									new Date(element["last_login"])
 							  ).toLocaleString())
 							: (element["last_login"] = "Brak logowania");
+						element["is_active"] = (
+							<Checkbox
+								checked={element["is_active"]}
+								onClick={() =>
+									handleClickIsActive(
+										element.id,
+										element["is_active"].props.checked
+									)
+								}
+							/>
+						);
 					});
 				}
 				setData(sortedData);
+
+				console.log(sortedData);
 
 				props.setRefresh(false);
 				setLoading(false);
 			})
 			.catch((error: any) => {
 				console.log(error);
-				setAlert(error.message, "error");
+				setAlert(
+					error.response.data.message
+						? error.response.data.message
+						: error.message,
+					"error"
+				);
+			});
+	};
+
+	const handleClickIsActive = (id: number, is_active: boolean) => {
+		console.log(id, is_active);
+
+		AxiosInstance.put(`moderator_panel/user/${id}/update/`, {
+			is_active: !is_active,
+		})
+			.then((response) => {
+				props.setRefresh(true);
+				setAlert(response.data.message, "success");
+			})
+			.catch((error: any) => {
+				console.log(error);
+				setAlert(
+					error.response.data.message
+						? error.response.data.message
+						: error.message,
+					"error"
+				);
 			});
 	};
 
@@ -84,7 +124,12 @@ export default function ModeratorPanelDataManagementTable(props: Props) {
 			})
 			.catch((error: any) => {
 				console.log(error);
-				setAlert(error.message, "error");
+				setAlert(
+					error.response.data.message
+						? error.response.data.message
+						: error.message,
+					"error"
+				);
 			});
 	};
 

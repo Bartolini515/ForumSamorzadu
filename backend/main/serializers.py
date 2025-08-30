@@ -143,6 +143,7 @@ class Profiles_moderatorPanelSerializer(serializers.ModelSerializer):
         instance.first_name = validated_data.get('first_name', instance.first_name)
         instance.last_name = validated_data.get('last_name', instance.last_name)
         instance.email = validated_data.get('email', instance.email)
+        instance.is_active = validated_data.get('is_active', instance.is_active)
         password = validated_data.get('password', None)
         if password:
             instance.set_password(password)
@@ -156,7 +157,7 @@ class Profiles_moderatorPanelSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Profile
-        fields = ("id" , "first_name", "last_name", "email", "last_login", "password")
+        fields = ("id" , "first_name", "last_name", "email", "last_login", "is_active", "password")
         
         
 # Event_typesSerializers

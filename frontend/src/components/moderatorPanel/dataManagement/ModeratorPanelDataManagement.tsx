@@ -15,7 +15,14 @@ export default function ModeratorPanelDataManagement() {
 			name: "user",
 			label: "Użytkownicy",
 			labelSingle: "Użytkownika",
-			headers: ["ID", "Imię", "Nazwisko", "Email", "Ostatnie logowanie"],
+			headers: [
+				"ID",
+				"Imię",
+				"Nazwisko",
+				"Email",
+				"Ostatnie logowanie",
+				"Aktywny",
+			],
 			buttonAdd: "Dodaj użytkownika",
 			forms: {
 				first_field: {

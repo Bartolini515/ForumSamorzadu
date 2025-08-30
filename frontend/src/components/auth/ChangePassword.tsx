@@ -1,4 +1,3 @@
-import "../App.css";
 import { useState } from "react";
 import { Box, Typography } from "@mui/material";
 import MyPassField from "../../UI/forms/MyPassField";
@@ -56,7 +55,12 @@ export default function ChangePasswordLogin() {
 					});
 				} else {
 					console.log(error);
-					setAlert(error.message, "error");
+					setAlert(
+						error.response.data.message
+							? error.response.data.message
+							: error.message,
+						"error"
+					);
 				}
 			});
 	};

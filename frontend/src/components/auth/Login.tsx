@@ -1,4 +1,3 @@
-import "../App.css";
 import { useEffect, useState } from "react";
 import { Box, Typography } from "@mui/material";
 import MyTextField from "../../UI/forms/MyTextField";

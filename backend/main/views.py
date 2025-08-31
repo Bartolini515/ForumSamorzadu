@@ -434,12 +434,9 @@ class UtilitiesViewset(viewsets.ViewSet):
 
     @action(detail=False, methods=["get"], url_path="email/test")
     def test_email(self, request):
-        if settings.DEBUG:
-            send_email_notification.delay(
-                subject="Test Email",
-                message="This is a test email.",
-                recipient_list=["b.jedrzychowski@zset.leszno.pl"]
-            )
-            return Response({"message": "Test email sent"}, status=200)
-        else:
-            return Response({"message": "Server not in debug mode"}, status=404)
+        send_email_notification.delay(
+            subject="Test Email",
+            message="This is a test email.",
+            recipient_list=["b.jedrzychowski@zset.leszno.pl"]
+        )
+        return Response({"message": "Test email sent"}, status=200)

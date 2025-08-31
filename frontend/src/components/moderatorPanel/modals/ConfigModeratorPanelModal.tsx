@@ -2,12 +2,13 @@ import Backdrop from "@mui/material/Backdrop";
 import Box from "@mui/material/Box";
 import Modal from "@mui/material/Modal";
 import Fade from "@mui/material/Fade";
-import AxiosInstance from "../AxiosInstance";
+import AxiosInstance from "../../AxiosInstance";
 import { Button, Typography } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import MyTextField from "../../../UI/forms/MyTextField";
 import { useForm } from "react-hook-form";
-import { useAlert } from "../../contexts/AlertContext";
-import MyDropzone from "../forms/MyDropzone";
+import MyButton from "../../../UI/forms/MyButton";
+import { useAlert } from "../../../contexts/AlertContext";
 
 const style = {
 	position: "absolute",
@@ -26,37 +27,53 @@ const style = {
 };
 
 interface Props {
+	option: {
+		name: string;
+		axiosUrl: string;
+		labelModal: string;
+		buttonSend: string;
+		forms: {
+			first_field: {
+				title: string;
+				label: string;
+				name: string;
+				helperText?: string;
+			};
+		};
+		payload: (data: any) => any;
+	};
 	open: boolean;
-	onClose: () => void;
-	onAvatarChange?: () => void; // Add this prop
+	setOpen: any;
 }
 
 interface FormData {
-	profile_picture: File | null;
+	url?: string;
 }
 
-export default function ChangeAvatarModal(props: Props) {
-	const { handleSubmit, control, setError, clearErrors, setValue } =
-		useForm<FormData>({
-			defaultValues: {
-				profile_picture: null,
-			},
-		});
+export default function ConfigModeratorPanel(props: Props) {
+	const { handleSubmit, control, setError, clearErrors } = useForm<FormData>({
+		defaultValues: {
+			url: "",
+		},
+	});
+
+	const handleClose = () => {
+		props.setOpen(false);
+	};
 
 	const { setAlert } = useAlert();
 
 	const submission = (data: FormData) => {
-		AxiosInstance.post(`/account/change_profile_picture/`, data, {
-			headers: {
-				"Content-Type": "multipart/form-data",
-			},
-		})
+		if (props.option.name === "schedule") {
+			setAlert("Trwa tworzenie planu lekcji, proszę czekać", "info");
+		}
+		AxiosInstance.post(
+			`moderator_panel/${props.option.axiosUrl}`,
+			props.option.payload(data)
+		)
 			.then((response) => {
-				props.onClose();
+				handleClose();
 				setAlert(response.data.message, "success");
-				if (props.onAvatarChange) {
-					props.onAvatarChange();
-				}
 			})
 			.catch((error: any) => {
 				if (
@@ -73,7 +90,12 @@ export default function ChangeAvatarModal(props: Props) {
 					});
 				} else {
 					console.log(error);
-					setAlert(error.message, "error");
+					setAlert(
+						error.response.data.message
+							? error.response.data.message
+							: error.message,
+						"error"
+					);
 				}
 			});
 	};
@@ -84,7 +106,7 @@ export default function ChangeAvatarModal(props: Props) {
 				aria-labelledby="transition-modal-title"
 				aria-describedby="transition-modal-description"
 				open={props.open}
-				onClose={props.onClose}
+				onClose={handleClose}
 				closeAfterTransition
 				slots={{ backdrop: Backdrop }}
 				slotProps={{
@@ -108,7 +130,7 @@ export default function ChangeAvatarModal(props: Props) {
 								variant="h5"
 								component="h2"
 							>
-								Zmień profilowe
+								{props.option.labelModal}
 							</Typography>
 						</Box>
 						<Button
@@ -120,36 +142,38 @@ export default function ChangeAvatarModal(props: Props) {
 								padding: "0px",
 								minWidth: "0px",
 							}}
-							onClick={props.onClose}
+							onClick={handleClose}
 						>
 							<CloseIcon sx={{ color: "red" }} fontSize="medium" />
 						</Button>
-						<form>
-							<MyDropzone
-								label={"Prześlij zdjęcie profilowe"}
-								name={"profile_picture"}
-								control={control}
-								multiple={false}
-								onSubmit={(files) => {
-									clearErrors();
-									if (files && files.length > 0) {
-										setValue("profile_picture", files[0]);
-									}
-									handleSubmit((data) => {
-										submission(data);
-									})();
-									props.onClose();
-								}}
-								accept={["image/*"]}
-								style={{
-									width: "100%",
-									minHeight: "200px",
-									textAlign: "center",
+						<form onSubmit={handleSubmit(submission)}>
+							<Box
+								sx={{
+									boxShadow: 3,
+									padding: "20px",
 									display: "flex",
-									justifyContent: "center",
-									alignItems: "center",
+									flexDirection: "row",
+									marginBottom: "20px",
 								}}
-							></MyDropzone>
+							>
+								<Box sx={{ fontWeight: "bold", alignContent: "center" }}>
+									{props.option.forms.first_field.title}:{" "}
+								</Box>
+								<Box sx={{ marginLeft: "10px" }}>
+									<MyTextField
+										label={props.option.forms.first_field.label}
+										name={props.option.forms.first_field.name}
+										control={control}
+										helperText={props.option.forms.first_field.helperText}
+									/>
+								</Box>
+							</Box>
+							<MyButton
+								label="Stwórz"
+								type="submit"
+								onClick={() => clearErrors()}
+								style={{ width: "100%" }}
+							/>
 						</form>
 					</Box>
 				</Fade>

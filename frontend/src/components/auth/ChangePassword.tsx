@@ -1,12 +1,12 @@
-import "../App.css";
 import { useState } from "react";
 import { Box, Typography } from "@mui/material";
-import MyPassField from "./forms/MyPassField";
-import MyButton from "./forms/MyButton";
+import MyPassField from "../../UI/forms/MyPassField";
+import MyButton from "../../UI/forms/MyButton";
 import { useForm } from "react-hook-form";
-import AxiosInstance from "./AxiosInstance";
+import AxiosInstance from "../AxiosInstance";
 import { useNavigate } from "react-router-dom";
-import { useAlert } from "../contexts/AlertContext";
+import { useAlert } from "../../contexts/AlertContext";
+import { useCustomTheme } from "../../contexts/ThemeContext";
 
 interface FormData {
 	password?: string;
@@ -23,6 +23,7 @@ export default function ChangePasswordLogin() {
 	});
 	const [showMessage, setShowMessage] = useState(false);
 	const { setAlert } = useAlert();
+	const { mode } = useCustomTheme();
 
 	const submission = (data: FormData) => {
 		if (data.password !== data.confirmPassword) {
@@ -56,7 +57,12 @@ export default function ChangePasswordLogin() {
 					});
 				} else {
 					console.log(error);
-					setAlert(error.message, "error");
+					setAlert(
+						error.response.data.message
+							? error.response.data.message
+							: error.message,
+						"error"
+					);
 				}
 			});
 	};
@@ -68,7 +74,7 @@ export default function ChangePasswordLogin() {
 				justifyContent: "center",
 				alignItems: "center",
 				minHeight: "100vh",
-				backgroundColor: "#f5f5f5",
+				backgroundColor: mode === "light" ? "#f5f5f5" : "#121212",
 			}}
 		>
 			<form onSubmit={handleSubmit(submission)}>
@@ -76,14 +82,18 @@ export default function ChangePasswordLogin() {
 					sx={{
 						width: 300,
 						padding: 4,
-						backgroundColor: "white",
+						backgroundColor: mode === "light" ? "white" : "#1e1e1e",
 						borderRadius: 2,
 						boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
 					}}
 				>
 					<Typography
 						variant="h5"
-						sx={{ textAlign: "center", marginBottom: 2, fontWeight: "bold" }}
+						sx={{
+							textAlign: "center",
+							marginBottom: 2,
+							fontWeight: "bold",
+						}}
 					>
 						Zmień hasło
 					</Typography>

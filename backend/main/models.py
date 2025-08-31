@@ -67,19 +67,6 @@ class Event_types(models.Model):
     def __str__(self):
         return self.event_type
     
-class Event_colorsManager(models.Manager):
-    def create_event_color(self, event_color):
-        event_color = self.model(event_color=event_color)
-        event_color.save(using=self._db)
-        return event_color
-    
-class Event_colors(models.Model):
-    event_color = models.CharField(max_length=6, unique=True, null=False, blank=False)
-    
-    objects = Event_colorsManager()
-    def __str__(self):
-        return self.event_color
-        
     
 class Timetable_events(models.Model):
     event_name = models.CharField(max_length=255)
@@ -87,30 +74,36 @@ class Timetable_events(models.Model):
     end_date = models.DateField(null=True, blank=True)
     description = models.TextField(null=True, blank=True)
     event_type = models.ForeignKey(Event_types, on_delete=models.CASCADE, related_name='events_of_type', null=False, blank=False)
-    event_color = models.ForeignKey(Event_colors, on_delete=models.CASCADE, related_name='events_of_color', null=False, blank=False)
+    event_color = models.CharField(max_length=6, null=False, blank=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    created_by = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='created_events', null=False, blank=False)
+    created_by = models.ForeignKey(Profile, on_delete=models.SET_NULL, related_name='created_events', null=True, blank=False)
     
     def __str__(self):
         return self.event_name
     
+    
 class TasksManager(models.Manager):
     def create_task(self, task_name, description, user_id, due_date, event):
-        task = self.model(task_name=task_name, description=description, user=user_id, completion_status=False, due_date=due_date, event=event)
+        user = None
+        if user_id:
+            try:
+                user = Profile.objects.get(pk=user_id)
+            except Profile.DoesNotExist:
+                pass
+        task = self.model(task_name=task_name, description=description, user=user, completion_status=False, due_date=due_date, event=event)
         task.save(using=self._db)
         return task
 
-    
 class Tasks(models.Model):
     task_name = models.CharField(max_length=255)
     description = models.TextField(null=True, blank=True)
-    user = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='tasks', null=True, blank=True)
+    user = models.ForeignKey(Profile, on_delete=models.SET_NULL, related_name='tasks', null=True, blank=True)
     completion_status = models.BooleanField(default=False)
-    due_date = models.DateField(null=True, blank=True)
+    due_date = models.DateField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    event = models.ForeignKey(Timetable_events, on_delete=models.CASCADE, related_name='tasks', null=True, blank=True)
+    event = models.ForeignKey(Timetable_events, on_delete=models.CASCADE, related_name='tasks')
     
     objects = TasksManager()
     def __str__(self):

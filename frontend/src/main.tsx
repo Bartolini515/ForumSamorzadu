@@ -5,19 +5,20 @@ import App from "./App.tsx";
 import { AuthProvider } from "./contexts/AuthContext.tsx";
 import { AlertProvider } from "./contexts/AlertContext.tsx";
 import { CalendarResizeProvider } from "./contexts/CalendarResizeContext.tsx";
+import { CustomThemeProvider } from "./contexts/ThemeContext.tsx";
 
 createRoot(document.getElementById("root")!).render(
-	<AuthProvider>
-		<AlertProvider>
-			<CalendarResizeProvider>
-				<StrictMode>
-					<BrowserRouter>
-						<App />
-					</BrowserRouter>
-				</StrictMode>
-			</CalendarResizeProvider>
-		</AlertProvider>
-	</AuthProvider>
+	<CustomThemeProvider>
+		<AuthProvider>
+			<AlertProvider>
+				<CalendarResizeProvider>
+					<StrictMode>
+						<BrowserRouter>
+							<App />
+						</BrowserRouter>
+					</StrictMode>
+				</CalendarResizeProvider>
+			</AlertProvider>
+		</AuthProvider>
+	</CustomThemeProvider>
 );
-
-// TODO : Delete StrictMode

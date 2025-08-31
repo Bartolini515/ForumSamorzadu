@@ -15,6 +15,12 @@ django-rest-knox = "*"
 pillow = "*"
 gunicorn = "*"
 pymysql = {extras = ["rsa"], version = "*"}
+requests = "*"
+beautifulsoup4 = "*"
+celery = "*"
+redis = "*"
+django-celery-beat = "*"
+django-redis = "*"
 
 [dev-packages]
 

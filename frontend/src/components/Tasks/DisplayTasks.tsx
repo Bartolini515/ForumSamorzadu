@@ -2,9 +2,9 @@ import { Box, Chip, Typography } from "@mui/material";
 import { useAuth } from "../../contexts/AuthContext";
 import AxiosInstance from "../AxiosInstance";
 import { useAlert } from "../../contexts/AlertContext";
-import MyButton from "../forms/MyButton";
+import MyButton from "../../UI/forms/MyButton";
 import { differenceInCalendarDays } from "date-fns";
-import AlertDialog from "../modalsAndDialogs/AlertDialog";
+import AlertDialog from "../../UI/dialogs/AlertDialog";
 import { useState } from "react";
 
 interface Task {
@@ -15,6 +15,7 @@ interface Task {
 	completion_status: boolean;
 	due_date: string | null;
 	event: string | null;
+	event_id: number | null;
 	user_id: number | null;
 	color: string;
 }
@@ -59,6 +60,7 @@ export default function DisplayTasks(props: Props) {
 	const [changeStatusId, setChangeStatusId] = useState<number>(0);
 	const [changeStatusCompletionStatus, setChangeStatusCompletionStatus] =
 		useState<boolean>(false);
+	const [deleteTaskId, setDeleteTaskId] = useState<number>(0);
 
 	const { user, isAdmin } = useAuth();
 	const { setAlert } = useAlert();
@@ -73,7 +75,12 @@ export default function DisplayTasks(props: Props) {
 			})
 			.catch((error: any) => {
 				console.log(error);
-				setAlert(error.message, "error");
+				setAlert(
+					error.response.data.message
+						? error.response.data.message
+						: error.message,
+					"error"
+				);
 			});
 	};
 
@@ -86,7 +93,29 @@ export default function DisplayTasks(props: Props) {
 			})
 			.catch((error: any) => {
 				console.log(error);
-				setAlert(error.message, "error");
+				setAlert(
+					error.response.data.message
+						? error.response.data.message
+						: error.message,
+					"error"
+				);
+			});
+	};
+
+	const DeleteTask = (id: number) => {
+		AxiosInstance.delete(`tasks/${id}/`)
+			.then((response) => {
+				setAlert(response.data.message, "success");
+				props.setRefresh(true);
+			})
+			.catch((error: any) => {
+				console.log(error);
+				setAlert(
+					error.response.data.message
+						? error.response.data.message
+						: error.message,
+					"error"
+				);
 			});
 	};
 
@@ -98,6 +127,11 @@ export default function DisplayTasks(props: Props) {
 
 	const handleTakeTask = (id: number, user_id: number | null) => {
 		ChangeAssigned(id, user_id ? user_id : null);
+	};
+
+	const handleDeleteTask = (id: number) => {
+		setDeleteTaskId(id);
+		setOpenDialog(true);
 	};
 
 	return (
@@ -292,6 +326,20 @@ export default function DisplayTasks(props: Props) {
 										}}
 									/>
 								)}
+								{(isAdmin ||
+									user?.created_events.find(
+										(event_id) => event_id === task.event_id
+									)) && (
+									<MyButton
+										label={"Usuń zadanie"}
+										color="error"
+										type={"button"}
+										style={{ marginBottom: "10px", marginTop: "0px" }}
+										onClick={() => {
+											handleDeleteTask(task.id);
+										}}
+									/>
+								)}
 							</Box>
 						</Box>
 					))}
@@ -300,19 +348,34 @@ export default function DisplayTasks(props: Props) {
 			{openDialog && (
 				<AlertDialog
 					open={openDialog}
-					onClose={() => setOpenDialog(false)}
+					onClose={() => {
+						setOpenDialog(false);
+						setDeleteTaskId(0);
+						setChangeStatusId(0);
+						setChangeStatusCompletionStatus(false);
+					}}
 					label={
-						changeStatusCompletionStatus
+						deleteTaskId
+							? "Czy na pewno chcesz usunąć zadanie?"
+							: changeStatusCompletionStatus
 							? "Czy na pewno chcesz oznaczyć zadanie jako nieukończone?"
 							: "Czy na pewno chcesz ukończyć zadanie?"
 					}
 					content={
-						changeStatusCompletionStatus
+						deleteTaskId
+							? "Usunięcie zadania jest permanentne i nie można go cofnąć."
+							: changeStatusCompletionStatus
 							? " "
 							: "Nie będziesz mógł cofnąć tej akcji, bez skontaktowania się z przewodniczącym."
 					}
 					onCloseOption2={() => {
-						ChangeStatus(changeStatusId, changeStatusCompletionStatus);
+						if (deleteTaskId) {
+							DeleteTask(deleteTaskId);
+							setOpenDialog(false);
+							setDeleteTaskId(0);
+						} else {
+							ChangeStatus(changeStatusId, changeStatusCompletionStatus);
+						}
 						setOpenDialog(false);
 					}}
 				/>

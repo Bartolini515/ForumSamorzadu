@@ -1,5 +1,5 @@
 import { useState } from "react";
-import TaskDescriptionModal from "../modalsAndDialogs/TaskDescriptionModal"; // Import the new modal component
+import TaskDescriptionModal from "../../components/timetable/modals/TaskDescriptionModal"; // Import the new modal component
 import Chip from "@mui/material/Chip";
 import Stack from "@mui/material/Stack";
 
@@ -12,9 +12,13 @@ interface Props {
 		completion_status: boolean;
 		due_date: string;
 	}[];
+	is_creator: boolean;
+	isAdmin: boolean;
+	onClose?: () => void;
 }
 
 export default function TasksList(props: Props) {
+	const [taskId, setTaskId] = useState<string | null>(null);
 	const [taskDescription, setTaskDescription] = useState<string | null>(null);
 	const [taskAssigned, setTaskAssigned] = useState<string | null>(null);
 	const [taskCompletionStatus, setTaskCompletionStatus] = useState<
@@ -24,11 +28,13 @@ export default function TasksList(props: Props) {
 	const [modalOpen, setModalOpen] = useState(false);
 
 	const handleTaskClick = (
+		task_id: string,
 		task_description: string,
 		task_due_date: string,
 		task_assigned: string,
 		task_completion_status: boolean
 	) => {
+		setTaskId(task_id);
 		setTaskDescription(task_description);
 		setTaskDueDate(task_due_date);
 		setTaskAssigned(task_assigned);
@@ -40,6 +46,12 @@ export default function TasksList(props: Props) {
 		setModalOpen(false);
 		setTaskDescription(null);
 		setTaskDueDate(null);
+		setTaskAssigned(null);
+		setTaskCompletionStatus(null);
+		setTaskId(null);
+		if (props.onClose) {
+			props.onClose();
+		}
 	};
 
 	return (
@@ -68,6 +80,7 @@ export default function TasksList(props: Props) {
 						label={task.task_name}
 						onClick={() =>
 							handleTaskClick(
+								task.id,
 								task.task_description,
 								task.due_date,
 								task.assigned,
@@ -79,10 +92,13 @@ export default function TasksList(props: Props) {
 			</Stack>
 			{modalOpen && (
 				<TaskDescriptionModal
+					task_id={taskId}
 					task_description={taskDescription}
 					task_due_date={taskDueDate}
 					task_assigned={taskAssigned}
 					task_completion_Status={taskCompletionStatus}
+					is_creator={props.is_creator}
+					isAdmin={props.isAdmin}
 					onClose={closeModal}
 				/>
 			)}

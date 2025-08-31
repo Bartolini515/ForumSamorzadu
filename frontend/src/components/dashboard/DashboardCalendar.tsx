@@ -4,7 +4,7 @@ import interactionPlugin from "@fullcalendar/interaction";
 import plLocale from "@fullcalendar/core/locales/pl";
 import { useNavigate } from "react-router-dom";
 import { Box, Typography, useMediaQuery, useTheme } from "@mui/material";
-import MyButton from "../forms/MyButton";
+import MyButton from "../../UI/forms/MyButton";
 import { useRef, useEffect } from "react";
 import { useCalendarResize } from "../../contexts/CalendarResizeContext";
 
@@ -79,7 +79,7 @@ export default function Calendar(props: Props) {
 						navigate("/timetable");
 					}}
 					variant="text"
-					style={{ color: "black", textDecoration: "underline" }}
+					style={{ color: "inherit", textDecoration: "underline" }}
 				></MyButton>
 			</Box>
 			<FullCalendar

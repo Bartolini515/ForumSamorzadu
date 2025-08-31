@@ -1,9 +1,4 @@
-import {
-	createContext,
-	useState,
-	useContext,
-	ReactNode,
-} from "react";
+import { createContext, useState, useContext, ReactNode } from "react";
 
 interface AuthContextType {
 	isAdmin: boolean;
@@ -19,6 +14,7 @@ interface UserType {
 	last_name: String | null;
 	last_login: String;
 	profile_picture: String | null;
+	created_events: number[];
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);

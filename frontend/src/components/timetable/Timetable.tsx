@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import TimetableCalendar from "./TimetableCalendar";
-import FAB from "../forms/FAB";
+import FAB from "../../UI/forms/FAB";
 import AxiosInstance from "../AxiosInstance";
 // import MultipleSelectChip from "./forms/MultiSelectChip";
 import { Box, Skeleton } from "@mui/material";
-import MultiSelectCheckbox from "../forms/MultiSelectCheckbox";
-import EventDetails from "../modalsAndDialogs/EventDetailsModal";
-import CreateEventModal from "../modalsAndDialogs/CreateEventModal";
+import MultiSelectCheckbox from "../../UI/forms/MultiSelectCheckbox";
+import EventDetails from "./modals/EventDetailsModal";
+import CreateEventModal from "./modals/CreateEventModal";
 import { useAlert } from "../../contexts/AlertContext";
 
 export default function Timetable() {
@@ -36,12 +36,16 @@ export default function Timetable() {
 				setSelectedOptions([
 					...new Set(response.data.map((event: any) => event.event_type)),
 				]);
-
 				setLoading(false);
 			})
 			.catch((error: any) => {
 				console.log(error);
-				setAlert(error.message, "error");
+				setAlert(
+					error.response.data.message
+						? error.response.data.message
+						: error.message,
+					"error"
+				);
 			});
 	};
 

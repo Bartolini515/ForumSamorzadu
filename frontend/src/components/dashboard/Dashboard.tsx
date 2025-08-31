@@ -15,6 +15,7 @@ interface Task {
 	completion_status: boolean;
 	due_date: string | null;
 	event: string | null;
+	event_id: number | null;
 	user_id: number | null;
 	color: string;
 }
@@ -34,7 +35,12 @@ export default function Dashboard() {
 			})
 			.catch((error: any) => {
 				console.log(error);
-				setAlert(error.message, "error");
+				setAlert(
+					error.response.data.message
+						? error.response.data.message
+						: error.message,
+					"error"
+				);
 			});
 		AxiosInstance.get("tasks/")
 			.then((response) => {
@@ -66,7 +72,12 @@ export default function Dashboard() {
 			})
 			.catch((error: any) => {
 				console.log(error);
-				setAlert(error.message, "error");
+				setAlert(
+					error.response.data.message
+						? error.response.data.message
+						: error.message,
+					"error"
+				);
 			});
 	};
 
@@ -109,7 +120,7 @@ export default function Dashboard() {
 					sx={{
 						flex: { sm: 1, xs: "none" },
 						height: "100%",
-						boxShadow: 0, // TODO: 3
+						boxShadow: 0, // TODO: 3, znaleźć użytek dla tego miejsca
 						padding: "20px",
 					}}
 				></Box>

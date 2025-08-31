@@ -3,11 +3,11 @@ import { Box, Skeleton } from "@mui/material";
 import AxiosInstance from "../AxiosInstance";
 import { useAlert } from "../../contexts/AlertContext";
 import DisplayTasks from "./DisplayTasks";
-import SingleSelect from "../forms/SingleSelect";
-import MultiSelectCheckbox from "../forms/MultiSelectCheckbox";
+import SingleSelect from "../../UI/forms/SingleSelect";
+import MultiSelectCheckbox from "../../UI/forms/MultiSelectCheckbox";
 import { useAuth } from "../../contexts/AuthContext";
-import FAB from "../forms/FAB";
-import CreateTaskModal from "../modalsAndDialogs/CreateTaskModal";
+import FAB from "../../UI/forms/FAB";
+import CreateTaskModal from "./CreateTaskModal";
 
 interface Task {
 	id: string;
@@ -17,6 +17,7 @@ interface Task {
 	completion_status: boolean;
 	due_date: string | null;
 	event: string | null;
+	event_id: number | null;
 	user_id: number | null;
 	color: string;
 }
@@ -38,9 +39,7 @@ export default function Tasks() {
 	const filteredTasks: any = tasks.filter((task: any) => {
 		const unassignedUser = task.user_id === null && selectedOptionUser === 0;
 		const matchesUser = task.user_id === selectedOptionUser;
-		const matchesEvent =
-			selectedOptionEvent.includes(task.event) ||
-			(task.event === null && selectedOptionEvent.includes("Bez wydarzenia"));
+		const matchesEvent = selectedOptionEvent.includes(task.event);
 
 		return (matchesUser && matchesEvent) || (unassignedUser && matchesEvent);
 	});
@@ -68,7 +67,6 @@ export default function Tasks() {
 							.filter((task: any) => task.event != null)
 							.map((task: any) => task.event)
 					),
-					"Bez wydarzenia",
 				]);
 				// Domyślne wybranie wszystkich wydarzeń
 				setSelectedOptionEvent([
@@ -77,13 +75,17 @@ export default function Tasks() {
 							.filter((task: any) => task.event != null)
 							.map((task: any) => task.event)
 					),
-					"Bez wydarzenia",
 				]);
 				setRefresh(false);
 			})
 			.catch((error: any) => {
 				console.log(error);
-				setAlert(error.message, "error");
+				setAlert(
+					error.response.data.message
+						? error.response.data.message
+						: error.message,
+					"error"
+				);
 			});
 	};
 
@@ -110,7 +112,12 @@ export default function Tasks() {
 			})
 			.catch((error: any) => {
 				console.log(error);
-				setAlert(error.message, "error");
+				setAlert(
+					error.response.data.message
+						? error.response.data.message
+						: error.message,
+					"error"
+				);
 			});
 	};
 

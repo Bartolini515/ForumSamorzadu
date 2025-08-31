@@ -2,15 +2,17 @@ import Backdrop from "@mui/material/Backdrop";
 import Box from "@mui/material/Box";
 import Modal from "@mui/material/Modal";
 import Fade from "@mui/material/Fade";
-import AxiosInstance from "../AxiosInstance";
+import AxiosInstance from "../../AxiosInstance";
 import { Button, Typography, Skeleton } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import MyTextField from "../forms/MyTextField";
+import MyTextField from "../../../UI/forms/MyTextField";
 import { useForm } from "react-hook-form";
-import MyButton from "../forms/MyButton";
-import MyDatePicker from "../forms/MyDatePicker";
+import MyButton from "../../../UI/forms/MyButton";
+import MyDatePicker from "../../../UI/forms/MyDatePicker";
+import MySelect from "../../../UI/forms/MySelect";
 import { useEffect, useState } from "react";
-import { useAlert } from "../../contexts/AlertContext";
+import { useAlert } from "../../../contexts/AlertContext";
+import MyColorInput from "../../../UI/forms/MyColorInput";
 
 const style = {
 	position: "absolute",
@@ -29,27 +31,6 @@ const style = {
 };
 
 interface Props {
-	id: number;
-	event: {
-		id: number;
-		title: string;
-		start: string;
-		end: string | null;
-		event_type: string;
-		event_color: string;
-		description: string;
-		creator: string;
-		creator_id: string;
-		tasks: {
-			id: string;
-			task_name: string;
-			task_description: string;
-			assigned: string;
-			completion_status: boolean;
-			due_date: string;
-		}[];
-		is_creator: boolean;
-	};
 	open: boolean;
 	onClose: () => void;
 }
@@ -64,39 +45,46 @@ interface FormData {
 	created_by: string;
 }
 
-export default function ModifyEventModal(props: Props) {
-	const { handleSubmit, control, setError, clearErrors, reset } =
-		useForm<FormData>({
-			defaultValues: {
-				event_name: "",
-				start_date: new Date(),
-				end_date: null,
-				description: "",
-				event_type: "1",
-			},
-		});
+export default function CreateEventModal(props: Props) {
+	const [options, setOptions] = useState<any>([]);
+	const [selectedOption, setSelectedOption] = useState<any>(null);
+	const [selectedColor, setSelectedColor] = useState<any>("#2196f3");
+	const { handleSubmit, control, setError, clearErrors } = useForm<FormData>({
+		defaultValues: {
+			event_name: "",
+			start_date: new Date(),
+			end_date: null,
+			description: "",
+			event_color: selectedColor,
+			event_type: selectedOption,
+		},
+	});
 
 	const [loading, setLoading] = useState(true);
 
 	const { setAlert } = useAlert();
 
 	const submission = (data: FormData) => {
-		if (data.end_date) {
-			const date = new Date(data.end_date);
-			date.setDate(date.getDate() + 2);
-			data.end_date = new Date(date);
-		}
+		// Helper function to omit timezone conversion
+		const formatDate = (date: Date | null | undefined) => {
+			if (!date) return null;
+			const d = new Date(date);
+			const year = d.getFullYear();
+			const month = String(d.getMonth() + 1).padStart(2, "0");
+			const day = String(d.getDate()).padStart(2, "0");
+			return `${year}-${month}-${day}`;
+		};
 
 		const payload = {
 			event_name: data.event_name,
-			start_date: data.start_date.toISOString().split("T")[0],
-			end_date: data.end_date
-				? data.end_date.toISOString().split("T")[0]
-				: null,
+			start_date: formatDate(data.start_date),
+			end_date: formatDate(data.end_date),
+			event_type: data.event_type,
+			event_color: data.event_color.substring(1),
 			description: data.description,
 		};
 
-		AxiosInstance.put(`timetable/${props.id}/update/`, payload)
+		AxiosInstance.post(`timetable/`, payload)
 			.then((response) => {
 				props.onClose();
 				setAlert(response.data.message, "success");
@@ -107,8 +95,6 @@ export default function ModifyEventModal(props: Props) {
 					error.response.data &&
 					error.response.status === 400
 				) {
-					console.log(error);
-
 					const serverErrors = error.response.data;
 					Object.keys(serverErrors).forEach((field) => {
 						setError(field as keyof FormData, {
@@ -118,33 +104,40 @@ export default function ModifyEventModal(props: Props) {
 					});
 				} else {
 					console.log(error);
-					setAlert(error.message, "error");
+					setAlert(
+						error.response.data.message
+							? error.response.data.message
+							: error.message,
+						"error"
+					);
 				}
 			});
 	};
 
-	const getEventDetails = () => {
-		AxiosInstance.get(`timetable/${props.id}`)
+	const getEventTypes = () => {
+		AxiosInstance.get("timetable/event_types/")
 			.then((response) => {
-				const event = response.data;
-				reset({
-					event_name: event.title,
-					start_date: new Date(event.start),
-					end_date: event.end ? new Date(event.end) : null,
-					description: event.description,
-					event_type: event.event_type,
+				let tempOptions: { id: number; option: string }[] = [];
+				response.data.forEach((element: any) => {
+					tempOptions.push({ id: element.id, option: element.event_type });
 				});
+				setOptions(tempOptions);
 				setLoading(false);
 			})
 			.catch((error: any) => {
 				console.log(error);
-				setAlert(error.message, "error");
+				setAlert(
+					error.response.data.message
+						? error.response.data.message
+						: error.message,
+					"error"
+				);
 			});
 	};
 
 	useEffect(() => {
-		getEventDetails();
-	}, [props.id]);
+		getEventTypes();
+	}, []);
 
 	const handleClick = () => {
 		clearErrors();
@@ -209,7 +202,12 @@ export default function ModifyEventModal(props: Props) {
 										marginBottom: "20px",
 									}}
 								>
-									<Box sx={{ fontWeight: "bold", alignContent: "center" }}>
+									<Box
+										sx={{
+											fontWeight: "bold",
+											alignContent: "center",
+										}}
+									>
 										Nazwa wydarzenia
 									</Box>
 									<Box sx={{ marginLeft: "10px" }}>
@@ -290,8 +288,57 @@ export default function ModifyEventModal(props: Props) {
 									</Box>
 								</Box>
 
+								<Box
+									sx={{
+										boxShadow: 3,
+										padding: "20px",
+										display: "flex",
+										flexDirection: "row",
+										marginBottom: "20px",
+									}}
+								>
+									<Box sx={{ fontWeight: "bold", alignContent: "center" }}>
+										Typ wydarzenia:{" "}
+									</Box>
+									<Box sx={{ marginLeft: "10px", width: "40%" }}>
+										<MySelect
+											label="Typ wydarzenia"
+											name="event_type"
+											options={options}
+											control={control}
+											selectedOption={selectedOption}
+											setSelectedOption={setSelectedOption}
+										/>
+									</Box>
+								</Box>
+
+								<Box
+									sx={{
+										boxShadow: 3,
+										padding: "20px",
+										display: "flex",
+										flexDirection: "row",
+										marginBottom: "20px",
+									}}
+								>
+									<Box sx={{ fontWeight: "bold", alignContent: "center" }}>
+										Kolor wydarzenia:{" "}
+									</Box>
+									<Box sx={{ marginLeft: "10px", width: "40%" }}>
+										<MyColorInput
+											label={"Kolor wydarzenia"}
+											name={"event_color"}
+											control={control}
+											selectedColor={selectedColor}
+											setSelectedColor={setSelectedColor}
+											format="hex"
+											isAlphaHidden={true}
+										/>
+									</Box>
+								</Box>
+
 								<MyButton
-									label="Zatwierdź"
+									label="Stwórz"
 									type="submit"
 									onClick={handleClick}
 									style={{ width: "100%" }}

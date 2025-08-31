@@ -3,17 +3,17 @@ import Box from "@mui/material/Box";
 import Modal from "@mui/material/Modal";
 import Fade from "@mui/material/Fade";
 import { useState, useEffect } from "react";
-import AxiosInstance from "../AxiosInstance";
+import AxiosInstance from "../../AxiosInstance";
 import { Button, IconButton, Typography } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import TasksList from "../lists/TasksList";
-import MyButton from "../forms/MyButton";
-import { useAuth } from "../../contexts/AuthContext";
-import { useAlert } from "../../contexts/AlertContext";
+import TasksList from "../../../UI/lists/TasksList";
+import MyButton from "../../../UI/forms/MyButton";
+import { useAuth } from "../../../contexts/AuthContext";
+import { useAlert } from "../../../contexts/AlertContext";
 import ModifyEventModal from "./ModifyEventModal";
 import AddCircleOutlineOutlinedIcon from "@mui/icons-material/AddCircleOutlineOutlined";
-import CreateTaskModal from "./CreateTaskModal";
-import AlertDialog from "./AlertDialog";
+import CreateTaskModal from "../../Tasks/CreateTaskModal";
+import AlertDialog from "../../../UI/dialogs/AlertDialog";
 
 const style = {
 	position: "absolute",
@@ -102,19 +102,29 @@ export default function EventDetails(props: Props) {
 			})
 			.catch((error: any) => {
 				console.log(error);
-				setAlert(error.message, "error");
+				setAlert(
+					error.response.data.message
+						? error.response.data.message
+						: error.message,
+					"error"
+				);
 			});
 	};
 
 	const DeleteData = () => {
-		AxiosInstance.delete(`timetable/delete/${props.id}/`)
+		AxiosInstance.delete(`timetable/${props.id}/`)
 			.then((response) => {
 				handleClose();
 				setAlert(response.data.message, "success");
 			})
 			.catch((error: any) => {
 				console.log(error);
-				setAlert(error.message, "error");
+				setAlert(
+					error.response.data.message
+						? error.response.data.message
+						: error.message,
+					"error"
+				);
 			});
 	};
 
@@ -260,7 +270,9 @@ export default function EventDetails(props: Props) {
 							<Box sx={{ fontWeight: "bold", alignContent: "center" }}>
 								Utworzył(a):{" "}
 							</Box>
-							<Box sx={{ marginLeft: "10px" }}>{event.creator}</Box>
+							<Box sx={{ marginLeft: "10px", fontStyle: "italic" }}>
+								{event.creator ? event.creator : "Usunięty użytkownik"}
+							</Box>
 						</Box>
 						{event.description ? (
 							<>
@@ -313,7 +325,14 @@ export default function EventDetails(props: Props) {
 								}}
 							>
 								{event.tasks && event.tasks.length > 0 ? (
-									<TasksList tasks={event.tasks} />
+									<TasksList
+										tasks={event.tasks}
+										is_creator={event.is_creator}
+										isAdmin={isAdmin}
+										onClose={() => {
+											setRefresh(!refresh);
+										}}
+									/>
 								) : (
 									"Brak zadań"
 								)}

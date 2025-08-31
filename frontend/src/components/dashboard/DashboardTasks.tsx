@@ -1,5 +1,5 @@
 import { Box, Chip, Typography } from "@mui/material";
-import MyButton from "../forms/MyButton";
+import MyButton from "../../UI/forms/MyButton";
 import { useNavigate } from "react-router-dom";
 import { differenceInCalendarDays } from "date-fns";
 
@@ -11,6 +11,7 @@ interface Task {
 	completion_status: boolean;
 	due_date: string | null;
 	event: string | null;
+	event_id: number | null;
 	user_id: number | null;
 	color: string;
 }
@@ -55,7 +56,7 @@ export default function DashboardTasks(props: Props) {
 					onClick={() => {
 						navigate("/tasks");
 					}}
-					style={{ color: "black", textDecoration: "underline" }}
+					style={{ color: "inherit", textDecoration: "underline" }}
 				></MyButton>
 			</Box>
 			<Box

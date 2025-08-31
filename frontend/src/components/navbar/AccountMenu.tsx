@@ -7,7 +7,7 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
 import Tooltip from "@mui/material/Tooltip";
-// import Settings from "@mui/icons-material/Settings";
+import Settings from "@mui/icons-material/Settings";
 import Logout from "@mui/icons-material/Logout";
 import AxiosInstance from "../AxiosInstance";
 import { useNavigate } from "react-router-dom";
@@ -111,12 +111,17 @@ export default function AccountMenu() {
 					{user?.first_name} {user?.last_name}
 				</MenuItem>
 				<Divider />
-				{/* <MenuItem onClick={handleClose}>
+				<MenuItem
+					onClick={() => {
+						handleClose();
+						navigate("/settings");
+					}}
+				>
 					<ListItemIcon>
 						<Settings fontSize="small" />
 					</ListItemIcon>
 					Ustawienia
-				</MenuItem> */}
+				</MenuItem>
 				<MenuItem
 					onClick={() => {
 						handleClose();

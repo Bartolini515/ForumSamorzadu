@@ -1,9 +1,9 @@
 import { Avatar, Typography, Box } from "@mui/material";
-import { useAuth } from "../contexts/AuthContext";
-import MyButton from "./forms/MyButton";
+import { useAuth } from "../../contexts/AuthContext";
+import MyButton from "../../UI/forms/MyButton";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import ChangeAvatarModal from "./modalsAndDialogs/ChangeAvatarModal";
+import ChangeAvatarModal from "./ChangeAvatarModal";
 
 export default function Account() {
 	const [openChangeAvatarModal, setOpenChangeAvatarModal] = useState(false);

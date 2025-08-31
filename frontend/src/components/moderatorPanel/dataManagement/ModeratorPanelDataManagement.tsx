@@ -1,8 +1,8 @@
 import { Box, Divider, Button } from "@mui/material";
-import ModeratorPanelTable from "./ModeratorPanelDataManagementTable";
-import SingleSelectAutoWidth from "../../forms/SingleSelectAutoWidth";
+import ModeratorPanelDataManagementTable from "./ModeratorPanelDataManagementTable";
+import SingleSelectAutoWidth from "../../../UI/forms/SingleSelectAutoWidth";
 import { useState } from "react";
-import CreateForPanelDataModal from "../../modalsAndDialogs/CreateForPanelDataModal";
+import CreateForPanelDataModal from "../modals/CreateForPanelDataModal";
 
 export default function ModeratorPanelDataManagement() {
 	const [selectedOption, setSelectedOption] =
@@ -15,7 +15,14 @@ export default function ModeratorPanelDataManagement() {
 			name: "user",
 			label: "Użytkownicy",
 			labelSingle: "Użytkownika",
-			headers: ["ID", "Imię", "Nazwisko", "Email", "Ostatnie logowanie"],
+			headers: [
+				"ID",
+				"Imię",
+				"Nazwisko",
+				"Email",
+				"Ostatnie logowanie",
+				"Aktywny",
+			],
 			buttonAdd: "Dodaj użytkownika",
 			forms: {
 				first_field: {
@@ -48,24 +55,6 @@ export default function ModeratorPanelDataManagement() {
 				event_type: data.event_type,
 			}),
 		},
-		event_colors: {
-			name: "event_colors",
-			label: "Kolory wydarzeń",
-			labelSingle: "Kolor wydarzenia",
-			headers: ["ID", "Hex koloru"],
-			buttonAdd: "Dodaj kolor wydarzenia",
-			forms: {
-				first_field: {
-					title: "Kolor",
-					label: "Hex koloru",
-					name: "event_color",
-					helperText: "Podaj hex koloru bez #, np. 00FF00",
-				},
-			},
-			payload: (data: any) => ({
-				event_color: data.event_color,
-			}),
-		},
 	};
 
 	const handleClick = () => {
@@ -92,7 +81,7 @@ export default function ModeratorPanelDataManagement() {
 				/>
 			</Box>
 
-			<ModeratorPanelTable
+			<ModeratorPanelDataManagementTable
 				option={optionsMap[selectedOption]}
 				refresh={refresh}
 				setRefresh={setRefresh}

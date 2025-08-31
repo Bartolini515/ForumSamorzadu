@@ -1,16 +1,15 @@
-import "../App.css";
 import { useEffect, useState } from "react";
 import { Box, Typography } from "@mui/material";
-import MyTextField from "./forms/MyTextField";
-import MyPassField from "./forms/MyPassField";
-import MyButton from "./forms/MyButton";
+import MyTextField from "../../UI/forms/MyTextField";
+import MyPassField from "../../UI/forms/MyPassField";
+import MyButton from "../../UI/forms/MyButton";
 // import { Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import AxiosInstance from "./AxiosInstance";
+import AxiosInstance from "../AxiosInstance";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../contexts/AuthContext";
-import { useAlert } from "../contexts/AlertContext";
-// import MyMessage from "./Message";
+import { useAuth } from "../../contexts/AuthContext";
+import { useAlert } from "../../contexts/AlertContext";
+import { useCustomTheme } from "../../contexts/ThemeContext";
 
 interface FormData {
 	email?: string;
@@ -28,6 +27,7 @@ export default function Login() {
 	const [showMessage, setShowMessage] = useState(false);
 	const { setIsAdmin, setUser } = useAuth();
 	const { setAlert } = useAlert();
+	const { mode } = useCustomTheme();
 
 	const submission = (data: FormData) => {
 		AxiosInstance.post(`login/`, {
@@ -89,7 +89,7 @@ export default function Login() {
 				justifyContent: "center",
 				alignItems: "center",
 				minHeight: "100vh",
-				backgroundColor: "#f5f5f5",
+				backgroundColor: mode === "light" ? "#f5f5f5" : "#121212",
 			}}
 		>
 			<form onSubmit={handleSubmit(submission)}>
@@ -97,7 +97,7 @@ export default function Login() {
 					sx={{
 						width: 300,
 						padding: 4,
-						backgroundColor: "white",
+						backgroundColor: mode === "light" ? "white" : "#1e1e1e",
 						borderRadius: 2,
 						boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
 					}}

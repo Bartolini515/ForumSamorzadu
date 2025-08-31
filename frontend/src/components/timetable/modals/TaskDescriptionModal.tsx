@@ -2,12 +2,20 @@ import Modal from "@mui/material/Modal";
 import Backdrop from "@mui/material/Backdrop";
 import { Box, Button, Typography, Fade, Chip } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
+import { useState } from "react";
+import AlertDialog from "../../../UI/dialogs/AlertDialog";
+import AxiosInstance from "../../AxiosInstance";
+import { useAlert } from "../../../contexts/AlertContext";
 
 interface Props {
+	task_id: string | null;
 	task_description: string | null;
 	task_due_date: string | null;
 	task_assigned: string | null;
 	task_completion_Status: boolean | null;
+	is_creator: boolean;
+	isAdmin: boolean;
 	onClose: () => void;
 }
 
@@ -28,6 +36,30 @@ const style = {
 };
 
 export default function TaskDescriptionModal(props: Props) {
+	const [openDialog, setOpenDialog] = useState<boolean>(false);
+
+	const { setAlert } = useAlert();
+
+	const DeleteTask = (id: number) => {
+		AxiosInstance.delete(`tasks/${id}/`)
+			.then((response) => {
+				setAlert(response.data.message, "success");
+			})
+			.catch((error: any) => {
+				console.log(error);
+				setAlert(
+					error.response.data.message
+						? error.response.data.message
+						: error.message,
+					"error"
+				);
+			});
+	};
+
+	const handleDelete = () => {
+		setOpenDialog(true);
+	};
+
 	return (
 		<div>
 			<Modal
@@ -58,6 +90,24 @@ export default function TaskDescriptionModal(props: Props) {
 						>
 							<CloseIcon sx={{ color: "red" }} fontSize="medium" />
 						</Button>
+
+						{(props.is_creator || props.isAdmin) && (
+							<Button
+								sx={{
+									position: "absolute",
+									left: "2px",
+									top: "4px",
+									zIndex: 9999,
+									padding: "0px",
+									minWidth: "0px",
+								}}
+								onClick={() => {
+									handleDelete();
+								}}
+							>
+								<DeleteForeverIcon sx={{ color: "red" }} fontSize="medium" />
+							</Button>
+						)}
 
 						<Typography
 							id="TaskDescription-modal-title"
@@ -140,6 +190,22 @@ export default function TaskDescriptionModal(props: Props) {
 						>
 							{props.task_description ? props.task_description : "Brak"}
 						</Typography>
+
+						{openDialog && (
+							<AlertDialog
+								open={openDialog}
+								onClose={() => setOpenDialog(false)}
+								label={"Czy na pewno chcesz usunąć zadanie?"}
+								content={"Nie będziesz mógł cofnąć tej akcji."}
+								onCloseOption2={() => {
+									if (props.task_id) {
+										DeleteTask(parseInt(props.task_id));
+										props.onClose();
+									}
+									setOpenDialog(false);
+								}}
+							/>
+						)}
 					</Box>
 				</Fade>
 			</Modal>

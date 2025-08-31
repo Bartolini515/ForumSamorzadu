@@ -2,14 +2,14 @@ import Backdrop from "@mui/material/Backdrop";
 import Box from "@mui/material/Box";
 import Modal from "@mui/material/Modal";
 import Fade from "@mui/material/Fade";
-import AxiosInstance from "../AxiosInstance";
+import AxiosInstance from "../../AxiosInstance";
 import { Button, Typography } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import MyTextField from "../forms/MyTextField";
+import MyTextField from "../../../UI/forms/MyTextField";
 import { useForm } from "react-hook-form";
-import MyButton from "../forms/MyButton";
-import { useAlert } from "../../contexts/AlertContext";
-import MyPassField from "../forms/MyPassField";
+import MyButton from "../../../UI/forms/MyButton";
+import { useAlert } from "../../../contexts/AlertContext";
+import MyPassField from "../../../UI/forms/MyPassField";
 
 const style = {
 	position: "absolute",
@@ -58,7 +58,7 @@ interface FormData {
 	event_color?: string;
 }
 
-export default function CreateUserOrEvent(props: Props) {
+export default function CreateDataModerator(props: Props) {
 	const { handleSubmit, control, setError, clearErrors } = useForm<FormData>({
 		defaultValues: {
 			email: "",
@@ -101,7 +101,12 @@ export default function CreateUserOrEvent(props: Props) {
 					});
 				} else {
 					console.log(error);
-					setAlert(error.message, "error");
+					setAlert(
+						error.response.data.message
+							? error.response.data.message
+							: error.message,
+						"error"
+					);
 				}
 			});
 	};

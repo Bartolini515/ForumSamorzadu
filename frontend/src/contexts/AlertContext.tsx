@@ -1,5 +1,5 @@
 import { createContext, useState, useContext, ReactNode } from "react";
-import MyAlert from "../components/feedback/MyAlert";
+import MyAlert from "../UI/feedback/MyAlert";
 
 interface AlertContextType {
     alertOpen: boolean;

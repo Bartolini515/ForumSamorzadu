@@ -2,7 +2,6 @@ import * as React from "react";
 import { styled, useTheme } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import Drawer from "@mui/material/Drawer";
-import CssBaseline from "@mui/material/CssBaseline";
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
@@ -108,7 +107,6 @@ export default function Navbar({ content }: NavbarProps) {
 
 	return (
 		<Box sx={{ display: "flex" }}>
-			<CssBaseline />
 			<AppBar position="fixed" open={open} sx={{ pr: "24px !important" }}>
 				<Toolbar
 					sx={{
@@ -149,7 +147,7 @@ export default function Navbar({ content }: NavbarProps) {
 			>
 				<DrawerHeader>
 					<img src="/Logo_SU.svg" alt="Logo" width="32" height="32" />
-					<Typography noWrap component="div">
+					<Typography noWrap component="div" sx={{ fontWeight: 600 }}>
 						Panel Narzędzi
 					</Typography>
 					<IconButton onClick={handleDrawerClose}>

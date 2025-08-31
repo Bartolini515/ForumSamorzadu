@@ -17,11 +17,13 @@ import DatasetOutlinedIcon from "@mui/icons-material/DatasetOutlined";
 import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import { useState } from "react";
 import { useAuth } from "../../contexts/AuthContext";
+import { useCustomTheme } from "../../contexts/ThemeContext";
 
 export default function Menu() {
 	const [openEvents, setOpenEvents] = useState(false);
 	const [openModerator, setOpenModerator] = useState(false);
 	const { isAdmin } = useAuth();
+	const { mode } = useCustomTheme();
 
 	const handleClickEvents = () => {
 		setOpenEvents(!openEvents);
@@ -40,7 +42,10 @@ export default function Menu() {
 				width: "100%",
 				maxWidth: 360,
 				bgcolor: "background.paper",
-				color: "rgba(0, 0, 0, 0.54)",
+				color:
+					mode === "light"
+						? "rgba(0, 0, 0, 0.54)"
+						: "rgba(255, 255, 255, 0.54)",
 			}}
 			component="nav"
 		>

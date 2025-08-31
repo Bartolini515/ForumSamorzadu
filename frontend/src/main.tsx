@@ -1,21 +1,14 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router";
-import { ThemeProvider, createTheme } from "@mui/material/styles";
-import { blueGrey } from "@mui/material/colors";
 import App from "./App.tsx";
 import { AuthProvider } from "./contexts/AuthContext.tsx";
 import { AlertProvider } from "./contexts/AlertContext.tsx";
 import { CalendarResizeProvider } from "./contexts/CalendarResizeContext.tsx";
-
-const theme = createTheme({
-	palette: {
-		primary: blueGrey,
-	},
-});
+import { CustomThemeProvider } from "./contexts/ThemeContext.tsx";
 
 createRoot(document.getElementById("root")!).render(
-	<ThemeProvider theme={theme}>
+	<CustomThemeProvider>
 		<AuthProvider>
 			<AlertProvider>
 				<CalendarResizeProvider>
@@ -27,5 +20,5 @@ createRoot(document.getElementById("root")!).render(
 				</CalendarResizeProvider>
 			</AlertProvider>
 		</AuthProvider>
-	</ThemeProvider>
+	</CustomThemeProvider>
 );

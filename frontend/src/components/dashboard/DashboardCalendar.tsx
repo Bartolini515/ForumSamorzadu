@@ -79,7 +79,7 @@ export default function Calendar(props: Props) {
 						navigate("/timetable");
 					}}
 					variant="text"
-					style={{ color: "black", textDecoration: "underline" }}
+					style={{ color: "inherit", textDecoration: "underline" }}
 				></MyButton>
 			</Box>
 			<FullCalendar

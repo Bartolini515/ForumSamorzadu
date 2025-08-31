@@ -56,7 +56,7 @@ export default function DashboardTasks(props: Props) {
 					onClick={() => {
 						navigate("/tasks");
 					}}
-					style={{ color: "black", textDecoration: "underline" }}
+					style={{ color: "inherit", textDecoration: "underline" }}
 				></MyButton>
 			</Box>
 			<Box

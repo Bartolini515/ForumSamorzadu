@@ -1,6 +1,7 @@
 import { Routes, Route, useLocation } from "react-router";
 import "./App.css";
 import "./index.css";
+import CssBaseline from "@mui/material/CssBaseline";
 import Dashboard from "./components/dashboard/Dashboard";
 import Login from "./components/auth/Login";
 import Schedule from "./components/schedule/Schedule";
@@ -16,13 +17,12 @@ import { de } from "date-fns/locale";
 import { plPL } from "@mui/x-date-pickers/locales";
 import Account from "./components/account/Account";
 import ModeratorPanelConfiguration from "./components/moderatorPanel/ModeratorPanelConfiguration";
+import Settings from "./components/settings/Settings";
 
 export default function App() {
 	const location = useLocation();
 	const noNavbar =
-		location.pathname === "/" ||
-		location.pathname === "/register" ||
-		location.pathname === "/change_password";
+		location.pathname === "/" || location.pathname === "/change_password";
 
 	return (
 		<LocalizationProvider
@@ -32,6 +32,7 @@ export default function App() {
 				plPL.components.MuiLocalizationProvider.defaultProps.localeText
 			}
 		>
+			<CssBaseline />
 			{noNavbar ? (
 				<Routes>
 					<Route path="/" element={<Login />} />
@@ -55,6 +56,7 @@ export default function App() {
 									element={<ModeratorPanelConfiguration />}
 								/>
 								<Route path="/account" element={<Account />} />
+								<Route path="/settings" element={<Settings />} />
 							</Route>
 						</Routes>
 					}

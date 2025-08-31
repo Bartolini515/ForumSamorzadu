@@ -9,6 +9,7 @@ import {
 	Typography,
 } from "@mui/material";
 import { useEffect, useState } from "react";
+import { useCustomTheme } from "../../contexts/ThemeContext";
 
 interface Props {
 	schedule: {
@@ -36,6 +37,8 @@ export default function ClassWalkTable(props: Props) {
 	const [absentClasses, setAbsentClasses] = useState<string[]>([]);
 
 	const dayNames = ["Poniedziałek", "Wtorek", "Środa", "Czwartek", "Piątek"];
+
+	const { mode } = useCustomTheme();
 
 	useEffect(() => {
 		const selectedDayName = dayNames[props.selectedDay];
@@ -110,14 +113,23 @@ export default function ClassWalkTable(props: Props) {
 					sx={{
 						marginTop: "20px",
 						padding: "15px",
-						backgroundColor: "#f5f5f5",
+						backgroundColor: mode === "light" ? "#f5f5f5" : "#424242",
 						borderRadius: "8px",
 					}}
 				>
-					<Typography variant="h6" sx={{ margin: "0 0 10px 0", color: "#666" }}>
+					<Typography
+						variant="h6"
+						sx={{
+							margin: "0 0 10px 0",
+							color: mode === "light" ? "#666" : "#fff",
+						}}
+					>
 						Klasy nieobecne w tym czasie:
 					</Typography>
-					<Typography variant="body2" sx={{ margin: 0, color: "#666" }}>
+					<Typography
+						variant="body2"
+						sx={{ margin: 0, color: mode === "light" ? "#666" : "#fff" }}
+					>
 						{absentClasses.sort().join(", ")}
 					</Typography>
 				</Box>
@@ -126,7 +138,11 @@ export default function ClassWalkTable(props: Props) {
 			{presentClasses.length === 0 && absentClasses.length === 0 && (
 				<Typography
 					variant="body2"
-					sx={{ textAlign: "center", fontWeight: "bold", color: "#666" }}
+					sx={{
+						textAlign: "center",
+						fontWeight: "bold",
+						color: mode === "light" ? "#666" : "#fff",
+					}}
 				>
 					Brak danych dla wybranego dnia i lekcji
 				</Typography>

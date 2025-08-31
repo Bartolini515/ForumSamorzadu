@@ -12,12 +12,12 @@ def send_email_notification(subject, message, recipient_list):
     User = get_user_model()
     match recipient_list:
         case ["all"]:
-            recipient_list = list(User.objects.values_list('email', flat=True))
+            recipient_list = list(User.objects.values_list('email', flat=True, filter={'is_active': True}))
         case ["admins"]:
-            recipient_list = list(User.objects.filter(is_superuser=True).values_list('email', flat=True))
+            recipient_list = list(User.objects.filter(is_superuser=True, is_active=True).values_list('email', flat=True))
         case _:
-            recipient_list = [email for email in recipient_list if User.objects.filter(email=email).exists()]
-        
+            recipient_list = [email for email in recipient_list if User.objects.filter(email=email, is_active=True).exists()]
+
     full_message = f"{message}{settings.EMAIL_FOOTER}"
         
     send_mail(

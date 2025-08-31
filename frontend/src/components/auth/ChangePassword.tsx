@@ -80,7 +80,7 @@ export default function ChangePasswordLogin() {
 			<form onSubmit={handleSubmit(submission)}>
 				<Box
 					sx={{
-						width: 300,
+						width: 350,
 						padding: 4,
 						backgroundColor: mode === "light" ? "white" : "#1e1e1e",
 						borderRadius: 2,

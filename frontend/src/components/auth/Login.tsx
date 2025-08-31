@@ -68,9 +68,15 @@ export default function Login() {
 							message: serverErrors[field][0],
 						});
 					});
-				} else {
+				} else if (error.response && error.response.status === 401) {
 					console.log(error);
 					setAlert("Nieprawidłowe dane logowania", "error");
+				} else {
+					console.log(error);
+					setAlert(
+						"Wystąpił błąd, spróbuj ponownie później: " + error.message,
+						"error"
+					);
 				}
 			});
 	};
@@ -95,7 +101,7 @@ export default function Login() {
 			<form onSubmit={handleSubmit(submission)}>
 				<Box
 					sx={{
-						width: 300,
+						width: 350,
 						padding: 4,
 						backgroundColor: mode === "light" ? "white" : "#1e1e1e",
 						borderRadius: 2,
@@ -117,7 +123,7 @@ export default function Login() {
 								textAlign: "center",
 							}}
 						>
-							Logowanie nie powiodło się, proszę spróbować ponownie.
+							Logowanie nie powiodło się
 						</Typography>
 					)}
 

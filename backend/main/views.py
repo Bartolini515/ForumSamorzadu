@@ -13,6 +13,7 @@ from django.core.files.base import ContentFile
 from .utils.schedule_scrapper import schedule_scrapper_main
 from .tasks import send_email_notification
 from django.core.cache import cache
+from django.conf import settings
 User = get_user_model()
 
 def message_response(data, message="Operacja się powiodła"):
@@ -433,9 +434,12 @@ class UtilitiesViewset(viewsets.ViewSet):
 
     @action(detail=False, methods=["get"], url_path="email/test")
     def test_email(self, request):
-        send_email_notification.delay(
-            subject="Test Email",
-            message="This is a test email.",
-            recipient_list=["b.jedrzychowski@zset.leszno.pl"]
-        )
-        return Response({"message": "Test email sent"}, status=200)
+        if settings.DEBUG:
+            send_email_notification.delay(
+                subject="Test Email",
+                message="This is a test email.",
+                recipient_list=["b.jedrzychowski@zset.leszno.pl"]
+            )
+            return Response({"message": "Test email sent"}, status=200)
+        else:
+            return Response({"message": "Server not in debug mode"}, status=404)

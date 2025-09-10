@@ -198,7 +198,8 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend' if not DEBUG else 
 EMAIL_HOST = env('EMAIL_HOST', default='127.0.0.1')
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-DEFAULT_FROM_EMAIL = 'samorzad@samorzad.w.zset.pl'
+EMAIL_USE_SSL = False
+DEFAULT_FROM_EMAIL = 'samorzad@samorzad.w.zset.leszno.pl'
 EMAIL_HOST_USER = env('EMAIL_HOST_USER') if DEBUG else ''
 EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD') if DEBUG else ''
 EMAIL_FOOTER = "\n\n--\nTa wiadomość została wysłana automatycznie. Prosimy na nią nie odpowiadać.\nForum Samorządu ZSET\nhttps://samorzad.w.zset.leszno.pl"

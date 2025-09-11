@@ -71,6 +71,17 @@ export default function ModeratorPanelDataManagementTable(props: Props) {
 								}
 							/>
 						);
+						element["is_staff"] = (
+							<Checkbox
+								checked={element["is_staff"]}
+								onClick={() =>
+									handleClickIsStaff(
+										element.id,
+										element["is_staff"].props.checked
+									)
+								}
+							/>
+						);
 					});
 				}
 				setData(sortedData);
@@ -91,6 +102,25 @@ export default function ModeratorPanelDataManagementTable(props: Props) {
 	const handleClickIsActive = (id: number, is_active: boolean) => {
 		AxiosInstance.put(`moderator_panel/user/${id}/update/`, {
 			is_active: !is_active,
+		})
+			.then((response) => {
+				props.setRefresh(true);
+				setAlert(response.data.message, "success");
+			})
+			.catch((error: any) => {
+				console.log(error);
+				setAlert(
+					error.response.data.message
+						? error.response.data.message
+						: error.message,
+					"error"
+				);
+			});
+	};
+
+	const handleClickIsStaff = (id: number, is_staff: boolean) => {
+		AxiosInstance.put(`moderator_panel/user/${id}/update/`, {
+			is_staff: !is_staff,
 		})
 			.then((response) => {
 				props.setRefresh(true);

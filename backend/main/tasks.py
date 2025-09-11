@@ -12,7 +12,7 @@ def send_email_notification(subject, message, recipient_list):
     User = get_user_model()
     match recipient_list:
         case ["all"]:
-            recipient_list = list(User.objects.values_list('email', flat=True, filter={'is_active': True}))
+            recipient_list = list(User.objects.filter(is_active=True).values_list('email', flat=True))
         case ["admins"]:
             recipient_list = list(User.objects.filter(is_superuser=True, is_active=True).values_list('email', flat=True))
         case _:
@@ -34,7 +34,7 @@ def send_event_reminders():
     reminder_date = timezone.now().date() + timedelta(days=3)
     
     # Filter events that start on the reminder_date
-    upcoming_events = Timetable_events.objects.filter(start_date__date=reminder_date)
+    upcoming_events = Timetable_events.objects.filter(start_date__date=reminder_date, do_notify=True)
     
     for event in upcoming_events:
         subject = f"Przypomnienie: wydarzenie '{event.event_name}' za 3 dni!"

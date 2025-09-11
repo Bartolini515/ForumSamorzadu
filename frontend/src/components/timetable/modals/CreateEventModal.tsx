@@ -13,6 +13,7 @@ import MySelect from "../../../UI/forms/MySelect";
 import { useEffect, useState } from "react";
 import { useAlert } from "../../../contexts/AlertContext";
 import MyColorInput from "../../../UI/forms/MyColorInput";
+import MyCheckbox from "../../../UI/forms/MyCheckbox";
 
 const style = {
 	position: "absolute",
@@ -43,12 +44,14 @@ interface FormData {
 	event_color: string;
 	event_type: string;
 	created_by: string;
+	do_notify: boolean;
 }
 
 export default function CreateEventModal(props: Props) {
 	const [options, setOptions] = useState<any>([]);
 	const [selectedOption, setSelectedOption] = useState<any>(null);
 	const [selectedColor, setSelectedColor] = useState<any>("#2196f3");
+	const [doNotify, setDoNotify] = useState<boolean>(false);
 	const { handleSubmit, control, setError, clearErrors } = useForm<FormData>({
 		defaultValues: {
 			event_name: "",
@@ -57,6 +60,7 @@ export default function CreateEventModal(props: Props) {
 			description: "",
 			event_color: selectedColor,
 			event_type: selectedOption,
+			do_notify: doNotify,
 		},
 	});
 
@@ -82,6 +86,7 @@ export default function CreateEventModal(props: Props) {
 			event_type: data.event_type,
 			event_color: data.event_color.substring(1),
 			description: data.description,
+			do_notify: data.do_notify,
 		};
 
 		AxiosInstance.post(`timetable/`, payload)
@@ -333,6 +338,28 @@ export default function CreateEventModal(props: Props) {
 											setSelectedColor={setSelectedColor}
 											format="hex"
 											isAlphaHidden={true}
+										/>
+									</Box>
+								</Box>
+
+								<Box
+									sx={{
+										boxShadow: 3,
+										padding: "20px",
+										display: "flex",
+										flexDirection: "row",
+										marginBottom: "20px",
+									}}
+								>
+									<Box sx={{ fontWeight: "bold", alignContent: "center" }}>
+										Wyślij powiadomienie:{" "}
+									</Box>
+									<Box sx={{ marginLeft: "10px" }}>
+										<MyCheckbox
+											name="do_notify"
+											control={control}
+											selectedValue={doNotify}
+											setSelectedValue={setDoNotify}
 										/>
 									</Box>
 								</Box>

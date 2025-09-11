@@ -86,11 +86,12 @@ class TimetableViewset(viewsets.ModelViewSet):
         data['created_by'] = user.id
         serializer = Timetable_eventsCreateSerializer(data=data)
         if serializer.is_valid():
-            send_email_notification.delay(
-                subject="Nowe wydarzenie w planie lekcji",
-                message=f"Użytkownik {user.first_name} {user.last_name} utworzył nowe wydarzenie: {data['event_name']} o dacie {data['start_date']}.",
-                recipient_list=["all"]
-            )
+            if data.get('do_notify'):
+                send_email_notification.delay(
+                    subject="Nowe wydarzenie w kalendarzu",
+                    message=f"Użytkownik {user.first_name} {user.last_name} utworzył nowe wydarzenie: {data['event_name']} o dacie {data['start_date']}.",
+                    recipient_list=["all"]
+                )
             cache.delete('timetable_events_list')
             return message_response(Timetable_eventsDetailsSerializer(serializer.save()).data, "Wydarzenie utworzone")
         else:
@@ -163,6 +164,13 @@ class ModeratorPanelViewset(viewsets.ViewSet):
         serializer = Profiles_moderatorPanelSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
+            send_email_notification.delay(
+                subject="Witamy w samorządzie szkolnym ZSET!",
+                message=f"Twoje konto samorządowe zostało utworzone. "
+                        f"Możesz się zalogować używając adresu email: \"{request.data.get('email')}\" oraz hasła \"{request.data.get('password')}\"."
+                        f"Link do strony - https://samorzad.w.zset.leszno.pl",
+                recipient_list=[request.data.get('email')]
+            )
             cache.delete('profiles_list')
             return message_response(serializer.data, "Dodano użytkownika")
         else:
@@ -332,11 +340,21 @@ class TasksViewset(viewsets.ModelViewSet):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            send_email_notification.delay(
-                subject="Nowe zadanie do wykonania",
-                message=f"Użytkownik {request.user.first_name} {request.user.last_name} dodał nowe zadanie: {serializer.validated_data['task_name']}.",
-                recipient_list=["all"]
-            )
+            if serializer.data.get('user_id') is not None:
+                user = User.objects.get(pk=serializer.data.get('user_id'))
+                event = Timetable_events.objects.get(pk=serializer.data.get('event'))
+                if user and event:
+                    send_email_notification.delay(
+                        subject="Zadanie zostało przypisane",
+                        message=f"Przypisano do Ciebie zadanie: {serializer.data['task_name']} w wydarzeniu {event.event_name}.",
+                        recipient_list=[user.email]
+                    )
+            else:
+                send_email_notification.delay(
+                    subject="Nowe zadanie do wykonania",
+                    message=f"Użytkownik {request.user.first_name} {request.user.last_name} dodał nowe zadanie: {serializer.validated_data['task_name']}.",
+                    recipient_list=["all"]
+                )
             cache.delete('tasks_list')
             return message_response(serializer.data, "Dodano zadanie")
         else:
@@ -375,24 +393,16 @@ class TasksViewset(viewsets.ModelViewSet):
             serializer.save()
             if serializer.data.get('user_id') is not None:
                 user = User.objects.get(pk=serializer.data.get('user_id'))
-                if user:
-                    send_email_notification.delay(
-                            subject="Zadanie zostało przypisane",
-                            message=f"Przypisano do Ciebie zadanie: {serializer.data['task_name']}.",
-                        recipient_list=[user.email]
+                if (event_id := serializer.data.get('event')) and user:
+                    try:
+                        event = Timetable_events.objects.get(pk=event_id)
+                        send_email_notification.delay(
+                            subject="Zadanie twojego wydarzenia zostało przypisane",
+                            message=f'Użytkownikowi {user.first_name} {user.last_name} zostało przypisane zadanie "{serializer.data["task_name"]}" do wydarzenia: {event.event_name}.',
+                            recipient_list=[event.created_by.email]
                         )
-                    if serializer.data.get('event'):
-                        event_id = serializer.data.get('event')
-                        if event_id:
-                            try:
-                                event = Timetable_events.objects.get(pk=event_id)
-                                send_email_notification.delay(
-                                    subject="Zadanie twojego wydarzenia zostało przypisane",
-                                    message=f'Użytkownikowi {user.first_name} {user.last_name} zostało przypisane zadanie "{serializer.data["task_name"]}" do wydarzenia: {event.event_name}.',
-                                    recipient_list=[event.created_by.email]
-                                )
-                            except Timetable_events.DoesNotExist:
-                                pass
+                    except Timetable_events.DoesNotExist:
+                        pass
             cache.delete('tasks_list')
             return message_response(serializer.data, "Przypisanie zmienione")
         else:

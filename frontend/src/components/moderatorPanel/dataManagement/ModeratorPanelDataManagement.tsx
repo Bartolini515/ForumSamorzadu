@@ -22,6 +22,7 @@ export default function ModeratorPanelDataManagement() {
 				"Email",
 				"Ostatnie logowanie",
 				"Aktywny",
+				"Administrator",
 			],
 			buttonAdd: "Dodaj użytkownika",
 			forms: {

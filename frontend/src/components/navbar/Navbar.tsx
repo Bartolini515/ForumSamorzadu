@@ -10,6 +10,7 @@ import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 import Menu from "./Menu";
 import AccountMenu from "./AccountMenu";
 import { useLocation } from "react-router-dom";
@@ -129,7 +130,18 @@ export default function Navbar({ content }: NavbarProps) {
 					>
 						<MenuIcon />
 					</IconButton>
-					<AccountMenu />
+					<Box sx={{ display: "flex", alignItems: "center" }}>
+						<IconButton
+							color="inherit"
+							component="a"
+							href="https://youtu.be/rKz7JDsS364" // Replace with your desired URL
+							target="_blank"
+							rel="noopener noreferrer"
+						>
+							<HelpOutlineIcon sx={{ fontSize: 27 }} />
+						</IconButton>
+						<AccountMenu />
+					</Box>
 				</Toolbar>
 			</AppBar>
 			<Drawer

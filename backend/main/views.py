@@ -166,8 +166,8 @@ class ModeratorPanelViewset(viewsets.ViewSet):
             serializer.save()
             send_email_notification.delay(
                 subject="Witamy w samorządzie szkolnym ZSET!",
-                message=f"Twoje konto samorządowe zostało utworzone. "
-                        f"Możesz się zalogować używając adresu email: \"{request.data.get('email')}\" oraz hasła \"{request.data.get('password')}\"."
+                message=f"Twoje konto samorządowe zostało utworzone. \n"
+                        f"Możesz się zalogować używając adresu email: \"{request.data.get('email')}\" oraz hasła \"{request.data.get('password')}\".\n"
                         f"Link do strony - https://samorzad.w.zset.leszno.pl",
                 recipient_list=[request.data.get('email')]
             )

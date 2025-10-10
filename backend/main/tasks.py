@@ -34,7 +34,7 @@ def send_event_reminders():
     reminder_date = timezone.now().date() + timedelta(days=3)
     
     # Filter events that start on the reminder_date
-    upcoming_events = Timetable_events.objects.filter(start_date__date=reminder_date, do_notify=True)
+    upcoming_events = Timetable_events.objects.filter(start_date=reminder_date, do_notify=True)
     
     for event in upcoming_events:
         subject = f"Przypomnienie: wydarzenie '{event.event_name}' za 3 dni!"
@@ -57,7 +57,7 @@ def send_task_reminders():
     reminder_date = timezone.now().date() + timedelta(days=3)
     
     # Filter tasks that have a deadline on the reminder_date
-    upcoming_tasks = Tasks.objects.filter(due_date__date=reminder_date, completed=False)
+    upcoming_tasks = Tasks.objects.filter(due_date=reminder_date, completion_status=False)
     
     for task in upcoming_tasks:
         if task.user and task.user.email:

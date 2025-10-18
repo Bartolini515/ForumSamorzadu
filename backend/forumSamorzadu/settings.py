@@ -193,6 +193,11 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': ('knox.auth.TokenAuthentication',)
 }
 
+# Knox settings
+REST_KNOX = {
+    'TOKEN_TTL': 259200  # 3 days
+}
+
 # Email settings
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend' if not DEBUG else 'django.core.mail.backends.console.EmailBackend'
 EMAIL_HOST = env('EMAIL_HOST', default='127.0.0.1')

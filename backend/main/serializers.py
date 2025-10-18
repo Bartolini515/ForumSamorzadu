@@ -20,7 +20,7 @@ class ProfileSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Profile
-        fields = ('id', 'first_name', 'last_name', 'email', 'last_login', 'profile_picture', 'created_events')
+        fields = ('id', 'first_name', 'last_name', 'email', 'last_login', 'role', 'profile_picture', 'created_events')
 
 class LoginSerializer(serializers.ModelSerializer):
     email = serializers.EmailField()
@@ -131,6 +131,7 @@ class Profiles_moderatorPanelSerializer(serializers.ModelSerializer):
     last_name = serializers.CharField()
     email = serializers.EmailField()
     password = serializers.CharField()
+    role = serializers.CharField()
     
     def validate_password(self, value):
         if value:
@@ -147,6 +148,7 @@ class Profiles_moderatorPanelSerializer(serializers.ModelSerializer):
         instance.first_name = validated_data.get('first_name', instance.first_name)
         instance.last_name = validated_data.get('last_name', instance.last_name)
         instance.email = validated_data.get('email', instance.email)
+        instance.role = validated_data.get('role', instance.role)
         instance.is_active = validated_data.get('is_active', instance.is_active)
         instance.is_staff = validated_data.get('is_staff', instance.is_staff)
         password = validated_data.get('password', None)
@@ -162,7 +164,7 @@ class Profiles_moderatorPanelSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Profile
-        fields = ("id" , "first_name", "last_name", "email", "last_login", "is_active", "is_staff", "password")
+        fields = ("id" , "first_name", "last_name", "email", "role", "last_login", "is_active", "is_staff", "password")
 
 
 # Event_typesSerializers

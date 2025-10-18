@@ -57,6 +57,7 @@ interface ResponseData {
 	first_name?: string;
 	last_name?: string;
 	email?: string;
+	role?: string;
 	last_login?: string;
 	event_type?: string;
 	event_color?: string;
@@ -67,6 +68,7 @@ interface FormData {
 	password?: string;
 	first_name?: string;
 	last_name?: string;
+	role?: string;
 	event_type?: string;
 	event_color?: string;
 }
@@ -76,6 +78,7 @@ export default function ModifyDataModerator(props: Props) {
 		id: 0,
 		first_name: "",
 		last_name: "",
+		role: "",
 		email: "",
 		last_login: "",
 		event_type: "",
@@ -117,6 +120,7 @@ export default function ModifyDataModerator(props: Props) {
 				first_name: responseData.first_name,
 				last_name: responseData.last_name,
 				event_type: responseData.event_type,
+				role: responseData.role,
 			},
 		});
 
@@ -128,6 +132,7 @@ export default function ModifyDataModerator(props: Props) {
 			last_name: responseData.last_name,
 			event_type: responseData.event_type,
 			event_color: responseData.event_color,
+			role: responseData.role,
 		});
 	}, [responseData, reset]);
 
@@ -312,6 +317,29 @@ export default function ModifyDataModerator(props: Props) {
 													<MyTextField
 														label="Nazwisko"
 														name="last_name"
+														control={control}
+													/>
+												</Box>
+											</Box>
+
+											<Box
+												sx={{
+													boxShadow: 3,
+													padding: "20px",
+													display: "flex",
+													flexDirection: "row",
+													marginBottom: "20px",
+												}}
+											>
+												<Box
+													sx={{ fontWeight: "bold", alignContent: "center" }}
+												>
+													Rola:{" "}
+												</Box>
+												<Box sx={{ marginLeft: "10px" }}>
+													<MyTextField
+														label="Rola"
+														name="role"
 														control={control}
 													/>
 												</Box>

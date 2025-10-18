@@ -54,6 +54,7 @@ interface FormData {
 	password?: string;
 	first_name?: string;
 	last_name?: string;
+	role?: string;
 	event_type?: string;
 	event_color?: string;
 }
@@ -65,6 +66,7 @@ export default function CreateDataModerator(props: Props) {
 			password: "",
 			first_name: "",
 			last_name: "",
+			role: "",
 			event_type: "",
 			event_color: "",
 		},
@@ -242,6 +244,23 @@ export default function CreateDataModerator(props: Props) {
 												name="last_name"
 												control={control}
 											/>
+										</Box>
+									</Box>
+
+									<Box
+										sx={{
+											boxShadow: 3,
+											padding: "20px",
+											display: "flex",
+											flexDirection: "row",
+											marginBottom: "20px",
+										}}
+									>
+										<Box sx={{ fontWeight: "bold", alignContent: "center" }}>
+											Rola:{" "}
+										</Box>
+										<Box sx={{ marginLeft: "10px" }}>
+											<MyTextField label="Rola" name="role" control={control} />
 										</Box>
 									</Box>
 								</>

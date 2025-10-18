@@ -27,6 +27,7 @@ class Profile(AbstractUser):
     username = models.CharField(max_length=255, null=True, blank=True)
     first_name = models.CharField(max_length=255, null=True, blank=True)
     last_name = models.CharField(max_length=255, null=True, blank=True)
+    role = models.CharField(max_length=50, null=True, blank=True)
     profile_picture = models.ImageField(null=True, blank=True, upload_to=user_profile_picture)
     
     

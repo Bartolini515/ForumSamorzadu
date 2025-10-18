@@ -13,6 +13,7 @@ interface UserType {
 	first_name: String | null;
 	last_name: String | null;
 	last_login: String;
+	role: String | null;
 	profile_picture: String | null;
 	created_events: number[];
 }

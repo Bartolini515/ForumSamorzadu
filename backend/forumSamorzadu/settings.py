@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
+from datetime import timedelta
 import os
 from pathlib import Path
 import environ
@@ -195,7 +196,7 @@ REST_FRAMEWORK = {
 
 # Knox settings
 REST_KNOX = {
-    'TOKEN_TTL': 259200  # 3 days
+    'TOKEN_TTL': timedelta(days=3),
 }
 
 # Email settings

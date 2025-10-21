@@ -100,12 +100,13 @@ class TasksManager(models.Manager):
 class Tasks(models.Model):
     task_name = models.CharField(max_length=255)
     description = models.TextField(null=True, blank=True)
-    user = models.ForeignKey(Profile, on_delete=models.SET_NULL, related_name='tasks', null=True, blank=True)
+    users = models.ManyToManyField(Profile, related_name='tasks', blank=True)
     completion_status = models.BooleanField(default=False)
     due_date = models.DateField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     event = models.ForeignKey(Timetable_events, on_delete=models.CASCADE, related_name='tasks')
+    max_users = models.IntegerField(default=1)
     
     objects = TasksManager()
     def __str__(self):

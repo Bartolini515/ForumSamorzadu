@@ -10,6 +10,7 @@ import { useForm } from "react-hook-form";
 import MyButton from "../../../UI/forms/MyButton";
 import MyDatePicker from "../../../UI/forms/MyDatePicker";
 import { useEffect, useState } from "react";
+import { formatDate } from "../../../util/formatDate";
 import { useAlert } from "../../../contexts/AlertContext";
 
 const style = {
@@ -81,18 +82,10 @@ export default function ModifyEventModal(props: Props) {
 	const { setAlert } = useAlert();
 
 	const submission = (data: FormData) => {
-		if (data.end_date) {
-			const date = new Date(data.end_date);
-			date.setDate(date.getDate() + 2);
-			data.end_date = new Date(date);
-		}
-
 		const payload = {
 			event_name: data.event_name,
-			start_date: data.start_date.toISOString().split("T")[0],
-			end_date: data.end_date
-				? data.end_date.toISOString().split("T")[0]
-				: null,
+			start_date: formatDate(data.start_date),
+			end_date: formatDate(data.end_date),
 			description: data.description,
 		};
 

@@ -12,6 +12,7 @@ import MyDatePicker from "../../../UI/forms/MyDatePicker";
 import MySelect from "../../../UI/forms/MySelect";
 import { useEffect, useState } from "react";
 import { useAlert } from "../../../contexts/AlertContext";
+import { formatDate } from "../../../util/formatDate";
 import MyColorInput from "../../../UI/forms/MyColorInput";
 import MyCheckbox from "../../../UI/forms/MyCheckbox";
 
@@ -69,16 +70,6 @@ export default function CreateEventModal(props: Props) {
 	const { setAlert } = useAlert();
 
 	const submission = (data: FormData) => {
-		// Helper function to omit timezone conversion
-		const formatDate = (date: Date | null | undefined) => {
-			if (!date) return null;
-			const d = new Date(date);
-			const year = d.getFullYear();
-			const month = String(d.getMonth() + 1).padStart(2, "0");
-			const day = String(d.getDate()).padStart(2, "0");
-			return `${year}-${month}-${day}`;
-		};
-
 		const payload = {
 			event_name: data.event_name,
 			start_date: formatDate(data.start_date),

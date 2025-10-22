@@ -44,6 +44,24 @@ class Password_changeSerializer(serializers.Serializer):
         ret = super().to_representation(instance)
         ret.pop('password', None)
         return ret
+    
+class Password_resetSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    def validate_email(self, value):
+        if not Profile.objects.filter(email=value).exists():
+            raise serializers.ValidationError("Użytkownik z podanym emailem nie istnieje")
+        return value
+
+class PasswordResetConfirmSerializer(serializers.Serializer):
+    token = serializers.CharField()
+    password = serializers.CharField()
+
+    def validate_password(self, value):
+        try:
+            validate_password(value)
+        except ValidationError as e:
+            raise serializers.ValidationError(e.messages)
+        return value
         
         
 # TasksSerializers

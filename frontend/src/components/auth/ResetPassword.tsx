@@ -1,24 +1,22 @@
 import { useState } from "react";
 import { Box, Typography } from "@mui/material";
-import MyPassField from "../../UI/forms/MyPassField";
 import MyButton from "../../UI/forms/MyButton";
 import { useForm } from "react-hook-form";
 import AxiosInstance from "../AxiosInstance";
 import { useNavigate } from "react-router-dom";
 import { useAlert } from "../../contexts/AlertContext";
 import { useCustomTheme } from "../../contexts/ThemeContext";
+import MyTextField from "../../UI/forms/MyTextField";
 
 interface FormData {
-	password?: string;
-	confirmPassword?: string;
+	email?: string;
 }
 
-export default function ChangePasswordLogin() {
+export default function ResetPassword() {
 	const navigate = useNavigate();
 	const { handleSubmit, control, setError } = useForm<FormData>({
 		defaultValues: {
-			password: "",
-			confirmPassword: "",
+			email: "",
 		},
 	});
 	const [showMessage, setShowMessage] = useState(false);
@@ -26,19 +24,11 @@ export default function ChangePasswordLogin() {
 	const { mode } = useCustomTheme();
 
 	const submission = (data: FormData) => {
-		if (data.password !== data.confirmPassword) {
-			setError("confirmPassword", {
-				type: "manual",
-				message: "Hasła się nie zgadzają",
-			});
-			return;
-		}
-
-		AxiosInstance.post(`account/change_password/`, {
-			password: data.password,
+		AxiosInstance.post(`account/reset_password/`, {
+			email: data.email,
 		})
 			.then((response: any) => {
-				navigate(`/dashboard`);
+				navigate(`/login`);
 				setAlert(response.data.message, "success");
 			})
 			.catch((error: any) => {
@@ -95,7 +85,7 @@ export default function ChangePasswordLogin() {
 							fontWeight: "bold",
 						}}
 					>
-						Zmień hasło
+						Reset hasła
 					</Typography>
 
 					{showMessage && (
@@ -106,29 +96,21 @@ export default function ChangePasswordLogin() {
 								textAlign: "center",
 							}}
 						>
-							Zmiana hasła nie powiodła się, proszę spróbować ponownie.
+							Resetowanie hasła nie powiodło się, proszę spróbować ponownie.
 						</Typography>
 					)}
 
-					<Box sx={{ marginBottom: 2 }}>
-						<MyPassField
-							label={"Nowe hasło"}
-							name={"password"}
-							control={control}
-						/>
-					</Box>
-
 					<Box sx={{ marginBottom: 2, marginTop: 2 }}>
-						<MyPassField
-							label={"Potwierdź hasło"}
-							name={"confirmPassword"}
+						<MyTextField
+							label={"Adres e-mail"}
+							name={"email"}
 							control={control}
 						/>
 					</Box>
 
 					<Box sx={{ marginTop: 2, width: "100%", textAlign: "center" }}>
 						<MyButton
-							label={"Zmień hasło"}
+							label={"Zresetuj hasło"}
 							type={"submit"}
 							style={{ width: "100%" }}
 						/>

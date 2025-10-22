@@ -2,6 +2,9 @@ import os
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.base_user import BaseUserManager
+from django.utils import timezone
+from datetime import timedelta
+import uuid
 
 class ProfileManager(BaseUserManager):
     def create_user(self, email, password, **extra_fields):
@@ -53,6 +56,18 @@ class Profile(AbstractUser):
             if self.username is not None
             else self.email
         )
+
+
+class PasswordResetToken(models.Model):
+    user = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='password_reset_tokens')
+    token = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def is_expired(self):
+        return self.created_at < timezone.now() - timedelta(hours=1)
+
+    def __str__(self):
+        return f"Password reset token for {self.user}"
 
 
 class Event_typesManager(models.Manager):

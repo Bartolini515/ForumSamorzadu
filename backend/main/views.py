@@ -318,6 +318,48 @@ class AccountViewset(viewsets.ModelViewSet):
             return message_response(serializer.data, "Zmieniono zdjęcie profilowe")
         else:
             return Response(serializer.errors, status=400)
+
+    @action(detail=False, methods=["post"], url_path="reset_password", permission_classes=[permissions.AllowAny])
+    def reset_password(self, request):
+        serializer = Password_resetSerializer(data=request.data)
+        if serializer.is_valid():
+            user = Profile.objects.get(email=serializer.validated_data['email'])
+            token, created = PasswordResetToken.objects.get_or_create(user=user)
+
+            origin = request.headers.get('Origin')
+            reset_link = f"{origin}/reset-password?token={token.token}"
+
+            send_email_notification.delay(
+                subject="Resetowanie hasła",
+                message=f"Aby zresetować hasło, kliknij w poniższy link: {reset_link}\nLink jest ważny przez 1 godzinę.",
+                recipient_list=[user.email]
+            )
+
+            return Response({"message": "Link do resetowania hasła został wysłany na Twój adres email."})
+        else:
+            return Response(serializer.errors, status=400)
+
+    @action(detail=False, methods=["post"], url_path="reset_password_confirm", permission_classes=[permissions.AllowAny])
+    def reset_password_confirm(self, request):
+        serializer = PasswordResetConfirmSerializer(data=request.data)
+        if serializer.is_valid():
+            try:
+                token_obj = PasswordResetToken.objects.get(token=serializer.validated_data['token'])
+            except PasswordResetToken.DoesNotExist:
+                return Response({"message": "Nieprawidłowy token."}, status=404)
+
+            if token_obj.is_expired():
+                token_obj.delete()
+                return Response({"message": "Token wygasł."}, status=400)
+
+            user = token_obj.user
+            user.set_password(serializer.validated_data['password'])
+            user.save()
+            token_obj.delete()
+
+            return Response({"message": "Hasło zostało pomyślnie zmienione."})
+        else:
+            return Response(serializer.errors, status=400)
     
 class TasksViewset(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]

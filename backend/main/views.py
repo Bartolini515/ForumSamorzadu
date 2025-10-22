@@ -268,7 +268,7 @@ class AccountViewset(viewsets.ModelViewSet):
     queryset = Profile.objects.all()
     
     def list(self, request):
-        queryset = Profile.objects.all()
+        queryset = Profile.objects.filter(is_active=True, is_superuser=False)
         serializer = ProfileSerializer(queryset, many=True)
         return Response(serializer.data)
     

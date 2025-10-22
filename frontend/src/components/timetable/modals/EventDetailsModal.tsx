@@ -14,6 +14,8 @@ import ModifyEventModal from "./ModifyEventModal";
 import AddCircleOutlineOutlinedIcon from "@mui/icons-material/AddCircleOutlineOutlined";
 import CreateTaskModal from "../../Tasks/CreateTaskModal";
 import AlertDialog from "../../../UI/dialogs/AlertDialog";
+import NotesList from "../../../UI/lists/NotesList";
+import CreateNoteModal from "./CreateNoteModal";
 
 const style = {
 	position: "absolute",
@@ -55,6 +57,15 @@ interface EventData {
 		completion_status: boolean;
 		due_date: string;
 	}[];
+	notes: {
+		id: string;
+		title: string;
+		content: string;
+		created_at: string;
+		updated_at: string;
+		created_by: string;
+		created_by_id: string;
+	}[];
 	is_creator: boolean;
 }
 
@@ -62,6 +73,7 @@ export default function EventDetails(props: Props) {
 	const [open, setOpen] = useState<boolean>(false);
 	const [openModify, setOpenModify] = useState<boolean>(false);
 	const [openCreateTask, setOpenCreateTask] = useState<boolean>(false);
+	const [openCreateNote, setOpenCreateNote] = useState<boolean>(false);
 	const [openDialog, setOpenDialog] = useState<boolean>(false);
 	const [refresh, setRefresh] = useState<boolean>(false);
 	const [event, setEvent] = useState<EventData>({
@@ -75,6 +87,7 @@ export default function EventDetails(props: Props) {
 		creator: "",
 		creator_id: "",
 		tasks: [],
+		notes: [],
 		is_creator: false,
 	});
 
@@ -131,10 +144,14 @@ export default function EventDetails(props: Props) {
 	useEffect(() => {
 		GetData();
 	}, [props.id, refresh]);
+
 	function handleAddTaskClick() {
 		setOpenCreateTask(true);
 	}
 
+	function handleAddNoteClick() {
+		setOpenCreateNote(true);
+	}
 	return (
 		<>
 			<Modal
@@ -345,6 +362,43 @@ export default function EventDetails(props: Props) {
 							)}
 						</Box>
 
+						<Box
+							sx={{
+								boxShadow: 3,
+								padding: "20px",
+								display: "flex",
+								flexDirection: "row",
+								marginBottom: "20px",
+							}}
+						>
+							<Box sx={{ fontWeight: "bold", alignContent: "center" }}>
+								Notatki:
+							</Box>
+							<Box
+								sx={{
+									marginLeft: "10px",
+									fontWeight: "normal",
+									marginTop: "6px",
+								}}
+							>
+								{event.notes && event.notes.length > 0 ? (
+									<NotesList
+										notes={event.notes}
+										is_creator={event.is_creator}
+										isAdmin={isAdmin}
+										onClose={() => {
+											setRefresh(!refresh);
+										}}
+									/>
+								) : (
+									"Brak notatek"
+								)}
+							</Box>
+							<IconButton onClick={handleAddNoteClick}>
+								<AddCircleOutlineOutlinedIcon fontSize="small" />
+							</IconButton>
+						</Box>
+
 						{(event.is_creator || isAdmin) && (
 							<Box sx={{ display: "flex", justifyContent: "space-between" }}>
 								<MyButton
@@ -392,6 +446,17 @@ export default function EventDetails(props: Props) {
 								onClose={() => {
 									setRefresh(!refresh);
 									setOpenCreateTask(false);
+								}}
+								event_id={props.id}
+							/>
+						)}
+
+						{openCreateNote && (
+							<CreateNoteModal
+								open={openCreateNote}
+								onClose={() => {
+									setRefresh(!refresh);
+									setOpenCreateNote(false);
 								}}
 								event_id={props.id}
 							/>

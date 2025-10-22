@@ -100,6 +100,18 @@ class Timetable_events(models.Model):
         return self.event_name
     
     
+class Notes(models.Model):
+    title = models.CharField(max_length=255)
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    event = models.ForeignKey(Timetable_events, on_delete=models.CASCADE, related_name='notes')
+    created_by = models.ForeignKey(Profile, on_delete=models.SET_NULL, related_name='created_notes', null=True, blank=True)
+    
+    def __str__(self):
+        return self.title
+
+
 class TasksManager(models.Manager):
     def create_task(self, task_name, description, user_id, due_date, event):
         user = None

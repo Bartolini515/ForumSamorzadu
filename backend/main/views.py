@@ -451,7 +451,48 @@ class TasksViewset(viewsets.ModelViewSet):
         task.delete()
         cache.delete('tasks_list')
         return Response({"message": "Zadanie usunięte"})
+
+class NotesViewset(viewsets.ModelViewSet):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = NotesSerializer
+    queryset = Notes.objects.all()
+    
+    def list(self, request):
+        cache_key = 'notes_list'
+        cached_data = cache.get(cache_key)
+        if cached_data:
+            return Response(cached_data)
+
+        queryset = Notes.objects.all()
+        serializer = self.serializer_class(queryset, many=True)
+        cache.set(cache_key, serializer.data, timeout=3600)
+        return Response(serializer.data)
+    
+    def create(self, request):
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            cache.delete('notes_list')
+            return message_response(serializer.data, "Dodano notatkę")
+        else:
+            return Response(serializer.errors, status=400)
         
+    def update(self, request, pk=None):
+        queryset = self.queryset.get(pk=pk)
+        serializer = self.serializer_class(queryset, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            cache.delete('notes_list')
+            return message_response(serializer.data, "Notatka zaktualizowana")
+        else:
+            return Response(serializer.errors, status=400)
+    
+    def destroy(self, request, pk=None):
+        note = self.queryset.get(pk=pk)
+        note.delete()
+        cache.delete('notes_list')
+        return Response({"message": "Notatka usunięta"})
+
 class ScheduleViewset(viewsets.ViewSet):
     permission_classes = [permissions.IsAuthenticated]
     

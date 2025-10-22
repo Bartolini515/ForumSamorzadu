@@ -116,6 +116,20 @@ class Tasks_for_eventSerializer(serializers.ModelSerializer):
         fields = ('id', 'task_name', 'task_description', 'assigned', 'completion_status', 'due_date')
 
 
+# NotesSerializers
+class NotesSerializer(serializers.ModelSerializer):
+    created_by = serializers.StringRelatedField(read_only=True)
+    created_by_id = serializers.IntegerField(read_only=True, source='created_by.id')
+    
+    def create(self, validated_data):
+        validated_data['created_by'] = self.context['request'].user
+        return Notes.objects.create(**validated_data)
+    
+    class Meta:
+        model = Notes
+        fields = ("id", "title", "content", "created_at", "updated_at", "created_by", "created_by_id", "event")
+
+
 # Timetable_eventsSerializers
 class Timetable_eventsSerializer(serializers.ModelSerializer):
     title = serializers.CharField(source='event_name')
@@ -149,10 +163,11 @@ class Timetable_eventsDetailsSerializer(serializers.ModelSerializer):
     creator = serializers.StringRelatedField(source='created_by')
     creator_id = serializers.IntegerField(source='created_by_id')
     tasks = Tasks_for_eventSerializer(many=True)
+    notes = NotesSerializer(many=True)
     
     class Meta:
         model = Timetable_events
-        fields = ("id", "title", "start", "end", "event_type", "description", "creator", "creator_id", "tasks", "event_color")
+        fields = ("id", "title", "start", "end", "event_type", "description", "creator", "creator_id", "tasks", "event_color", "notes")
 
 
 # moderatorPanelSerializers

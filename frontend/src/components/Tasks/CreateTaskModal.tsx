@@ -51,7 +51,7 @@ interface Event {
 	description: string | null;
 }
 
-export default function CreateEventModal(props: Props) {
+export default function CreateTaskModal(props: Props) {
 	const [optionsEvents, setOptionsEvents] = useState<any>([]);
 	const [selectedOptionEvent, setSelectedOptionEvent] = useState<number | null>(
 		props.event_id ? props.event_id : null

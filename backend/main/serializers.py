@@ -55,6 +55,15 @@ class Password_resetSerializer(serializers.Serializer):
 class PasswordResetConfirmSerializer(serializers.Serializer):
     token = serializers.CharField()
     password = serializers.CharField()
+    
+    def validate_token(self, value):
+        try:
+            token_obj = PasswordResetToken.objects.get(token=value)
+        except PasswordResetToken.DoesNotExist:
+            raise serializers.ValidationError("Nieprawidłowy token resetu hasła.")
+        if token_obj.is_expired():
+            raise serializers.ValidationError("Token resetu hasła wygasł.")
+        return token_obj
 
     def validate_password(self, value):
         try:
@@ -62,7 +71,10 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
         except ValidationError as e:
             raise serializers.ValidationError(e.messages)
         return value
-        
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        ret.pop('password', None)
+        return ret
         
 # TasksSerializers
 class TasksSerializer(serializers.ModelSerializer):

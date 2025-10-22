@@ -7,9 +7,13 @@ import { useNavigate } from "react-router-dom";
 import { useAlert } from "../../contexts/AlertContext";
 import { useCustomTheme } from "../../contexts/ThemeContext";
 import MyTextField from "../../UI/forms/MyTextField";
+import MyPassField from "../../UI/forms/MyPassField";
 
 interface FormData {
 	email?: string;
+	token?: string;
+	password?: string;
+	confirmPassword?: string;
 }
 
 export default function ResetPassword() {
@@ -17,18 +21,64 @@ export default function ResetPassword() {
 	const { handleSubmit, control, setError } = useForm<FormData>({
 		defaultValues: {
 			email: "",
+			password: "",
 		},
 	});
 	const [showMessage, setShowMessage] = useState(false);
 	const { setAlert } = useAlert();
 	const { mode } = useCustomTheme();
+	const urlParams = new URLSearchParams(window.location.search);
+	const token = urlParams.get("token");
 
 	const submission = (data: FormData) => {
 		AxiosInstance.post(`account/reset_password/`, {
 			email: data.email,
 		})
 			.then((response: any) => {
-				navigate(`/login`);
+				navigate(`/`);
+				setAlert(response.data.message, "success");
+			})
+			.catch((error: any) => {
+				setShowMessage(true);
+				if (
+					error.response &&
+					error.response.data &&
+					error.response.status === 400
+				) {
+					const serverErrors = error.response.data;
+					Object.keys(serverErrors).forEach((field) => {
+						setError(field as keyof FormData, {
+							type: "server",
+							message: serverErrors[field][0],
+						});
+					});
+				} else {
+					console.log(error);
+					setAlert(
+						error.response.data.message
+							? error.response.data.message
+							: error.message,
+						"error"
+					);
+				}
+			});
+	};
+
+	const new_password_submission = (data: FormData) => {
+		if (data.password !== data.confirmPassword) {
+			setError("confirmPassword", {
+				type: "manual",
+				message: "Hasła się nie zgadzają",
+			});
+			return;
+		}
+
+		AxiosInstance.post(`account/reset_password_confirm/`, {
+			token: token,
+			password: data.password,
+		})
+			.then((response: any) => {
+				navigate(`/dashboard`);
 				setAlert(response.data.message, "success");
 			})
 			.catch((error: any) => {
@@ -67,7 +117,9 @@ export default function ResetPassword() {
 				backgroundColor: mode === "light" ? "#f5f5f5" : "#121212",
 			}}
 		>
-			<form onSubmit={handleSubmit(submission)}>
+			<form
+				onSubmit={handleSubmit(token ? new_password_submission : submission)}
+			>
 				<Box
 					sx={{
 						width: 350,
@@ -101,11 +153,29 @@ export default function ResetPassword() {
 					)}
 
 					<Box sx={{ marginBottom: 2, marginTop: 2 }}>
-						<MyTextField
-							label={"Adres e-mail"}
-							name={"email"}
-							control={control}
-						/>
+						{!token ? (
+							<MyTextField
+								label={"Adres e-mail"}
+								name={"email"}
+								control={control}
+							/>
+						) : (
+							<MyPassField
+								label={"Nowe hasło"}
+								name={"password"}
+								control={control}
+							/>
+						)}
+					</Box>
+
+					<Box sx={{ marginBottom: 2, marginTop: 2 }}>
+						{token && (
+							<MyPassField
+								label={"Powtórz nowe hasło"}
+								name={"confirmPassword"}
+								control={control}
+							/>
+						)}
 					</Box>
 
 					<Box sx={{ marginTop: 2, width: "100%", textAlign: "center" }}>

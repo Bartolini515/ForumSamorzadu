@@ -325,9 +325,12 @@ class AccountViewset(viewsets.ModelViewSet):
         if serializer.is_valid():
             user = Profile.objects.get(email=serializer.validated_data['email'])
             token, created = PasswordResetToken.objects.get_or_create(user=user)
+            if not created and token.is_expired():
+                token.delete()
+                token = PasswordResetToken.objects.create(user=user)
 
             origin = request.headers.get('Origin')
-            reset_link = f"{origin}/reset-password?token={token.token}"
+            reset_link = f"{origin}/reset_password?token={token.token}"
 
             send_email_notification.delay(
                 subject="Resetowanie hasła",
@@ -343,14 +346,7 @@ class AccountViewset(viewsets.ModelViewSet):
     def reset_password_confirm(self, request):
         serializer = PasswordResetConfirmSerializer(data=request.data)
         if serializer.is_valid():
-            try:
-                token_obj = PasswordResetToken.objects.get(token=serializer.validated_data['token'])
-            except PasswordResetToken.DoesNotExist:
-                return Response({"message": "Nieprawidłowy token."}, status=404)
-
-            if token_obj.is_expired():
-                token_obj.delete()
-                return Response({"message": "Token wygasł."}, status=400)
+            token_obj = serializer.validated_data['token']
 
             user = token_obj.user
             user.set_password(serializer.validated_data['password'])

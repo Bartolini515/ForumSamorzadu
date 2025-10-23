@@ -29,6 +29,30 @@ const style = {
 	p: 4,
 };
 
+interface User {
+	id: number;
+	first_name: string;
+	last_name: string;
+	email: string;
+}
+
+interface Event {
+	id: number;
+	event_name: string;
+	event_color: string;
+}
+
+interface Task {
+	id: number;
+	task_name: string;
+	description: string | null;
+	users: User[];
+	completion_status: boolean;
+	due_date: string;
+	event: Event;
+	max_users: number;
+}
+
 interface Props {
 	id: number;
 	event: {
@@ -41,14 +65,7 @@ interface Props {
 		description: string;
 		creator: string;
 		creator_id: string;
-		tasks: {
-			id: string;
-			task_name: string;
-			task_description: string;
-			assigned: string;
-			completion_status: boolean;
-			due_date: string;
-		}[];
+		tasks: Task[];
 		is_creator: boolean;
 	};
 	open: boolean;

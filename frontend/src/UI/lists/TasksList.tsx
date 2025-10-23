@@ -3,24 +3,41 @@ import TaskDescriptionModal from "../../components/timetable/modals/TaskDescript
 import Chip from "@mui/material/Chip";
 import Stack from "@mui/material/Stack";
 
+interface User {
+	id: number;
+	first_name: string;
+	last_name: string;
+	email: string;
+}
+
+interface Event {
+	id: number;
+	event_name: string;
+	event_color: string;
+}
+
+interface Task {
+	id: number;
+	task_name: string;
+	description: string | null;
+	users: User[];
+	completion_status: boolean;
+	due_date: string;
+	event: Event;
+	max_users: number;
+}
+
 interface Props {
-	tasks: {
-		id: string;
-		task_name: string;
-		task_description: string;
-		assigned: string;
-		completion_status: boolean;
-		due_date: string;
-	}[];
+	tasks: Task[];
 	is_creator: boolean;
 	isAdmin: boolean;
 	onClose?: () => void;
 }
 
 export default function TasksList(props: Props) {
-	const [taskId, setTaskId] = useState<string | null>(null);
+	const [taskId, setTaskId] = useState<number | null>(null);
 	const [taskDescription, setTaskDescription] = useState<string | null>(null);
-	const [taskAssigned, setTaskAssigned] = useState<string | null>(null);
+	const [taskAssigned, setTaskAssigned] = useState<User[]>([]);
 	const [taskCompletionStatus, setTaskCompletionStatus] = useState<
 		boolean | null
 	>(null);
@@ -28,10 +45,10 @@ export default function TasksList(props: Props) {
 	const [modalOpen, setModalOpen] = useState(false);
 
 	const handleTaskClick = (
-		task_id: string,
-		task_description: string,
+		task_id: number,
+		task_description: string | null,
 		task_due_date: string,
-		task_assigned: string,
+		task_assigned: User[],
 		task_completion_status: boolean
 	) => {
 		setTaskId(task_id);
@@ -46,7 +63,7 @@ export default function TasksList(props: Props) {
 		setModalOpen(false);
 		setTaskDescription(null);
 		setTaskDueDate(null);
-		setTaskAssigned(null);
+		setTaskAssigned([]);
 		setTaskCompletionStatus(null);
 		setTaskId(null);
 		if (props.onClose) {
@@ -81,9 +98,9 @@ export default function TasksList(props: Props) {
 						onClick={() =>
 							handleTaskClick(
 								task.id,
-								task.task_description,
+								task.description,
 								task.due_date,
-								task.assigned,
+								task.users,
 								task.completion_status
 							)
 						}

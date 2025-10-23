@@ -7,17 +7,28 @@ import { useAuth } from "../../contexts/AuthContext";
 import DashboardTasks from "./DashboardTasks";
 import { Skeleton } from "@mui/material";
 
+interface User {
+	id: number;
+	first_name: string;
+	last_name: string;
+	email: string;
+}
+
+interface Event {
+	id: number;
+	event_name: string;
+	event_color: string;
+}
+
 interface Task {
 	id: number;
 	task_name: string;
 	description: string | null;
-	users: number[] | null;
+	users: User[];
 	completion_status: boolean;
-	due_date: string | null;
-	event: string | null;
-	event_id: number | null;
-	user_id: number | null;
-	color: string;
+	due_date: string;
+	event: Event;
+	max_users: number;
 }
 
 export default function Dashboard() {
@@ -54,7 +65,7 @@ export default function Dashboard() {
 									.toISOString()
 									.split("T")[0]) ||
 							(task.due_date === null && task.completion_status === false)) &&
-						task.user_id === user?.id &&
+						task.users.some((user_e) => user_e.id === user?.id) &&
 						task.completion_status === false
 					) {
 						tempTasks.push(task);

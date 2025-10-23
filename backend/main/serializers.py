@@ -102,7 +102,7 @@ class TasksSerializer(serializers.ModelSerializer):
     
     def update(self, instance, validated_data):
         instance.completion_status = validated_data.get('completion_status', instance.completion_status)
-        instance.user_id = validated_data.get('user_id', instance.user_id)
+        instance.users.set(validated_data.get('users', instance.users.all()))
         instance.save()
         return instance
     
@@ -111,20 +111,20 @@ class TasksSerializer(serializers.ModelSerializer):
         fields = ('id', 'task_name', 'description', 'users', 'completion_status', 'due_date', 'event', 'max_users')
         
 class Tasks_for_displaySerializer(serializers.ModelSerializer):
-    users = serializers.StringRelatedField(many=True)
-    event = serializers.StringRelatedField()
-    color = serializers.CharField(source='event.event_color')
+    class UserSerializer(serializers.ModelSerializer):
+        class Meta:
+            model = Profile
+            fields = ('id', 'first_name', 'last_name', 'email')
+    class EventSerializer(serializers.ModelSerializer):
+        class Meta:
+            model = Timetable_events
+            fields = ('id', 'event_name', 'event_color')
+    users = UserSerializer(many=True, read_only=True)
+    event = EventSerializer(read_only=True)
     
     class Meta:
         model = Tasks
-        fields = ('id', 'task_name', 'description', 'users', 'completion_status', 'due_date', 'event', 'user_id', 'event_id', "color")
-
-class Tasks_for_eventSerializer(serializers.ModelSerializer):
-    task_description = serializers.CharField(source='description')
-    assigned = serializers.StringRelatedField(source='users')
-    class Meta:
-        model = Tasks
-        fields = ('id', 'task_name', 'task_description', 'assigned', 'completion_status', 'due_date')
+        fields = ('id', 'task_name', 'description', 'users', 'completion_status', 'due_date', 'event', 'max_users')
 
 
 # NotesSerializers
@@ -173,7 +173,7 @@ class Timetable_eventsDetailsSerializer(serializers.ModelSerializer):
     event_type = serializers.StringRelatedField()
     creator = serializers.StringRelatedField(source='created_by')
     creator_id = serializers.IntegerField(source='created_by_id')
-    tasks = Tasks_for_eventSerializer(many=True)
+    tasks = Tasks_for_displaySerializer(many=True)
     notes = NotesSerializer(many=True)
     
     class Meta:

@@ -9,11 +9,18 @@ import AxiosInstance from "../../AxiosInstance";
 import { useAlert } from "../../../contexts/AlertContext";
 import { useCustomTheme } from "../../../contexts/ThemeContext";
 
+interface User {
+	id: number;
+	first_name: string;
+	last_name: string;
+	email: string;
+}
+
 interface Props {
-	task_id: string | null;
+	task_id: number | null;
 	task_description: string | null;
 	task_due_date: string | null;
-	task_assigned: string | null;
+	task_assigned: User[];
 	task_completion_Status: boolean | null;
 	is_creator: boolean;
 	isAdmin: boolean;
@@ -120,13 +127,27 @@ export default function TaskDescriptionModal(props: Props) {
 								color: mode === "light" ? "#2c3e50" : "#ffffff",
 							}}
 						>
-							Przypisana osoba
+							{props.task_assigned.length > 1
+								? "Przypisane osoby"
+								: "Przypisana osoba"}
 						</Typography>
 
-						<Chip
-							sx={{ mb: 3 }}
-							label={props.task_assigned ? props.task_assigned : "Brak"}
-						/>
+						<Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mb: 3 }}>
+							{props.task_assigned.length > 0 ? (
+								props.task_assigned.map((user) => (
+									<Chip
+										key={user.id}
+										label={`${user.first_name} ${user.last_name}`}
+									/>
+								))
+							) : (
+								<Typography
+									sx={{ color: mode === "light" ? "#34495e" : "#bdc3c7" }}
+								>
+									Brak
+								</Typography>
+							)}
+						</Box>
 
 						{/* <Typography
 							id="TaskDescription-modal-description"
@@ -223,7 +244,7 @@ export default function TaskDescriptionModal(props: Props) {
 								content={"Nie będziesz mógł cofnąć tej akcji."}
 								onCloseOption2={() => {
 									if (props.task_id) {
-										DeleteTask(parseInt(props.task_id));
+										DeleteTask(props.task_id);
 										props.onClose();
 									}
 									setOpenDialog(false);

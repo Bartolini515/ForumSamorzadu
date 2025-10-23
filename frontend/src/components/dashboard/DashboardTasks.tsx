@@ -3,17 +3,28 @@ import MyButton from "../../UI/forms/MyButton";
 import { useNavigate } from "react-router-dom";
 import { differenceInCalendarDays } from "date-fns";
 
+interface User {
+	id: number;
+	first_name: string;
+	last_name: string;
+	email: string;
+}
+
+interface Event {
+	id: number;
+	event_name: string;
+	event_color: string;
+}
+
 interface Task {
 	id: number;
 	task_name: string;
 	description: string | null;
-	users: number[] | null;
+	users: User[];
 	completion_status: boolean;
-	due_date: string | null;
-	event: string | null;
-	event_id: number | null;
-	user_id: number | null;
-	color: string;
+	due_date: string;
+	event: Event;
+	max_users: number;
 }
 
 interface Props {
@@ -86,8 +97,8 @@ export default function DashboardTasks(props: Props) {
 						<Chip
 							label={<Typography>{task.task_name}</Typography>}
 							sx={{
-								backgroundColor: `#${task.color || "1976d2"}`,
-								color: getContrastingColor(task.color || "1976d2"),
+								backgroundColor: `#${task.event.event_color || "1976d2"}`,
+								color: getContrastingColor(task.event.event_color || "1976d2"),
 							}}
 						/>
 						{task.due_date && (

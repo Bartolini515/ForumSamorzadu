@@ -39,6 +39,40 @@ interface Props {
 	onClose: () => void;
 }
 
+interface Note {
+	id: string;
+	title: string;
+	content: string;
+	created_at: string;
+	updated_at: string;
+	created_by: string;
+	created_by_id: string;
+}
+
+interface User {
+	id: number;
+	first_name: string;
+	last_name: string;
+	email: string;
+}
+
+interface Event {
+	id: number;
+	event_name: string;
+	event_color: string;
+}
+
+interface Task {
+	id: number;
+	task_name: string;
+	description: string | null;
+	users: User[];
+	completion_status: boolean;
+	due_date: string;
+	event: Event;
+	max_users: number;
+}
+
 interface EventData {
 	id: number;
 	title: string;
@@ -49,23 +83,8 @@ interface EventData {
 	description: string;
 	creator: string;
 	creator_id: string;
-	tasks: {
-		id: string;
-		task_name: string;
-		task_description: string;
-		assigned: string;
-		completion_status: boolean;
-		due_date: string;
-	}[];
-	notes: {
-		id: string;
-		title: string;
-		content: string;
-		created_at: string;
-		updated_at: string;
-		created_by: string;
-		created_by_id: string;
-	}[];
+	tasks: Task[];
+	notes: Note[];
 	is_creator: boolean;
 }
 

@@ -7,17 +7,28 @@ import { differenceInCalendarDays } from "date-fns";
 import AlertDialog from "../../UI/dialogs/AlertDialog";
 import { useState } from "react";
 
+interface User {
+	id: number;
+	first_name: string;
+	last_name: string;
+	email: string;
+}
+
+interface Event {
+	id: number;
+	event_name: string;
+	event_color: string;
+}
+
 interface Task {
 	id: number;
 	task_name: string;
 	description: string | null;
-	user: string | null;
+	users: User[];
 	completion_status: boolean;
-	due_date: string | null;
-	event: string | null;
-	event_id: number | null;
-	user_id: number | null;
-	color: string;
+	due_date: string;
+	event: Event;
+	max_users: number;
 }
 
 interface Props {
@@ -84,8 +95,13 @@ export default function DisplayTasks(props: Props) {
 			});
 	};
 
-	const ChangeAssigned = (id: number, user_id: number | null) => {
-		const payload = user_id ? { user_id: null } : { user_id: user?.id };
+	const ChangeAssigned = (id: number, users: number[]) => {
+		if (users.includes(user!.id)) {
+			users = users.filter((userId) => userId !== user!.id);
+		} else {
+			users.push(user!.id);
+		}
+		const payload = { users: users };
 		AxiosInstance.put(`tasks/${id}/update_assigned/`, payload)
 			.then((response) => {
 				setAlert(response.data.message, "success");
@@ -125,8 +141,11 @@ export default function DisplayTasks(props: Props) {
 		setOpenDialog(true);
 	};
 
-	const handleTakeTask = (id: number, user_id: number | null) => {
-		ChangeAssigned(id, user_id ? user_id : null);
+	const handleTakeTask = (id: number, users: User[]) => {
+		ChangeAssigned(
+			id,
+			users.map((user) => user.id)
+		);
 	};
 
 	const handleDeleteTask = (id: number) => {
@@ -159,6 +178,7 @@ export default function DisplayTasks(props: Props) {
 								minHeight: "350px",
 								maxHeight: "max-content",
 								minWidth: "300px",
+								maxWidth: "450px",
 								gap: "10px",
 							}}
 						>
@@ -174,8 +194,10 @@ export default function DisplayTasks(props: Props) {
 									label={<Typography variant="h6">{task.task_name}</Typography>}
 									sx={{
 										zIndex: 3,
-										backgroundColor: `#${task.color || "1976d2"}`,
-										color: getContrastingColor(task.color || "1976d2"),
+										backgroundColor: `#${task.event.event_color || "1976d2"}`,
+										color: getContrastingColor(
+											task.event.event_color || "1976d2"
+										),
 									}}
 								/>
 								<Box
@@ -183,11 +205,14 @@ export default function DisplayTasks(props: Props) {
 										position: "absolute",
 										alignItems: "center",
 										justifyContent: "center",
-										backgroundColor: task.user_id
-											? statusMap[
-													task.completion_status.toString() as "true" | "false"
-											  ].backgroundColor
-											: "#686868",
+										backgroundColor:
+											task.users.length > 0
+												? statusMap[
+														task.completion_status.toString() as
+															| "true"
+															| "false"
+												  ].backgroundColor
+												: "#686868",
 										marginTop: 0,
 										top: "17px",
 										width: "90%",
@@ -205,16 +230,17 @@ export default function DisplayTasks(props: Props) {
 											marginTop: "2px",
 											textAlign: "center",
 											fontWeight: "600",
-											color: task.user_id
-												? statusMap[
-														task.completion_status.toString() as
-															| "true"
-															| "false"
-												  ].color
-												: "#e7e7e7",
+											color:
+												task.users.length > 0
+													? statusMap[
+															task.completion_status.toString() as
+																| "true"
+																| "false"
+													  ].color
+													: "#e7e7e7",
 										}}
 									>
-										{task.user_id
+										{task.users.length > 0
 											? statusMap[
 													task.completion_status.toString() as "true" | "false"
 											  ].statusText
@@ -247,13 +273,23 @@ export default function DisplayTasks(props: Props) {
 								<Typography sx={{ fontWeight: "bold" }} component="span">
 									Wydarzenie:
 								</Typography>{" "}
-								{task.event ? task.event : "Bez wydarzenia"}
+								{task.event.event_name}
 							</Typography>
 							<Typography component="div">
 								<Typography sx={{ fontWeight: "bold" }} component="span">
 									Przypisane do:
 								</Typography>{" "}
-								{task.user ? task.user : "Nieprzypisane"}
+								{task.users.length > 0
+									? task.users
+											.map((user) => user.first_name + " " + user.last_name)
+											.join(", ")
+									: "Nieprzypisane"}
+							</Typography>
+							<Typography component="div">
+								<Typography sx={{ fontWeight: "bold" }} component="span">
+									Liczba przypisanych osób:
+								</Typography>{" "}
+								{task.users.length} / {task.max_users}
 							</Typography>
 
 							{task.due_date && (
@@ -293,9 +329,9 @@ export default function DisplayTasks(props: Props) {
 								}}
 							>
 								{((task.completion_status === false &&
-									task.user_id &&
-									task.user_id === user?.id) ||
-									(task.user_id && isAdmin)) && (
+									task.users.length > 0 &&
+									task.users.some((user_e) => user_e.id === user?.id)) ||
+									(task.users.length > 0 && isAdmin)) && (
 									<MyButton
 										label={
 											task.completion_status
@@ -310,25 +346,27 @@ export default function DisplayTasks(props: Props) {
 										}}
 									/>
 								)}
-								{(task.user === null ||
-									(task.user_id &&
-										task.user_id === user?.id &&
+								{(task.users.length < task.max_users ||
+									(task.users.length > 0 &&
+										task.users.some((user_e) => user_e.id === user?.id) &&
 										task.completion_status === false)) && (
 									<MyButton
 										label={
-											task.user ? "Zrezygnuj z zadania" : "Przypisz do siebie"
+											task.users.some((user_e) => user_e.id === user?.id)
+												? "Zrezygnuj z zadania"
+												: "Przypisz do siebie"
 										}
 										color="secondary"
 										type={"button"}
 										style={{ marginBottom: "10px", marginTop: "0px" }}
 										onClick={() => {
-											handleTakeTask(task.id, task.user_id);
+											handleTakeTask(task.id, task.users);
 										}}
 									/>
 								)}
 								{(isAdmin ||
 									user?.created_events.find(
-										(event_id) => event_id === task.event_id
+										(event_id) => event_id === task.event.id
 									)) && (
 									<MyButton
 										label={"Usuń zadanie"}

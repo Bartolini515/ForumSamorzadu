@@ -378,8 +378,8 @@ class TasksViewset(viewsets.ModelViewSet):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            if serializer.data.get('users_id') is not None:
-                users = User.objects.filter(pk__in=serializer.data.get('users_id'))
+            if serializer.data.get('users') is not None:
+                users = User.objects.filter(pk__in=serializer.data.get('users'))
                 event = Timetable_events.objects.get(pk=serializer.data.get('event'))
                 if users and event:
                     for user in users:
@@ -426,7 +426,8 @@ class TasksViewset(viewsets.ModelViewSet):
     @action(detail=True, methods=["put"], url_path="update_assigned")
     def updateAssigned(self, request, pk=None):
         queryset = self.queryset.get(pk=pk)
-        serializer = self.serializer_class(queryset, data=request.data, partial=True)
+        data = request.data.copy()
+        serializer = self.serializer_class(queryset, data=data, partial=True)
 
         if serializer.is_valid():
             serializer.save()

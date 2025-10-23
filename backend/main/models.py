@@ -113,15 +113,11 @@ class Notes(models.Model):
 
 
 class TasksManager(models.Manager):
-    def create_task(self, task_name, description, user_id, due_date, event):
-        user = None
-        if user_id:
-            try:
-                user = Profile.objects.get(pk=user_id)
-            except Profile.DoesNotExist:
-                pass
-        task = self.model(task_name=task_name, description=description, user=user, completion_status=False, due_date=due_date, event=event)
+    def create_task(self, task_name, description, users, due_date, event, max_users=1):
+        task = self.model(task_name=task_name, description=description, completion_status=False, due_date=due_date, event=event, max_users=max_users)
         task.save(using=self._db)
+        if users:
+            task.users.set(users)
         return task
 
 class Tasks(models.Model):

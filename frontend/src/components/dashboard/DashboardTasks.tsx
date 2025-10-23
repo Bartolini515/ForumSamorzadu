@@ -7,7 +7,7 @@ interface Task {
 	id: number;
 	task_name: string;
 	description: string | null;
-	user: string | null;
+	users: number[] | null;
 	completion_status: boolean;
 	due_date: string | null;
 	event: string | null;

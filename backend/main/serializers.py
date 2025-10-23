@@ -78,7 +78,18 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
         
 # TasksSerializers
 class TasksSerializer(serializers.ModelSerializer):
-    user_id = serializers.IntegerField(allow_null=True)
+    users = serializers.PrimaryKeyRelatedField(many=True, queryset=Profile.objects.all(), allow_null=True)
+    
+    def validate(self, data):
+        """
+        Check that the number of users does not exceed max_users.
+        """
+        users = data.get('users')
+        max_users = data.get('max_users')
+
+        if users and max_users is not None and len(users) > max_users:
+            raise serializers.ValidationError({'users': f"Liczba przypisanych użytkowników ({len(users)}) nie może przekraczać maksymalnej liczby użytkowników ({max_users})."})
+        return data
     
     def create(self, validated_data):
         due_date = validated_data.get('due_date', None)
@@ -97,20 +108,20 @@ class TasksSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Tasks
-        fields = ('id', 'task_name', 'description', 'user', 'completion_status', 'due_date', 'event', 'user_id')
+        fields = ('id', 'task_name', 'description', 'users', 'completion_status', 'due_date', 'event', 'max_users')
         
 class Tasks_for_displaySerializer(serializers.ModelSerializer):
-    user = serializers.StringRelatedField()
+    users = serializers.StringRelatedField(many=True)
     event = serializers.StringRelatedField()
     color = serializers.CharField(source='event.event_color')
     
     class Meta:
         model = Tasks
-        fields = ('id', 'task_name', 'description', 'user', 'completion_status', 'due_date', 'event', 'user_id', 'event_id', "color")
+        fields = ('id', 'task_name', 'description', 'users', 'completion_status', 'due_date', 'event', 'user_id', 'event_id', "color")
 
 class Tasks_for_eventSerializer(serializers.ModelSerializer):
     task_description = serializers.CharField(source='description')
-    assigned = serializers.StringRelatedField(source='user')
+    assigned = serializers.StringRelatedField(source='users')
     class Meta:
         model = Tasks
         fields = ('id', 'task_name', 'task_description', 'assigned', 'completion_status', 'due_date')

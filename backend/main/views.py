@@ -378,12 +378,13 @@ class TasksViewset(viewsets.ModelViewSet):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            if serializer.data.get('user_id') is not None:
-                user = User.objects.get(pk=serializer.data.get('user_id'))
+            if serializer.data.get('users_id') is not None:
+                users = User.objects.filter(pk__in=serializer.data.get('users_id'))
                 event = Timetable_events.objects.get(pk=serializer.data.get('event'))
-                if user and event:
-                    send_email_notification.delay(
-                        subject="Zadanie zostało przypisane",
+                if users and event:
+                    for user in users:
+                        send_email_notification.delay(
+                            subject="Zadanie zostało przypisane",
                         message=f"Przypisano do Ciebie zadanie: {serializer.data['task_name']} w wydarzeniu {event.event_name}.",
                         recipient_list=[user.email]
                     )
@@ -429,18 +430,18 @@ class TasksViewset(viewsets.ModelViewSet):
 
         if serializer.is_valid():
             serializer.save()
-            if serializer.data.get('user_id') is not None:
-                user = User.objects.get(pk=serializer.data.get('user_id'))
-                if (event_id := serializer.data.get('event')) and user:
-                    try:
-                        event = Timetable_events.objects.get(pk=event_id)
-                        send_email_notification.delay(
-                            subject="Zadanie twojego wydarzenia zostało przypisane",
-                            message=f'Użytkownikowi {user.first_name} {user.last_name} zostało przypisane zadanie "{serializer.data["task_name"]}" do wydarzenia: {event.event_name}.',
-                            recipient_list=[event.created_by.email]
-                        )
-                    except Timetable_events.DoesNotExist:
-                        pass
+            # if serializer.data.get('user_id') is not None:
+            #     user = User.objects.get(pk=serializer.data.get('user_id'))
+            #     if (event_id := serializer.data.get('event')) and user:
+            #         try:
+            #             event = Timetable_events.objects.get(pk=event_id)
+            #             send_email_notification.delay(
+            #                 subject="Zadanie twojego wydarzenia zostało przypisane",
+            #                 message=f'Użytkownikowi {user.first_name} {user.last_name} zostało przypisane zadanie "{serializer.data["task_name"]}" do wydarzenia: {event.event_name}.',
+            #                 recipient_list=[event.created_by.email]
+            #             )
+            #         except Timetable_events.DoesNotExist:
+            #             pass
             cache.delete('tasks_list')
             return message_response(serializer.data, "Przypisanie zmienione")
         else:

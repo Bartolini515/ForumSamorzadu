@@ -12,6 +12,7 @@ import MyDatePicker from "../../UI/forms/MyDatePicker";
 import MySelect from "../../UI/forms/MySelect";
 import { useEffect, useState } from "react";
 import { useAlert } from "../../contexts/AlertContext";
+import MyMultiSelectChip from "../../UI/forms/MyMultiSelectChip";
 
 const style = {
 	position: "absolute",
@@ -38,9 +39,10 @@ interface Props {
 interface FormData {
 	task_name: string;
 	description: string;
-	event?: number | null;
+	event: number | null;
 	due_date?: Date | null;
-	user?: number | null;
+	users?: number[] | null;
+	max_users?: number | null;
 }
 
 interface Event {
@@ -51,17 +53,15 @@ interface Event {
 	description: string | null;
 }
 
-export default function CreateEventModal(props: Props) {
+export default function CreateTaskModal(props: Props) {
 	const [optionsEvents, setOptionsEvents] = useState<any>([]);
 	const [selectedOptionEvent, setSelectedOptionEvent] = useState<number | null>(
 		props.event_id ? props.event_id : null
 	);
+	const [selectedMaxUsers, setSelectedMaxUsers] = useState<number | null>(null);
 	const [optionsUsers, setOptionsUsers] = useState<
 		{ id: number; option: string }[]
 	>([]);
-	const [selectedOptionUser, setSelectedOptionUser] = useState<number | null>(
-		null
-	);
 	const [events, setEvents] = useState<Event[]>([]);
 	const [maxDate, setMaxDate] = useState<Date | undefined>(undefined);
 	const { handleSubmit, control, setError, clearErrors, resetField } =
@@ -71,7 +71,8 @@ export default function CreateEventModal(props: Props) {
 				description: "",
 				event: props.event_id ? props.event_id : selectedOptionEvent,
 				due_date: null,
-				user: selectedOptionUser,
+				users: [],
+				max_users: null,
 			},
 		});
 
@@ -87,7 +88,8 @@ export default function CreateEventModal(props: Props) {
 				? data.due_date.toISOString().split("T")[0]
 				: null,
 			event: data.event,
-			user_id: selectedOptionUser,
+			users: data.users,
+			max_users: data.max_users ? data.max_users : data.users?.length || null,
 		};
 		AxiosInstance.post(`tasks/`, payload)
 			.then((response) => {
@@ -196,6 +198,11 @@ export default function CreateEventModal(props: Props) {
 	const handleClick = () => {
 		clearErrors();
 	};
+
+	const maxUsersOptions = Array.from({ length: 10 }, (_, i) => ({
+		id: i + 1,
+		option: (i + 1).toString(),
+	}));
 
 	return (
 		<>
@@ -353,17 +360,45 @@ export default function CreateEventModal(props: Props) {
 										marginBottom: "20px",
 									}}
 								>
+									<Box
+										sx={{
+											fontWeight: "bold",
+											alignContent: "center",
+										}}
+									>
+										Ilość maksymalna użytkowników:{" "}
+									</Box>
+									<Box sx={{ marginLeft: "10px" }}>
+										<MySelect
+											label="Ilość maksymalna użytkowników"
+											name="max_users"
+											control={control}
+											options={maxUsersOptions}
+											selectedOption={selectedMaxUsers}
+											setSelectedOption={setSelectedMaxUsers}
+											style={{ width: "100px" }}
+										/>
+									</Box>
+								</Box>
+
+								<Box
+									sx={{
+										boxShadow: 3,
+										padding: "20px",
+										display: "flex",
+										flexDirection: "row",
+										marginBottom: "20px",
+									}}
+								>
 									<Box sx={{ fontWeight: "bold", alignContent: "center" }}>
 										Przypisanie:{" "}
 									</Box>
 									<Box sx={{ marginLeft: "10px" }}>
-										<MySelect
+										<MyMultiSelectChip
 											label="Przypisanie"
-											name="user"
+											name="users"
 											options={optionsUsers}
 											control={control}
-											selectedOption={selectedOptionUser}
-											setSelectedOption={setSelectedOptionUser}
 											helperText={
 												"Pozostaw puste, aby nie przypisywać użytkownika do zadania"
 											}

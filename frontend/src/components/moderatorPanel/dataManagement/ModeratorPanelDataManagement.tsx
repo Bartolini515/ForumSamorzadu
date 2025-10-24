@@ -20,6 +20,7 @@ export default function ModeratorPanelDataManagement() {
 				"Imię",
 				"Nazwisko",
 				"Email",
+				"Rola",
 				"Ostatnie logowanie",
 				"Aktywny",
 				"Administrator",
@@ -37,6 +38,7 @@ export default function ModeratorPanelDataManagement() {
 				password: data.password,
 				first_name: data.first_name,
 				last_name: data.last_name,
+				role: data.role,
 			}),
 		},
 		event_types: {

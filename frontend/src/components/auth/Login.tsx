@@ -3,10 +3,9 @@ import { Box, Typography } from "@mui/material";
 import MyTextField from "../../UI/forms/MyTextField";
 import MyPassField from "../../UI/forms/MyPassField";
 import MyButton from "../../UI/forms/MyButton";
-// import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import AxiosInstance from "../AxiosInstance";
-import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import { useAlert } from "../../contexts/AlertContext";
 import { useCustomTheme } from "../../contexts/ThemeContext";
@@ -135,15 +134,25 @@ export default function Login() {
 						<MyPassField label={"Hasło"} name={"password"} control={control} />
 					</Box>
 
-					<Box sx={{ marginTop: 2 }}>
-						<MyButton label={"Zaloguj"} type={"submit"} />
+					<Box sx={{ marginTop: 2, width: "100%", textAlign: "center" }}>
+						<MyButton
+							label={"Zaloguj"}
+							type={"submit"}
+							style={{ width: "100%" }}
+						/>
 					</Box>
 
-					{/* <Box sx={{ textAlign: "center", marginTop: 2 }}>
-                        <Link href="/request/password_reset" underline="hover">
-                            Forgot password?
-                        </Link>
-                    </Box> */}
+					<Box sx={{ textAlign: "center", marginTop: 2 }}>
+						<Link
+							to="/reset_password"
+							style={{
+								color: mode === "light" ? "blue" : "lightblue",
+								textDecoration: "underline",
+							}}
+						>
+							Zapomniałeś hasła?
+						</Link>
+					</Box>
 				</Box>
 			</form>
 		</Box>

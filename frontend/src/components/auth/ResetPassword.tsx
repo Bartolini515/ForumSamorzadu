@@ -1,31 +1,70 @@
 import { useState } from "react";
 import { Box, Typography } from "@mui/material";
-import MyPassField from "../../UI/forms/MyPassField";
 import MyButton from "../../UI/forms/MyButton";
 import { useForm } from "react-hook-form";
 import AxiosInstance from "../AxiosInstance";
 import { useNavigate } from "react-router-dom";
 import { useAlert } from "../../contexts/AlertContext";
 import { useCustomTheme } from "../../contexts/ThemeContext";
+import MyTextField from "../../UI/forms/MyTextField";
+import MyPassField from "../../UI/forms/MyPassField";
 
 interface FormData {
+	email?: string;
+	token?: string;
 	password?: string;
 	confirmPassword?: string;
 }
 
-export default function ChangePasswordLogin() {
+export default function ResetPassword() {
 	const navigate = useNavigate();
 	const { handleSubmit, control, setError } = useForm<FormData>({
 		defaultValues: {
+			email: "",
 			password: "",
-			confirmPassword: "",
 		},
 	});
 	const [showMessage, setShowMessage] = useState(false);
 	const { setAlert } = useAlert();
 	const { mode } = useCustomTheme();
+	const urlParams = new URLSearchParams(window.location.search);
+	const token = urlParams.get("token");
 
 	const submission = (data: FormData) => {
+		AxiosInstance.post(`account/reset_password/`, {
+			email: data.email,
+		})
+			.then((response: any) => {
+				navigate(`/`);
+				setAlert(response.data.message, "success");
+			})
+			.catch((error: any) => {
+				setShowMessage(true);
+				if (
+					error.response &&
+					error.response.data &&
+					error.response.status === 400
+				) {
+					const serverErrors = error.response.data;
+					Object.keys(serverErrors).forEach((field) => {
+						setError(field as keyof FormData, {
+							type: "server",
+							message: serverErrors[field][0],
+						});
+					});
+				} else {
+					console.log(error);
+					setAlert(
+						error.response.data.message
+							? error.response.data.message
+							: error.message,
+						"error"
+					);
+				}
+			});
+	};
+
+	const new_password_submission = (data: FormData) => {
 		if (data.password !== data.confirmPassword) {
 			setError("confirmPassword", {
 				type: "manual",
@@ -34,7 +73,8 @@ export default function ChangePasswordLogin() {
 			return;
 		}
 
-		AxiosInstance.post(`account/change_password/`, {
+		AxiosInstance.post(`account/reset_password_confirm/`, {
+			token: token,
 			password: data.password,
 		})
 			.then((response: any) => {
@@ -77,7 +117,9 @@ export default function ChangePasswordLogin() {
 				backgroundColor: mode === "light" ? "#f5f5f5" : "#121212",
 			}}
 		>
-			<form onSubmit={handleSubmit(submission)}>
+			<form
+				onSubmit={handleSubmit(token ? new_password_submission : submission)}
+			>
 				<Box
 					sx={{
 						width: 350,
@@ -95,7 +137,7 @@ export default function ChangePasswordLogin() {
 							fontWeight: "bold",
 						}}
 					>
-						Zmień hasło
+						Reset hasła
 					</Typography>
 
 					{showMessage && (
@@ -106,29 +148,39 @@ export default function ChangePasswordLogin() {
 								textAlign: "center",
 							}}
 						>
-							Zmiana hasła nie powiodła się, proszę spróbować ponownie.
+							Resetowanie hasła nie powiodło się, proszę spróbować ponownie.
 						</Typography>
 					)}
 
-					<Box sx={{ marginBottom: 2 }}>
-						<MyPassField
-							label={"Nowe hasło"}
-							name={"password"}
-							control={control}
-						/>
+					<Box sx={{ marginBottom: 2, marginTop: 2 }}>
+						{!token ? (
+							<MyTextField
+								label={"Adres e-mail"}
+								name={"email"}
+								control={control}
+							/>
+						) : (
+							<MyPassField
+								label={"Nowe hasło"}
+								name={"password"}
+								control={control}
+							/>
+						)}
 					</Box>
 
 					<Box sx={{ marginBottom: 2, marginTop: 2 }}>
-						<MyPassField
-							label={"Potwierdź hasło"}
-							name={"confirmPassword"}
-							control={control}
-						/>
+						{token && (
+							<MyPassField
+								label={"Powtórz nowe hasło"}
+								name={"confirmPassword"}
+								control={control}
+							/>
+						)}
 					</Box>
 
 					<Box sx={{ marginTop: 2, width: "100%", textAlign: "center" }}>
 						<MyButton
-							label={"Zmień hasło"}
+							label={"Zresetuj hasło"}
 							type={"submit"}
 							style={{ width: "100%" }}
 						/>

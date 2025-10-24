@@ -10,6 +10,7 @@ router.register('account', AccountViewset, basename='account')
 router.register('tasks', TasksViewset, basename='tasks')
 router.register('schedule', ScheduleViewset, basename='schedule')
 router.register('utilities', UtilitiesViewset, basename='utilities')
+router.register('notes', NotesViewset, basename='notes')
 urlpatterns = router.urls
 if not settings.DEBUG:
     urlpatterns = [url for url in urlpatterns if url.name != 'api-root']

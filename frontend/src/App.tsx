@@ -18,11 +18,14 @@ import { plPL } from "@mui/x-date-pickers/locales";
 import Account from "./components/account/Account";
 import ModeratorPanelConfiguration from "./components/moderatorPanel/ModeratorPanelConfiguration";
 import Settings from "./components/settings/Settings";
+import ResetPassword from "./components/auth/ResetPassword";
 
 export default function App() {
 	const location = useLocation();
 	const noNavbar =
-		location.pathname === "/" || location.pathname === "/change_password";
+		location.pathname === "/" ||
+		location.pathname === "/change_password" ||
+		location.pathname === "/reset_password";
 
 	return (
 		<LocalizationProvider
@@ -37,6 +40,7 @@ export default function App() {
 				<Routes>
 					<Route path="/" element={<Login />} />
 					<Route path="/change_password" element={<ChangePassword />} />
+					<Route path="/reset_password" element={<ResetPassword />} />
 				</Routes>
 			) : (
 				<Navbar

@@ -9,17 +9,28 @@ import { useAuth } from "../../contexts/AuthContext";
 import FAB from "../../UI/forms/FAB";
 import CreateTaskModal from "./CreateTaskModal";
 
+interface User {
+	id: number;
+	first_name: string;
+	last_name: string;
+	email: string;
+}
+
+interface Event {
+	id: number;
+	event_name: string;
+	event_color: string;
+}
+
 interface Task {
-	id: string;
+	id: number;
 	task_name: string;
 	description: string | null;
-	user: string | null;
+	users: User[];
 	completion_status: boolean;
-	due_date: string | null;
-	event: string | null;
-	event_id: number | null;
-	user_id: number | null;
-	color: string;
+	due_date: string;
+	event: Event;
+	max_users: number;
 }
 
 export default function Tasks() {
@@ -36,10 +47,13 @@ export default function Tasks() {
 	const { setAlert } = useAlert();
 	const { user } = useAuth();
 
-	const filteredTasks: any = tasks.filter((task: any) => {
-		const unassignedUser = task.user_id === null && selectedOptionUser === 0;
-		const matchesUser = task.user_id === selectedOptionUser;
-		const matchesEvent = selectedOptionEvent.includes(task.event);
+	const filteredTasks: Task[] = tasks.filter((task: Task) => {
+		const unassignedUser =
+			task.users.length < task.max_users && selectedOptionUser === 0;
+		const matchesUser = task.users.some(
+			(user) => user.id === selectedOptionUser
+		);
+		const matchesEvent = selectedOptionEvent.includes(task.event.event_name);
 
 		return (matchesUser && matchesEvent) || (unassignedUser && matchesEvent);
 	});
@@ -48,34 +62,21 @@ export default function Tasks() {
 		AxiosInstance.get("tasks/")
 			.then((response) => {
 				// Filtrowanie zadań które mają datę ukończenia nadal możliwą do wykonania
-				// lub nie mają daty ukończenia i nie są ukończone
 				// Celem jest wyświetlenie zadań które są aktualne
-				let tempTasks: any[] = [];
-				response.data.forEach((element: any) => {
-					if (
-						element.due_date >= new Date().toISOString().split("T")[0] ||
-						(element.due_date === null && element.completion_status === false)
-					) {
+				let tempTasks: Task[] = [];
+				response.data.forEach((element: Task) => {
+					if (element.due_date >= new Date().toISOString().split("T")[0]) {
 						tempTasks.push(element);
 					}
 				});
 				setTasks(tempTasks);
-				// Stworzenie listy dostępnych wydarzeń
-				setOptionsEvents([
-					...new Set(
-						tempTasks
-							.filter((task: any) => task.event != null)
-							.map((task: any) => task.event)
-					),
-				]);
+				// Stworzenie listy dostępnych wydarzeń i posortowanie ich alfabetycznie
+				let all_events = [
+					...new Set(tempTasks.map((task: Task) => task.event.event_name)),
+				].sort();
+				setOptionsEvents(all_events);
 				// Domyślne wybranie wszystkich wydarzeń
-				setSelectedOptionEvent([
-					...new Set(
-						tempTasks
-							.filter((task: any) => task.event != null)
-							.map((task: any) => task.event)
-					),
-				]);
+				setSelectedOptionEvent(all_events);
 				setRefresh(false);
 			})
 			.catch((error: any) => {
@@ -92,7 +93,7 @@ export default function Tasks() {
 	const GetUsers = () => {
 		AxiosInstance.get("account/")
 			.then((response) => {
-				let tempUsers: any = [{ id: 0, option: "Nieprzypisane" }];
+				let tempUsers: any[] = [];
 				// Tworzenie listy dostępnych użytkowników
 				// W przypadku braku imienia i nazwiska wyświetlany jest email
 				response.data.map((user: any) => {
@@ -107,6 +108,13 @@ export default function Tasks() {
 						option: tempOption,
 					});
 				});
+				tempUsers
+					.sort((a: any, b: any) => {
+						if (a.option < b.option) return -1;
+						if (a.option > b.option) return 1;
+						return 0;
+					})
+					.unshift({ id: 0, option: "Nieprzypisane" });
 				setOptionsUsers(tempUsers);
 				setLoading(false);
 			})

@@ -8,20 +8,14 @@ import AlertDialog from "../../../UI/dialogs/AlertDialog";
 import AxiosInstance from "../../AxiosInstance";
 import { useAlert } from "../../../contexts/AlertContext";
 import { useCustomTheme } from "../../../contexts/ThemeContext";
-
-interface User {
-	id: number;
-	first_name: string;
-	last_name: string;
-	email: string;
-}
+import { useAuth } from "../../../contexts/AuthContext";
 
 interface Props {
-	task_id: number | null;
-	task_description: string | null;
-	task_due_date: string | null;
-	task_assigned: User[];
-	task_completion_Status: boolean | null;
+	note_id: string | null;
+	note_title: string | null;
+	note_content: string | null;
+	note_created_by: string | null;
+	note_created_by_id: number | null;
 	is_creator: boolean;
 	isAdmin: boolean;
 	onClose: () => void;
@@ -43,13 +37,14 @@ const style = {
 	p: 4,
 };
 
-export default function TaskDescriptionModal(props: Props) {
+export default function NoteDescriptionModal(props: Props) {
 	const [openDialog, setOpenDialog] = useState<boolean>(false);
 	const { mode } = useCustomTheme();
 	const { setAlert } = useAlert();
+	const { user } = useAuth();
 
-	const DeleteTask = (id: number) => {
-		AxiosInstance.delete(`tasks/${id}/`)
+	const DeleteNote = (id: number) => {
+		AxiosInstance.delete(`notes/${id}/`)
 			.then((response) => {
 				setAlert(response.data.message, "success");
 			})
@@ -99,7 +94,9 @@ export default function TaskDescriptionModal(props: Props) {
 							<CloseIcon sx={{ color: "red" }} fontSize="medium" />
 						</Button>
 
-						{(props.is_creator || props.isAdmin) && (
+						{(props.is_creator ||
+							props.isAdmin ||
+							props.note_created_by_id === user?.id) && (
 							<Button
 								sx={{
 									position: "absolute",
@@ -127,62 +124,13 @@ export default function TaskDescriptionModal(props: Props) {
 								color: mode === "light" ? "#2c3e50" : "#ffffff",
 							}}
 						>
-							{props.task_assigned.length > 1
-								? "Przypisane osoby"
-								: "Przypisana osoba"}
+							Twórca notatki
 						</Typography>
 
-						<Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mb: 3 }}>
-							{props.task_assigned.length > 0 ? (
-								props.task_assigned.map((user) => (
-									<Chip
-										key={user.id}
-										label={`${user.first_name} ${user.last_name}`}
-									/>
-								))
-							) : (
-								<Typography
-									sx={{ color: mode === "light" ? "#34495e" : "#bdc3c7" }}
-								>
-									Brak
-								</Typography>
-							)}
-						</Box>
-
-						{/* <Typography
-							id="TaskDescription-modal-description"
-							component="p"
-							sx={{ mb: 3, color: "#34495e", lineHeight: 0.5 }}
-						>
-							{props.task_assigned ? props.task_assigned : "Brak"}
-						</Typography> */}
-
-						{props.task_due_date && (
-							<>
-								<Typography
-									id="TaskDescription-modal-title"
-									variant="h6"
-									component="h1"
-									sx={{
-										mb: 1,
-										fontWeight: "bold",
-										color: mode === "light" ? "#2c3e50" : "#ffffff",
-									}}
-								>
-									Termin ukończenia
-								</Typography>
-								<Typography
-									id="TaskDescription-modal-description"
-									component="p"
-									sx={{
-										mb: 3,
-										color: mode === "light" ? "#34495e" : "#bdc3c7",
-									}}
-								>
-									{props.task_due_date ? props.task_due_date : "Brak"}
-								</Typography>
-							</>
-						)}
+						<Chip
+							sx={{ mb: 3 }}
+							label={props.note_created_by ? props.note_created_by : "Brak"}
+						/>
 
 						<Typography
 							id="TaskDescription-modal-title"
@@ -194,31 +142,7 @@ export default function TaskDescriptionModal(props: Props) {
 								color: mode === "light" ? "#2c3e50" : "#ffffff",
 							}}
 						>
-							Status zadania
-						</Typography>
-						<Typography
-							id="TaskDescription-modal-description"
-							component="p"
-							sx={{
-								mb: 3,
-								color: mode === "light" ? "#34495e" : "#bdc3c7",
-								lineHeight: 0.5,
-							}}
-						>
-							{props.task_completion_Status ? "Ukończone" : "Nieukończone"}
-						</Typography>
-
-						<Typography
-							id="TaskDescription-modal-title"
-							variant="h6"
-							component="h1"
-							sx={{
-								mb: 1,
-								fontWeight: "bold",
-								color: mode === "light" ? "#2c3e50" : "#ffffff",
-							}}
-						>
-							Opis zadania
+							Zawartość notatki
 						</Typography>
 						<Typography
 							id="TaskDescription-modal-description"
@@ -234,18 +158,18 @@ export default function TaskDescriptionModal(props: Props) {
 								whiteSpace: "pre-wrap",
 							}}
 						>
-							{props.task_description ? props.task_description : "Brak"}
+							{props.note_content ? props.note_content : "Brak"}
 						</Typography>
 
 						{openDialog && (
 							<AlertDialog
 								open={openDialog}
 								onClose={() => setOpenDialog(false)}
-								label={"Czy na pewno chcesz usunąć zadanie?"}
+								label={"Czy na pewno chcesz usunąć notatkę?"}
 								content={"Nie będziesz mógł cofnąć tej akcji."}
 								onCloseOption2={() => {
-									if (props.task_id) {
-										DeleteTask(props.task_id);
+									if (props.note_id) {
+										DeleteNote(parseInt(props.note_id));
 										props.onClose();
 									}
 									setOpenDialog(false);

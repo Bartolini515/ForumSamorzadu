@@ -11,6 +11,7 @@ interface Props {
 	multiline?: boolean;
 	maxRows?: number;
 	helperText?: string;
+	type?: "text" | "number" | "password" | "email";
 }
 
 export default function MyTextField(props: Props) {
@@ -24,6 +25,7 @@ export default function MyTextField(props: Props) {
 					onChange={onChange}
 					value={value || ""}
 					label={props.label}
+					type={props.type || "text"}
 					variant={props.variant || "outlined"}
 					sx={props.style || { width: "100%" }}
 					multiline={props.multiline || false}

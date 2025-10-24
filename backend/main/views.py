@@ -268,7 +268,7 @@ class AccountViewset(viewsets.ModelViewSet):
     queryset = Profile.objects.all()
     
     def list(self, request):
-        queryset = Profile.objects.all()
+        queryset = Profile.objects.filter(is_active=True, is_superuser=False)
         serializer = ProfileSerializer(queryset, many=True)
         return Response(serializer.data)
     
@@ -318,6 +318,44 @@ class AccountViewset(viewsets.ModelViewSet):
             return message_response(serializer.data, "Zmieniono zdjęcie profilowe")
         else:
             return Response(serializer.errors, status=400)
+
+    @action(detail=False, methods=["post"], url_path="reset_password", permission_classes=[permissions.AllowAny])
+    def reset_password(self, request):
+        serializer = Password_resetSerializer(data=request.data)
+        if serializer.is_valid():
+            user = Profile.objects.get(email=serializer.validated_data['email'])
+            token, created = PasswordResetToken.objects.get_or_create(user=user)
+            if not created and token.is_expired():
+                token.delete()
+                token = PasswordResetToken.objects.create(user=user)
+
+            origin = request.headers.get('Origin')
+            reset_link = f"{origin}/reset_password?token={token.token}"
+
+            send_email_notification.delay(
+                subject="Resetowanie hasła",
+                message=f"Aby zresetować hasło, kliknij w poniższy link: {reset_link}\nLink jest ważny przez 1 godzinę.",
+                recipient_list=[user.email]
+            )
+
+            return Response({"message": "Link do resetowania hasła został wysłany na Twój adres email."})
+        else:
+            return Response(serializer.errors, status=400)
+
+    @action(detail=False, methods=["post"], url_path="reset_password_confirm", permission_classes=[permissions.AllowAny])
+    def reset_password_confirm(self, request):
+        serializer = PasswordResetConfirmSerializer(data=request.data)
+        if serializer.is_valid():
+            token_obj = serializer.validated_data['token']
+
+            user = token_obj.user
+            user.set_password(serializer.validated_data['password'])
+            user.save()
+            token_obj.delete()
+
+            return Response({"message": "Hasło zostało pomyślnie zmienione."})
+        else:
+            return Response(serializer.errors, status=400)
     
 class TasksViewset(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
@@ -340,12 +378,13 @@ class TasksViewset(viewsets.ModelViewSet):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            if serializer.data.get('user_id') is not None:
-                user = User.objects.get(pk=serializer.data.get('user_id'))
+            if serializer.data.get('users') is not None:
+                users = User.objects.filter(pk__in=serializer.data.get('users'))
                 event = Timetable_events.objects.get(pk=serializer.data.get('event'))
-                if user and event:
-                    send_email_notification.delay(
-                        subject="Zadanie zostało przypisane",
+                if users and event:
+                    for user in users:
+                        send_email_notification.delay(
+                            subject="Zadanie zostało przypisane",
                         message=f"Przypisano do Ciebie zadanie: {serializer.data['task_name']} w wydarzeniu {event.event_name}.",
                         recipient_list=[user.email]
                     )
@@ -387,22 +426,23 @@ class TasksViewset(viewsets.ModelViewSet):
     @action(detail=True, methods=["put"], url_path="update_assigned")
     def updateAssigned(self, request, pk=None):
         queryset = self.queryset.get(pk=pk)
-        serializer = self.serializer_class(queryset, data=request.data, partial=True)
+        data = request.data.copy()
+        serializer = self.serializer_class(queryset, data=data, partial=True)
 
         if serializer.is_valid():
             serializer.save()
-            if serializer.data.get('user_id') is not None:
-                user = User.objects.get(pk=serializer.data.get('user_id'))
-                if (event_id := serializer.data.get('event')) and user:
-                    try:
-                        event = Timetable_events.objects.get(pk=event_id)
-                        send_email_notification.delay(
-                            subject="Zadanie twojego wydarzenia zostało przypisane",
-                            message=f'Użytkownikowi {user.first_name} {user.last_name} zostało przypisane zadanie "{serializer.data["task_name"]}" do wydarzenia: {event.event_name}.',
-                            recipient_list=[event.created_by.email]
-                        )
-                    except Timetable_events.DoesNotExist:
-                        pass
+            # if serializer.data.get('user_id') is not None:
+            #     user = User.objects.get(pk=serializer.data.get('user_id'))
+            #     if (event_id := serializer.data.get('event')) and user:
+            #         try:
+            #             event = Timetable_events.objects.get(pk=event_id)
+            #             send_email_notification.delay(
+            #                 subject="Zadanie twojego wydarzenia zostało przypisane",
+            #                 message=f'Użytkownikowi {user.first_name} {user.last_name} zostało przypisane zadanie "{serializer.data["task_name"]}" do wydarzenia: {event.event_name}.',
+            #                 recipient_list=[event.created_by.email]
+            #             )
+            #         except Timetable_events.DoesNotExist:
+            #             pass
             cache.delete('tasks_list')
             return message_response(serializer.data, "Przypisanie zmienione")
         else:
@@ -413,7 +453,48 @@ class TasksViewset(viewsets.ModelViewSet):
         task.delete()
         cache.delete('tasks_list')
         return Response({"message": "Zadanie usunięte"})
+
+class NotesViewset(viewsets.ModelViewSet):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = NotesSerializer
+    queryset = Notes.objects.all()
+    
+    def list(self, request):
+        cache_key = 'notes_list'
+        cached_data = cache.get(cache_key)
+        if cached_data:
+            return Response(cached_data)
+
+        queryset = Notes.objects.all()
+        serializer = self.serializer_class(queryset, many=True)
+        cache.set(cache_key, serializer.data, timeout=3600)
+        return Response(serializer.data)
+    
+    def create(self, request):
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            cache.delete('notes_list')
+            return message_response(serializer.data, "Dodano notatkę")
+        else:
+            return Response(serializer.errors, status=400)
         
+    def update(self, request, pk=None):
+        queryset = self.queryset.get(pk=pk)
+        serializer = self.serializer_class(queryset, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            cache.delete('notes_list')
+            return message_response(serializer.data, "Notatka zaktualizowana")
+        else:
+            return Response(serializer.errors, status=400)
+    
+    def destroy(self, request, pk=None):
+        note = self.queryset.get(pk=pk)
+        note.delete()
+        cache.delete('notes_list')
+        return Response({"message": "Notatka usunięta"})
+
 class ScheduleViewset(viewsets.ViewSet):
     permission_classes = [permissions.IsAuthenticated]
     

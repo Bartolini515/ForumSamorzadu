@@ -2,6 +2,9 @@ import os
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.base_user import BaseUserManager
+from django.utils import timezone
+from datetime import timedelta
+import uuid
 
 class ProfileManager(BaseUserManager):
     def create_user(self, email, password, **extra_fields):
@@ -27,6 +30,7 @@ class Profile(AbstractUser):
     username = models.CharField(max_length=255, null=True, blank=True)
     first_name = models.CharField(max_length=255, null=True, blank=True)
     last_name = models.CharField(max_length=255, null=True, blank=True)
+    role = models.CharField(max_length=50, null=True, blank=True)
     profile_picture = models.ImageField(null=True, blank=True, upload_to=user_profile_picture)
     
     
@@ -52,6 +56,18 @@ class Profile(AbstractUser):
             if self.username is not None
             else self.email
         )
+
+
+class PasswordResetToken(models.Model):
+    user = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='password_reset_tokens')
+    token = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def is_expired(self):
+        return self.created_at < timezone.now() - timedelta(hours=1)
+
+    def __str__(self):
+        return f"Password reset token for {self.user}"
 
 
 class Event_typesManager(models.Manager):
@@ -84,27 +100,36 @@ class Timetable_events(models.Model):
         return self.event_name
     
     
+class Notes(models.Model):
+    title = models.CharField(max_length=255)
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    event = models.ForeignKey(Timetable_events, on_delete=models.CASCADE, related_name='notes')
+    created_by = models.ForeignKey(Profile, on_delete=models.SET_NULL, related_name='created_notes', null=True, blank=True)
+    
+    def __str__(self):
+        return self.title
+
+
 class TasksManager(models.Manager):
-    def create_task(self, task_name, description, user_id, due_date, event):
-        user = None
-        if user_id:
-            try:
-                user = Profile.objects.get(pk=user_id)
-            except Profile.DoesNotExist:
-                pass
-        task = self.model(task_name=task_name, description=description, user=user, completion_status=False, due_date=due_date, event=event)
+    def create_task(self, task_name, description, users, due_date, event, max_users=1):
+        task = self.model(task_name=task_name, description=description, completion_status=False, due_date=due_date, event=event, max_users=max_users)
         task.save(using=self._db)
+        if users:
+            task.users.set(users)
         return task
 
 class Tasks(models.Model):
     task_name = models.CharField(max_length=255)
     description = models.TextField(null=True, blank=True)
-    user = models.ForeignKey(Profile, on_delete=models.SET_NULL, related_name='tasks', null=True, blank=True)
+    users = models.ManyToManyField(Profile, related_name='tasks', blank=True)
     completion_status = models.BooleanField(default=False)
     due_date = models.DateField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     event = models.ForeignKey(Timetable_events, on_delete=models.CASCADE, related_name='tasks')
+    max_users = models.IntegerField(default=1)
     
     objects = TasksManager()
     def __str__(self):

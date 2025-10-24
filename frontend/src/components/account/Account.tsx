@@ -67,8 +67,15 @@ export default function Account() {
 				</Typography>
 			</Box>
 			<Box display="flex" alignItems="center" mb={1}>
-				<Typography variant="h6">{user?.email}</Typography>
+				<Typography variant="body1">{user?.email}</Typography>
 			</Box>
+			{user?.role && (
+				<Box display="flex" alignItems="center" mb={1}>
+					<Typography variant="subtitle1" color="text.secondary">
+						Rola: {user.role}
+					</Typography>
+				</Box>
+			)}
 
 			<MyButton
 				label="Zmień hasło"

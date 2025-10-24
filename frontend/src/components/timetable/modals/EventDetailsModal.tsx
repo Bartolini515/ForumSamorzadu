@@ -46,7 +46,7 @@ interface Note {
 	created_at: string;
 	updated_at: string;
 	created_by: string;
-	created_by_id: string;
+	created_by_id: number;
 }
 
 interface User {
@@ -331,6 +331,7 @@ export default function EventDetails(props: Props) {
 											maxWidth: "100%",
 											overflowY: "auto",
 											overflowWrap: "break-word",
+											whiteSpace: "pre-wrap",
 										}}
 									>
 										{event.description}

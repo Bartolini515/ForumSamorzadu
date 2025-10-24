@@ -12,7 +12,7 @@ interface Props {
 		created_at: string;
 		updated_at: string;
 		created_by: string;
-		created_by_id: string;
+		created_by_id: number;
 	}[];
 	is_creator: boolean;
 	isAdmin: boolean;
@@ -24,18 +24,21 @@ export default function NotesList(props: Props) {
 	const [noteTitle, setNoteTitle] = useState<string | null>(null);
 	const [noteContent, setNoteContent] = useState<string | null>(null);
 	const [noteCreatedBy, setNoteCreatedBy] = useState<string | null>(null);
+	const [noteCreatedById, setNoteCreatedById] = useState<number | null>(null);
 	const [modalOpen, setModalOpen] = useState(false);
 
 	const handleNoteClick = (
 		id: string,
 		title: string,
 		content: string,
-		created_by: string
+		created_by: string,
+		created_by_id: number
 	) => {
 		setNoteId(id);
 		setNoteTitle(title);
 		setNoteContent(content);
 		setNoteCreatedBy(created_by);
+		setNoteCreatedById(created_by_id);
 		setModalOpen(true);
 	};
 
@@ -71,7 +74,8 @@ export default function NotesList(props: Props) {
 								note.id,
 								note.title,
 								note.content,
-								note.created_by
+								note.created_by,
+								note.created_by_id
 							)
 						}
 					/>
@@ -83,6 +87,7 @@ export default function NotesList(props: Props) {
 					note_title={noteTitle}
 					note_content={noteContent}
 					note_created_by={noteCreatedBy}
+					note_created_by_id={noteCreatedById}
 					is_creator={props.is_creator}
 					isAdmin={props.isAdmin}
 					onClose={closeModal}

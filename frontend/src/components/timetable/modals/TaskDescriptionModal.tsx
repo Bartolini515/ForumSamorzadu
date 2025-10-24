@@ -231,6 +231,7 @@ export default function TaskDescriptionModal(props: Props) {
 								maxWidth: "100%",
 								overflowY: "auto",
 								overflowWrap: "break-word",
+								whiteSpace: "pre-wrap",
 							}}
 						>
 							{props.task_description ? props.task_description : "Brak"}

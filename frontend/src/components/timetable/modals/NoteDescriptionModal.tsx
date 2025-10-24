@@ -8,12 +8,14 @@ import AlertDialog from "../../../UI/dialogs/AlertDialog";
 import AxiosInstance from "../../AxiosInstance";
 import { useAlert } from "../../../contexts/AlertContext";
 import { useCustomTheme } from "../../../contexts/ThemeContext";
+import { useAuth } from "../../../contexts/AuthContext";
 
 interface Props {
 	note_id: string | null;
 	note_title: string | null;
 	note_content: string | null;
 	note_created_by: string | null;
+	note_created_by_id: number | null;
 	is_creator: boolean;
 	isAdmin: boolean;
 	onClose: () => void;
@@ -39,6 +41,7 @@ export default function NoteDescriptionModal(props: Props) {
 	const [openDialog, setOpenDialog] = useState<boolean>(false);
 	const { mode } = useCustomTheme();
 	const { setAlert } = useAlert();
+	const { user } = useAuth();
 
 	const DeleteNote = (id: number) => {
 		AxiosInstance.delete(`notes/${id}/`)
@@ -91,7 +94,9 @@ export default function NoteDescriptionModal(props: Props) {
 							<CloseIcon sx={{ color: "red" }} fontSize="medium" />
 						</Button>
 
-						{(props.is_creator || props.isAdmin) && (
+						{(props.is_creator ||
+							props.isAdmin ||
+							props.note_created_by_id === user?.id) && (
 							<Button
 								sx={{
 									position: "absolute",
@@ -137,30 +142,6 @@ export default function NoteDescriptionModal(props: Props) {
 								color: mode === "light" ? "#2c3e50" : "#ffffff",
 							}}
 						>
-							Tytuł notatki
-						</Typography>
-						<Typography
-							id="TaskDescription-modal-description"
-							component="p"
-							sx={{
-								mb: 3,
-								color: mode === "light" ? "#34495e" : "#bdc3c7",
-								lineHeight: 0.5,
-							}}
-						>
-							{props.note_title ? props.note_title : "Brak"}
-						</Typography>
-
-						<Typography
-							id="TaskDescription-modal-title"
-							variant="h6"
-							component="h1"
-							sx={{
-								mb: 1,
-								fontWeight: "bold",
-								color: mode === "light" ? "#2c3e50" : "#ffffff",
-							}}
-						>
 							Zawartość notatki
 						</Typography>
 						<Typography
@@ -174,6 +155,7 @@ export default function NoteDescriptionModal(props: Props) {
 								maxWidth: "100%",
 								overflowY: "auto",
 								overflowWrap: "break-word",
+								whiteSpace: "pre-wrap",
 							}}
 						>
 							{props.note_content ? props.note_content : "Brak"}
